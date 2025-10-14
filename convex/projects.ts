@@ -1,16 +1,40 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { getAuthUserId } from "@convex-dev/auth/server";
+
+const projectValidator = v.object({
+  _id: v.id("projects"),
+  _creationTime: v.number(),
+  businessOwnerClerkId: v.string(),
+  clientClerkId: v.string(),
+  projectType: v.string(),
+  projectName: v.string(),
+  projectTasks: v.array(v.string()),
+  estimatedLength: v.number(),
+  estimatedStartDateTime: v.number(),
+  estimatedEndDateTime: v.number(),
+  actualStartDateTime: v.optional(v.number()),
+  actualEndDateTime: v.optional(v.number()),
+  status: v.union(
+    v.literal("planned"),
+    v.literal("in_progress"),
+    v.literal("completed"),
+    v.literal("cancelled")
+  ),
+  notes: v.optional(v.string()),
+});
 
 export const getMyProjects = query({
   args: {},
+  returns: v.array(projectValidator),
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return [];
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const clerkUserId = identity.subject;
 
     const profile = await ctx.db
       .query("profiles")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", clerkUserId))
       .unique();
 
     if (!profile) return [];
@@ -19,31 +43,22 @@ export const getMyProjects = query({
     if (profile.userType === "business") {
       projects = await ctx.db
         .query("projects")
-        .withIndex("by_business", (q) => q.eq("businessOwnerId", userId))
+        .withIndex("by_business", (q) => q.eq("businessOwnerClerkId", clerkUserId))
         .collect();
     } else {
       projects = await ctx.db
         .query("projects")
-        .withIndex("by_client", (q) => q.eq("clientId", userId))
+        .withIndex("by_client", (q) => q.eq("clientClerkId", clerkUserId))
         .collect();
     }
 
-    // Get client/business info for each project
-    const projectsWithDetails = await Promise.all(
-      projects.map(async (project) => {
-        const client = await ctx.db.get(project.clientId);
-        const business = await ctx.db.get(project.businessOwnerId);
-        return { ...project, client, business };
-      })
-    );
-
-    return projectsWithDetails;
+    return projects;
   },
 });
 
 export const createProject = mutation({
   args: {
-    clientId: v.id("users"),
+    clientClerkId: v.string(),
     projectType: v.string(),
     projectName: v.string(),
     projectTasks: v.array(v.string()),
@@ -52,13 +67,16 @@ export const createProject = mutation({
     estimatedEndDateTime: v.number(),
     notes: v.optional(v.string()),
   },
+  returns: v.id("projects"),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const clerkUserId = identity.subject;
 
     const profile = await ctx.db
       .query("profiles")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", clerkUserId))
       .unique();
 
     if (!profile || profile.userType !== "business") {
@@ -66,7 +84,7 @@ export const createProject = mutation({
     }
 
     return await ctx.db.insert("projects", {
-      businessOwnerId: userId,
+      businessOwnerClerkId: clerkUserId,
       status: "planned",
       ...args,
     });
@@ -92,15 +110,18 @@ export const updateProject = mutation({
     )),
     notes: v.optional(v.string()),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const clerkUserId = identity.subject;
 
     const { projectId, ...updates } = args;
     const project = await ctx.db.get(projectId);
     
     if (!project) throw new Error("Project not found");
-    if (project.businessOwnerId !== userId) {
+    if (project.businessOwnerClerkId !== clerkUserId) {
       throw new Error("Not authorized to update this project");
     }
 
@@ -110,13 +131,16 @@ export const updateProject = mutation({
 
 export const getClients = query({
   args: {},
+  returns: v.array(v.string()),
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return [];
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const clerkUserId = identity.subject;
 
     const profile = await ctx.db
       .query("profiles")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", clerkUserId))
       .unique();
 
     if (!profile || profile.userType !== "business") return [];
@@ -124,22 +148,11 @@ export const getClients = query({
     // Get all clients who have projects with this business
     const projects = await ctx.db
       .query("projects")
-      .withIndex("by_business", (q) => q.eq("businessOwnerId", userId))
+      .withIndex("by_business", (q) => q.eq("businessOwnerClerkId", clerkUserId))
       .collect();
 
-    const clientIds = [...new Set(projects.map(p => p.clientId))];
+    const clientIds = [...new Set(projects.map(p => p.clientClerkId))];
     
-    const clients = await Promise.all(
-      clientIds.map(async (clientId) => {
-        const user = await ctx.db.get(clientId);
-        const profile = await ctx.db
-          .query("profiles")
-          .withIndex("by_user", (q) => q.eq("userId", clientId))
-          .unique();
-        return { user, profile };
-      })
-    );
-
-    return clients.filter(c => c.user && c.profile);
+    return clientIds;
   },
 });

@@ -18,7 +18,7 @@ export function TestimonialsDashboard({ profile }: TestimonialsDashboardProps) {
   const [showCreateTestimonial, setShowCreateTestimonial] = useState(false);
 
   const testimonials = useQuery(api.testimonials.getTestimonials, 
-    profile.userType === "business" ? { businessOwnerId: profile.userId } : {}
+    profile.userType === "business" ? { businessOwnerClerkId: profile.clerkUserId } : {}
   );
   const businessOwners = useQuery(api.profiles.getBusinessOwners);
   const myProjects = useQuery(api.projects.getMyProjects);
@@ -118,13 +118,10 @@ function TestimonialCard({ testimonial, userType }: any) {
           <div className="text-sm text-gray-500">
             <p>
               {userType === "business" 
-                ? `By: ${testimonial.client?.name || testimonial.client?.email}`
-                : `For: ${testimonial.business?.name || testimonial.business?.email}`
+                ? `Client ID: ${testimonial.clientClerkId}`
+                : `Business ID: ${testimonial.businessOwnerClerkId}`
               }
             </p>
-            {testimonial.project && (
-              <p>Project: {testimonial.project.projectName}</p>
-            )}
           </div>
         </div>
         {userType === "business" && (
@@ -144,7 +141,7 @@ function TestimonialCard({ testimonial, userType }: any) {
 
 function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
   const [testimonialData, setTestimonialData] = useState({
-    businessOwnerId: "",
+    businessOwnerClerkId: "",
     projectId: "",
     title: "",
     description: "",
@@ -157,7 +154,7 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
     e.preventDefault();
     try {
       const data: any = {
-        businessOwnerId: testimonialData.businessOwnerId as any,
+        businessOwnerClerkId: testimonialData.businessOwnerClerkId,
         title: testimonialData.title,
         description: testimonialData.description,
         rating: testimonialData.rating,
@@ -203,16 +200,16 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
       <div>
         <Label htmlFor="business">Business</Label>
         <Select 
-          value={testimonialData.businessOwnerId} 
-          onValueChange={(value) => setTestimonialData(prev => ({ ...prev, businessOwnerId: value }))}
+          value={testimonialData.businessOwnerClerkId} 
+          onValueChange={(value) => setTestimonialData(prev => ({ ...prev, businessOwnerClerkId: value }))}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select a business" />
           </SelectTrigger>
           <SelectContent>
             {businessOwners.map((business: any) => (
-              <SelectItem key={business.userId} value={business.userId}>
-                {business.businessName || business.user?.name || business.user?.email}
+              <SelectItem key={business.clerkUserId} value={business.clerkUserId}>
+                {business.businessName || "Business Owner"}
               </SelectItem>
             ))}
           </SelectContent>
@@ -231,7 +228,7 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
           <SelectContent>
             <SelectItem value="">No specific project</SelectItem>
             {projects
-              .filter((project: any) => project.businessOwnerId === testimonialData.businessOwnerId)
+              .filter((project: any) => project.businessOwnerClerkId === testimonialData.businessOwnerClerkId)
               .map((project: any) => (
                 <SelectItem key={project._id} value={project._id}>
                   {project.projectName}

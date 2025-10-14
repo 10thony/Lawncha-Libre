@@ -1,20 +1,32 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { getAuthUserId } from "@convex-dev/auth/server";
+
+const testimonialValidator = v.object({
+  _id: v.id("testimonials"),
+  _creationTime: v.number(),
+  clientClerkId: v.string(),
+  businessOwnerClerkId: v.string(),
+  projectId: v.optional(v.id("projects")),
+  title: v.string(),
+  description: v.string(),
+  rating: v.number(),
+  isHighlighted: v.boolean(),
+});
 
 export const getTestimonials = query({
   args: {
-    businessOwnerId: v.optional(v.id("users")),
+    businessOwnerClerkId: v.optional(v.string()),
     highlightedOnly: v.optional(v.boolean()),
   },
+  returns: v.array(testimonialValidator),
   handler: async (ctx, args) => {
     let testimonials;
 
-    if (args.businessOwnerId) {
+    if (args.businessOwnerClerkId) {
       testimonials = await ctx.db
         .query("testimonials")
         .withIndex("by_business", (q) => 
-          q.eq("businessOwnerId", args.businessOwnerId!)
+          q.eq("businessOwnerClerkId", args.businessOwnerClerkId!)
         )
         .collect();
     } else {
@@ -25,37 +37,28 @@ export const getTestimonials = query({
       testimonials = testimonials.filter(t => t.isHighlighted);
     }
 
-    // Get client and business info
-    const testimonialsWithDetails = await Promise.all(
-      testimonials.map(async (testimonial) => {
-        const client = await ctx.db.get(testimonial.clientId);
-        const business = await ctx.db.get(testimonial.businessOwnerId);
-        const project = testimonial.projectId ? 
-          await ctx.db.get(testimonial.projectId) : null;
-        
-        return { ...testimonial, client, business, project };
-      })
-    );
-
-    return testimonialsWithDetails;
+    return testimonials;
   },
 });
 
 export const createTestimonial = mutation({
   args: {
-    businessOwnerId: v.id("users"),
+    businessOwnerClerkId: v.string(),
     projectId: v.optional(v.id("projects")),
     title: v.string(),
     description: v.string(),
     rating: v.number(),
   },
+  returns: v.id("testimonials"),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const clerkUserId = identity.subject;
 
     const profile = await ctx.db
       .query("profiles")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", clerkUserId))
       .unique();
 
     if (!profile || profile.userType !== "client") {
@@ -63,7 +66,7 @@ export const createTestimonial = mutation({
     }
 
     return await ctx.db.insert("testimonials", {
-      clientId: userId,
+      clientClerkId: clerkUserId,
       isHighlighted: false,
       ...args,
     });
@@ -74,14 +77,17 @@ export const toggleHighlight = mutation({
   args: {
     testimonialId: v.id("testimonials"),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const clerkUserId = identity.subject;
 
     const testimonial = await ctx.db.get(args.testimonialId);
     if (!testimonial) throw new Error("Testimonial not found");
 
-    if (testimonial.businessOwnerId !== userId) {
+    if (testimonial.businessOwnerClerkId !== clerkUserId) {
       throw new Error("Only the business owner can highlight testimonials");
     }
 

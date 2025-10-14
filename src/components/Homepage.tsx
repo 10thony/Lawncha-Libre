@@ -380,18 +380,18 @@ export function Homepage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
+      <footer className="bg-white text-gray-900 py-12 px-4 border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold text-green-400 mb-4">Lawncha Libre</h3>
-              <p className="text-gray-400 text-sm">
+              <h3 className="text-xl font-bold text-green-600 mb-4">Lawncha Libre</h3>
+              <p className="text-gray-600 text-sm">
                 Professional landscaping services and business management platform.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Services</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
+              <h4 className="font-semibold mb-4 text-gray-900">Services</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
                 <li>Lawn Care</li>
                 <li>Garden Design</li>
                 <li>Tree Services</li>
@@ -399,8 +399,8 @@ export function Homepage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
+              <h4 className="font-semibold mb-4 text-gray-900">Platform</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
                 <li>Appointment Booking</li>
                 <li>Project Management</li>
                 <li>Customer Reviews</li>
@@ -408,8 +408,8 @@ export function Homepage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
-              <div className="space-y-2 text-sm text-gray-400">
+              <h4 className="font-semibold mb-4 text-gray-900">Contact</h4>
+              <div className="space-y-2 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
                   <span>(555) 123-4567</span>
@@ -425,8 +425,8 @@ export function Homepage() {
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; 2024 Lawncha Libre. All rights reserved. | Demo data shown for illustration purposes.</p>
+          <div className="border-t border-gray-200 mt-8 pt-8 text-center text-sm text-gray-600">
+            <p>&copy; 2024 Lawncha Libre. All rights reserved. | <span className="text-green-600">Demo data shown for illustration purposes.</span></p>
           </div>
         </div>
       </footer>

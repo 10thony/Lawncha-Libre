@@ -25,7 +25,7 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
 
   const myAppointments = useQuery(api.appointments.getMyAppointments);
   const availableAppointments = useQuery(api.appointments.getAvailableAppointments, 
-    selectedBusinessId ? { businessOwnerId: selectedBusinessId as any } : {}
+    selectedBusinessId ? { businessOwnerClerkId: selectedBusinessId } : {}
   );
   const businessOwners = useQuery(api.profiles.getBusinessOwners);
 
@@ -214,8 +214,8 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                   </SelectTrigger>
                   <SelectContent>
                     {businessOwners?.map((business) => (
-                      <SelectItem key={business._id} value={business.userId}>
-                        {business.businessName || business.user?.name || business.user?.email}
+                      <SelectItem key={business._id} value={business.clerkUserId}>
+                        {business.businessName || "Business Owner"}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -351,7 +351,7 @@ function CreateProjectDialog({ appointment, isOpen, onClose }: any) {
     e.preventDefault();
     try {
       await createProject({
-        clientId: appointment.clientId,
+        clientClerkId: appointment.clientClerkId,
         projectType: projectData.projectType,
         projectName: projectData.projectName,
         projectTasks: projectData.projectTasks,

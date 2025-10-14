@@ -120,8 +120,8 @@ function ProjectCard({ project, userType, onEdit }: any) {
           <User className="h-4 w-4" />
           <span>
             {userType === "business" 
-              ? `Client: ${project.client?.name || project.client?.email}`
-              : `Business: ${project.business?.name || project.business?.email}`
+              ? `Client ID: ${project.clientClerkId}`
+              : `Business ID: ${project.businessOwnerClerkId}`
             }
           </span>
         </div>
@@ -167,7 +167,7 @@ function ProjectCard({ project, userType, onEdit }: any) {
 
 function CreateProjectForm({ clients, onSuccess }: any) {
   const [projectData, setProjectData] = useState({
-    clientId: "",
+    clientClerkId: "",
     projectType: "",
     projectName: "",
     projectTasks: [] as string[],
@@ -201,7 +201,7 @@ function CreateProjectForm({ clients, onSuccess }: any) {
     e.preventDefault();
     try {
       await createProject({
-        clientId: projectData.clientId as any,
+        clientClerkId: projectData.clientClerkId,
         projectType: projectData.projectType,
         projectName: projectData.projectName,
         projectTasks: projectData.projectTasks,
@@ -221,14 +221,14 @@ function CreateProjectForm({ clients, onSuccess }: any) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="client">Client</Label>
-        <Select value={projectData.clientId} onValueChange={(value) => setProjectData(prev => ({ ...prev, clientId: value }))}>
+        <Select value={projectData.clientClerkId} onValueChange={(value) => setProjectData(prev => ({ ...prev, clientClerkId: value }))}>
           <SelectTrigger>
             <SelectValue placeholder="Select a client" />
           </SelectTrigger>
           <SelectContent>
-            {clients.map((client: any) => (
-              <SelectItem key={client.user._id} value={client.user._id}>
-                {client.user.name || client.user.email}
+            {clients.map((clientClerkId: string) => (
+              <SelectItem key={clientClerkId} value={clientClerkId}>
+                Client: {clientClerkId}
               </SelectItem>
             ))}
           </SelectContent>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useUser } from "@clerk/clerk-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -22,6 +23,7 @@ interface DashboardProps {
 }
 
 export function Dashboard({ profile }: DashboardProps) {
+  const { user } = useUser();
   const [activeTab, setActiveTab] = useState("overview");
 
   const tabs = [
@@ -39,7 +41,7 @@ export function Dashboard({ profile }: DashboardProps) {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Welcome back, {profile.user?.name || profile.user?.email}
+                Welcome back, {user?.firstName || user?.emailAddresses[0]?.emailAddress}
               </h1>
               <div className="flex items-center gap-2 mt-2">
                 <Badge variant={profile.userType === "business" ? "default" : "secondary"}>
@@ -97,13 +99,13 @@ export function Dashboard({ profile }: DashboardProps) {
                     <div className="space-y-4">
                       <div>
                         <label className="text-sm font-medium text-gray-500">Name</label>
-                        <p className="text-gray-900">{profile.user?.name || "Not provided"}</p>
+                        <p className="text-gray-900">{user?.fullName || "Not provided"}</p>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-500">Email</label>
                         <div className="flex items-center gap-2">
                           <Mail className="h-4 w-4 text-gray-400" />
-                          <p className="text-gray-900">{profile.user?.email}</p>
+                          <p className="text-gray-900">{user?.emailAddresses[0]?.emailAddress}</p>
                         </div>
                       </div>
                       {profile.phone && (
