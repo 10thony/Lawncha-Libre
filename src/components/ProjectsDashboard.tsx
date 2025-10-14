@@ -8,7 +8,7 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { Building2, Calendar, Clock, User, Plus, Edit } from "lucide-react";
+import { Building2, Calendar, Clock, User, Plus, Edit, CheckCircle, Play, Circle, Check, X } from "lucide-react";
 
 interface ProjectsDashboardProps {
   profile: any;
@@ -20,6 +20,10 @@ export function ProjectsDashboard({ profile }: ProjectsDashboardProps) {
 
   const myProjects = useQuery(api.projects.getMyProjects);
   const clients = useQuery(api.projects.getClients);
+  const clientsWithApprovedAppointments = useQuery(api.projects.getClientsWithApprovedAppointments);
+  const updateTaskStatus = useMutation(api.projects.updateTaskStatus);
+  const approveProject = useMutation(api.projects.approveProject);
+  const rejectProject = useMutation(api.projects.rejectProject);
 
   return (
     <div className="space-y-6">
@@ -38,7 +42,7 @@ export function ProjectsDashboard({ profile }: ProjectsDashboardProps) {
                 <DialogTitle>Create New Project</DialogTitle>
               </DialogHeader>
               <CreateProjectForm 
-                clients={clients || []}
+                clients={clientsWithApprovedAppointments || []}
                 onSuccess={() => setShowCreateProject(false)}
               />
             </DialogContent>
@@ -81,6 +85,70 @@ export function ProjectsDashboard({ profile }: ProjectsDashboardProps) {
   );
 }
 
+function TaskItem({ task, index, projectId, userType }: any) {
+  const updateTaskStatus = useMutation(api.projects.updateTaskStatus);
+
+  // Handle backward compatibility - task might be a string or an object
+  const taskName = typeof task === 'string' ? task : task.name;
+  const taskStatus = typeof task === 'string' ? 'queued' : (task.status || 'queued');
+
+  const getTaskStatusIcon = (status: string) => {
+    switch (status) {
+      case "queued": return <Circle className="h-4 w-4 text-gray-400" />;
+      case "in_progress": return <Play className="h-4 w-4 text-blue-500" />;
+      case "done": return <CheckCircle className="h-4 w-4 text-green-500" />;
+      default: return <Circle className="h-4 w-4 text-gray-400" />;
+    }
+  };
+
+  const getTaskStatusColor = (status: string) => {
+    switch (status) {
+      case "queued": return "bg-gray-100 text-gray-700 border-gray-200";
+      case "in_progress": return "bg-blue-100 text-blue-700 border-blue-200";
+      case "done": return "bg-green-100 text-green-700 border-green-200";
+      default: return "bg-gray-100 text-gray-700 border-gray-200";
+    }
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    try {
+      await updateTaskStatus({
+        projectId: projectId,
+        taskIndex: index,
+        status: newStatus as any
+      });
+      toast.success("Task status updated!");
+    } catch (error) {
+      toast.error("Failed to update task status");
+    }
+  };
+
+  return (
+    <div className={`flex items-center justify-between p-3 border rounded-lg ${getTaskStatusColor(taskStatus)}`}>
+      <div className="flex items-center gap-3">
+        {getTaskStatusIcon(taskStatus)}
+        <span className="font-medium">{taskName}</span>
+        <span className="text-xs px-2 py-1 rounded-full bg-white/50">
+          {taskStatus.replace('_', ' ')}
+        </span>
+      </div>
+      
+      {userType === "business" && (
+        <Select value={taskStatus} onValueChange={handleStatusChange}>
+          <SelectTrigger className="w-32 h-8">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="queued">Queued</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="done">Done</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
+    </div>
+  );
+}
+
 function ProjectCard({ project, userType, onEdit }: any) {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -88,6 +156,15 @@ function ProjectCard({ project, userType, onEdit }: any) {
       case "in_progress": return "bg-yellow-100 text-yellow-800";
       case "completed": return "bg-green-100 text-green-800";
       case "cancelled": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getApprovalStatusColor = (approvalStatus: string) => {
+    switch (approvalStatus) {
+      case "pending": return "bg-yellow-100 text-yellow-800";
+      case "approved": return "bg-green-100 text-green-800";
+      case "rejected": return "bg-red-100 text-red-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -107,6 +184,11 @@ function ProjectCard({ project, userType, onEdit }: any) {
           <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor(project.status)}`}>
             {project.status.replace('_', ' ')}
           </span>
+          {project.approvalStatus && (
+            <span className={`px-3 py-1 rounded-full text-sm ${getApprovalStatusColor(project.approvalStatus)}`}>
+              {project.approvalStatus}
+            </span>
+          )}
           {userType === "business" && (
             <Button size="sm" variant="outline" onClick={() => onEdit(project)}>
               <Edit className="h-4 w-4" />
@@ -142,14 +224,15 @@ function ProjectCard({ project, userType, onEdit }: any) {
       {project.projectTasks.length > 0 && (
         <div className="mb-4">
           <h4 className="font-medium mb-2">Tasks:</h4>
-          <div className="flex flex-wrap gap-2">
-            {project.projectTasks.map((task: string, index: number) => (
-              <span
+          <div className="space-y-2">
+            {project.projectTasks.map((task: any, index: number) => (
+              <TaskItem 
                 key={index}
-                className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm"
-              >
-                {task}
-              </span>
+                task={task}
+                index={index}
+                projectId={project._id}
+                userType={userType}
+              />
             ))}
           </div>
         </div>
@@ -160,6 +243,17 @@ function ProjectCard({ project, userType, onEdit }: any) {
           <h4 className="font-medium mb-2">Notes:</h4>
           <p className="text-gray-600 text-sm">{project.notes}</p>
         </div>
+      )}
+
+      {project.approvalStatus === "rejected" && project.rejectionReason && (
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <h4 className="font-medium text-red-800 mb-1">Rejection Reason:</h4>
+          <p className="text-red-700 text-sm">{project.rejectionReason}</p>
+        </div>
+      )}
+
+      {userType === "client" && project.approvalStatus === "pending" && (
+        <ProjectApprovalButtons project={project} />
       )}
     </div>
   );
@@ -226,9 +320,9 @@ function CreateProjectForm({ clients, onSuccess }: any) {
             <SelectValue placeholder="Select a client" />
           </SelectTrigger>
           <SelectContent>
-            {clients.map((clientClerkId: string) => (
-              <SelectItem key={clientClerkId} value={clientClerkId}>
-                Client: {clientClerkId}
+            {clients.map((client: any) => (
+              <SelectItem key={client.clerkUserId} value={client.clerkUserId}>
+                {client.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -348,7 +442,7 @@ function EditProjectForm({ project, onSuccess }: any) {
   const [projectData, setProjectData] = useState({
     projectType: project.projectType,
     projectName: project.projectName,
-    projectTasks: project.projectTasks,
+    projectTasks: project.projectTasks, // This is now an array of objects with name and status
     estimatedLength: project.estimatedLength,
     estimatedStartDateTime: new Date(project.estimatedStartDateTime).toISOString().split('T')[0],
     estimatedEndDateTime: new Date(project.estimatedEndDateTime).toISOString().split('T')[0],
@@ -362,19 +456,19 @@ function EditProjectForm({ project, onSuccess }: any) {
   const updateProject = useMutation(api.projects.updateProject);
 
   const addTask = () => {
-    if (taskInput.trim() && !projectData.projectTasks.includes(taskInput.trim())) {
+    if (taskInput.trim() && !projectData.projectTasks.some((t: any) => t.name === taskInput.trim())) {
       setProjectData(prev => ({
         ...prev,
-        projectTasks: [...prev.projectTasks, taskInput.trim()]
+        projectTasks: [...prev.projectTasks, { name: taskInput.trim(), status: "queued" }]
       }));
       setTaskInput("");
     }
   };
 
-  const removeTask = (task: string) => {
+  const removeTask = (taskName: string) => {
     setProjectData(prev => ({
       ...prev,
-      projectTasks: prev.projectTasks.filter((t: string) => t !== task)
+      projectTasks: prev.projectTasks.filter((t: any) => t.name !== taskName)
     }));
   };
 
@@ -458,15 +552,15 @@ function EditProjectForm({ project, onSuccess }: any) {
           <Button type="button" onClick={addTask}>Add</Button>
         </div>
         <div className="flex flex-wrap gap-2">
-          {projectData.projectTasks.map((task: string) => (
+          {projectData.projectTasks.map((task: any) => (
             <span
-              key={task}
+              key={task.name}
               className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
             >
-              {task}
+              {task.name}
               <button
                 type="button"
-                onClick={() => removeTask(task)}
+                onClick={() => removeTask(task.name)}
                 className="text-green-600 hover:text-green-800"
               >
                 ×
@@ -548,5 +642,94 @@ function EditProjectForm({ project, onSuccess }: any) {
         </Button>
       </div>
     </form>
+  );
+}
+
+function ProjectApprovalButtons({ project }: any) {
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const approveProject = useMutation(api.projects.approveProject);
+  const rejectProject = useMutation(api.projects.rejectProject);
+
+  const handleApprove = async () => {
+    try {
+      await approveProject({ projectId: project._id });
+      toast.success("Project approved!");
+    } catch (error) {
+      toast.error("Failed to approve project");
+    }
+  };
+
+  const handleReject = async () => {
+    if (!rejectionReason.trim()) {
+      toast.error("Please provide a reason for rejection");
+      return;
+    }
+    try {
+      await rejectProject({ 
+        projectId: project._id, 
+        rejectionReason: rejectionReason.trim() 
+      });
+      toast.success("Project rejected");
+      setShowRejectDialog(false);
+      setRejectionReason("");
+    } catch (error) {
+      toast.error("Failed to reject project");
+    }
+  };
+
+  return (
+    <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+      <h4 className="font-medium text-yellow-800 mb-3">Project Approval Required</h4>
+      <p className="text-yellow-700 text-sm mb-3">
+        Please review and approve or reject this project proposal.
+      </p>
+      <div className="flex gap-2">
+        <Button 
+          size="sm" 
+          onClick={handleApprove}
+          className="bg-green-600 hover:bg-green-700"
+        >
+          <Check className="h-4 w-4 mr-1" />
+          Approve
+        </Button>
+        <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+          <DialogTrigger asChild>
+            <Button size="sm" variant="outline" className="border-red-300 text-red-700 hover:bg-red-50">
+              <X className="h-4 w-4 mr-1" />
+              Reject
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reject Project</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="rejectionReason">Reason for rejection (required)</Label>
+                <Textarea
+                  id="rejectionReason"
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  placeholder="Please explain why you're rejecting this project..."
+                  rows={4}
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleReject}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Reject Project
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
   );
 }

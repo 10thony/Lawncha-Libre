@@ -8,6 +8,7 @@ export const getCurrentProfile = query({
       _id: v.id("profiles"),
       _creationTime: v.number(),
       clerkUserId: v.string(),
+      name: v.string(),
       userType: v.union(v.literal("client"), v.literal("business")),
       businessName: v.optional(v.string()),
       businessDescription: v.optional(v.string()),
@@ -32,6 +33,7 @@ export const getCurrentProfile = query({
 
 export const createProfile = mutation({
   args: {
+    name: v.string(),
     userType: v.union(v.literal("client"), v.literal("business")),
     businessName: v.optional(v.string()),
     businessDescription: v.optional(v.string()),
@@ -68,6 +70,7 @@ export const getBusinessOwners = query({
       _id: v.id("profiles"),
       _creationTime: v.number(),
       clerkUserId: v.string(),
+      name: v.string(),
       userType: v.union(v.literal("client"), v.literal("business")),
       businessName: v.optional(v.string()),
       businessDescription: v.optional(v.string()),

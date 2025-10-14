@@ -15,9 +15,13 @@ interface AppointmentBookingProps {
 }
 
 export function AppointmentBooking({ profile }: AppointmentBookingProps) {
+  const now = new Date();
+  const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
+  const twoHoursFromNow = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+  
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("10:00");
+  const [startTime, setStartTime] = useState(oneHourFromNow.toTimeString().slice(0, 5));
+  const [endTime, setEndTime] = useState(twoHoursFromNow.toTimeString().slice(0, 5));
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>("");
   const [notes, setNotes] = useState("");
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -38,6 +42,12 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
     try {
       const startDateTime = new Date(`${selectedDate}T${startTime}`).getTime();
       const endDateTime = new Date(`${selectedDate}T${endTime}`).getTime();
+      const now = Date.now();
+      
+      if (startDateTime < now) {
+        toast.error("Cannot create appointments in the past");
+        return;
+      }
       
       if (endDateTime <= startDateTime) {
         toast.error("End time must be after start time");
@@ -46,8 +56,13 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
       
       await createAppointmentSlot({ startDateTime, endDateTime });
       toast.success("Appointment slot created!");
-      setStartTime("09:00");
-      setEndTime("10:00");
+      
+      // Reset to intelligent defaults
+      const resetNow = new Date();
+      const oneHourFromNow = new Date(resetNow.getTime() + 60 * 60 * 1000);
+      const twoHoursFromNow = new Date(resetNow.getTime() + 2 * 60 * 60 * 1000);
+      setStartTime(oneHourFromNow.toTimeString().slice(0, 5));
+      setEndTime(twoHoursFromNow.toTimeString().slice(0, 5));
     } catch (error) {
       toast.error("Failed to create appointment slot");
     }
@@ -122,7 +137,21 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                   id="startTime"
                   type="time"
                   value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
+                  onChange={(e) => {
+                    setStartTime(e.target.value);
+                    // Auto-set end time to one hour after start time
+                    const startTimeValue = e.target.value;
+                    if (startTimeValue) {
+                      const [hours, minutes] = startTimeValue.split(':').map(Number);
+                      const startDate = new Date();
+                      startDate.setHours(hours, minutes, 0, 0);
+                      
+                      const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
+                      const endTimeString = endDate.toTimeString().slice(0, 5);
+                      setEndTime(endTimeString);
+                    }
+                  }}
+                  min={selectedDate === new Date().toISOString().split('T')[0] ? new Date().toTimeString().slice(0, 5) : undefined}
                   required
                 />
               </div>
@@ -133,6 +162,7 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
+                  min={selectedDate === new Date().toISOString().split('T')[0] ? new Date().toTimeString().slice(0, 5) : undefined}
                   required
                 />
               </div>

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useUser } from "@clerk/clerk-react";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -25,6 +27,22 @@ interface DashboardProps {
 export function Dashboard({ profile }: DashboardProps) {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Fetch real data from Convex
+  const myAppointments = useQuery(api.appointments.getMyAppointments);
+  const myProjects = useQuery(api.projects.getMyProjects);
+  const myTestimonials = useQuery(api.testimonials.getTestimonials, 
+    profile.userType === "business" ? { businessOwnerClerkId: profile.clerkUserId } : {}
+  );
+
+  // Calculate stats
+  const totalAppointments = myAppointments?.length || 0;
+  const activeProjects = myProjects?.filter(p => p.status === "in_progress").length || 0;
+  const totalProjects = myProjects?.length || 0;
+  const totalReviews = myTestimonials?.length || 0;
+  const averageRating = myTestimonials?.length > 0 
+    ? (myTestimonials.reduce((sum, t) => sum + t.rating, 0) / myTestimonials.length).toFixed(1)
+    : "0.0";
 
   const tabs = [
     { id: "overview", label: "Overview", icon: User },
@@ -175,9 +193,9 @@ export function Dashboard({ profile }: DashboardProps) {
                     <Calendar className="h-4 w-4 text-gray-500" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">12</div>
+                    <div className="text-2xl font-bold">{totalAppointments}</div>
                     <p className="text-xs text-gray-500">
-                      +2 from last month
+                      {myAppointments?.filter(a => a.status === "booked").length || 0} booked
                     </p>
                   </CardContent>
                 </Card>
@@ -190,9 +208,9 @@ export function Dashboard({ profile }: DashboardProps) {
                     <FolderOpen className="h-4 w-4 text-gray-500" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">8</div>
+                    <div className="text-2xl font-bold">{totalProjects}</div>
                     <p className="text-xs text-gray-500">
-                      3 in progress
+                      {activeProjects} in progress
                     </p>
                   </CardContent>
                 </Card>
@@ -205,9 +223,9 @@ export function Dashboard({ profile }: DashboardProps) {
                     <Star className="h-4 w-4 text-gray-500" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">24</div>
+                    <div className="text-2xl font-bold">{totalReviews}</div>
                     <p className="text-xs text-gray-500">
-                      4.8 average rating
+                      {averageRating} average rating
                     </p>
                   </CardContent>
                 </Card>

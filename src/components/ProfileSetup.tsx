@@ -6,6 +6,7 @@ import { toast } from "sonner";
 export function ProfileSetup() {
   const [userType, setUserType] = useState<"client" | "business" | null>(null);
   const [formData, setFormData] = useState({
+    name: "",
     businessName: "",
     businessDescription: "",
     phone: "",
@@ -22,8 +23,18 @@ export function ProfileSetup() {
 
     try {
       await createProfile({
+        name: formData.name,
         userType,
-        ...(userType === "business" ? formData : { phone: formData.phone, address: formData.address }),
+        ...(userType === "business" ? {
+          businessName: formData.businessName,
+          businessDescription: formData.businessDescription,
+          phone: formData.phone,
+          address: formData.address,
+          services: formData.services,
+        } : {
+          phone: formData.phone,
+          address: formData.address,
+        }),
       });
       toast.success("Profile created successfully!");
     } catch (error) {
@@ -88,6 +99,20 @@ export function ProfileSetup() {
             <h2 className="text-xl font-semibold">
               {userType === "client" ? "Client Information" : "Business Information"}
             </h2>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {userType === "client" ? "Full Name" : "Contact Name"} *
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              placeholder={userType === "client" ? "Enter your full name" : "Enter your name"}
+              className="w-full px-4 py-3 rounded-lg bg-white border border-gray-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-shadow"
+            />
           </div>
 
           {userType === "business" && (

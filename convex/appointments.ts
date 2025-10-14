@@ -34,7 +34,7 @@ export const getAvailableAppointments = query({
         .collect();
       
       appointments = appointments.filter(
-        (a) => a.status === "available" && a.startDateTime > Date.now()
+        (a) => a.status === "available" && a.endDateTime > Date.now()
       );
     } else {
       appointments = await ctx.db
@@ -42,7 +42,7 @@ export const getAvailableAppointments = query({
         .collect();
       
       appointments = appointments.filter(
-        (a) => a.status === "available" && a.startDateTime > Date.now()
+        (a) => a.status === "available" && a.endDateTime > Date.now()
       );
     }
 
@@ -119,6 +119,16 @@ export const createAppointmentSlot = mutation({
 
     if (!profile || profile.userType !== "business") {
       throw new Error("Only business owners can create appointment slots");
+    }
+
+    // Validate that the appointment is not in the past
+    const now = Date.now();
+    if (args.startDateTime < now) {
+      throw new Error("Cannot create appointments in the past");
+    }
+
+    if (args.endDateTime <= args.startDateTime) {
+      throw new Error("End time must be after start time");
     }
 
     return await ctx.db.insert("appointments", {

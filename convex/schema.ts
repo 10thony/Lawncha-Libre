@@ -5,6 +5,7 @@ export default defineSchema({
   // User profiles
   profiles: defineTable({
     clerkUserId: v.string(),
+    name: v.string(),
     userType: v.union(v.literal("client"), v.literal("business")),
     businessName: v.optional(v.string()),
     businessDescription: v.optional(v.string()),
@@ -37,7 +38,14 @@ export default defineSchema({
     clientClerkId: v.string(),
     projectType: v.string(),
     projectName: v.string(),
-    projectTasks: v.array(v.string()),
+    projectTasks: v.array(v.object({
+      name: v.string(),
+      status: v.union(
+        v.literal("queued"),
+        v.literal("in_progress"),
+        v.literal("done")
+      )
+    })),
     estimatedLength: v.number(), // in days
     estimatedStartDateTime: v.number(),
     estimatedEndDateTime: v.number(),
@@ -49,10 +57,17 @@ export default defineSchema({
       v.literal("completed"),
       v.literal("cancelled")
     ),
+    approvalStatus: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected")
+    ),
+    rejectionReason: v.optional(v.string()),
     notes: v.optional(v.string()),
   })
     .index("by_business", ["businessOwnerClerkId"])
-    .index("by_client", ["clientClerkId"]),
+    .index("by_client", ["clientClerkId"])
+    .index("by_approval_status", ["approvalStatus"]),
 
   // Testimonials/Reviews
   testimonials: defineTable({

@@ -7,7 +7,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Star, Plus, Heart, MessageSquare } from "lucide-react";
 
 interface TestimonialsDashboardProps {
@@ -40,6 +40,9 @@ export function TestimonialsDashboard({ profile }: TestimonialsDashboardProps) {
             <DialogContent className="max-w-lg">
               <DialogHeader>
                 <DialogTitle>Write a Review</DialogTitle>
+                <DialogDescription>
+                  Share your experience with a business you've worked with.
+                </DialogDescription>
               </DialogHeader>
               <CreateTestimonialForm 
                 businessOwners={businessOwners || []}
@@ -160,7 +163,7 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
         rating: testimonialData.rating,
       };
 
-      if (testimonialData.projectId) {
+      if (testimonialData.projectId && testimonialData.projectId !== "none") {
         data.projectId = testimonialData.projectId as any;
       }
 
@@ -226,7 +229,7 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
             <SelectValue placeholder="Select a project" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No specific project</SelectItem>
+            <SelectItem value="none">No specific project</SelectItem>
             {projects
               .filter((project: any) => project.businessOwnerClerkId === testimonialData.businessOwnerClerkId)
               .map((project: any) => (
