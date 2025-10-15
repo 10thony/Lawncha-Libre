@@ -8,7 +8,8 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { Star, Plus, Heart, MessageSquare } from "lucide-react";
+import { Star, Plus, Heart, MessageSquare, Image as ImageIcon } from "lucide-react";
+import { uploadImagesWithUploadThing } from "@/lib/uploadthing";
 
 interface TestimonialsDashboardProps {
   profile: any;
@@ -16,6 +17,7 @@ interface TestimonialsDashboardProps {
 
 export function TestimonialsDashboard({ profile }: TestimonialsDashboardProps) {
   const [showCreateTestimonial, setShowCreateTestimonial] = useState(false);
+  const [selectedTestimonial, setSelectedTestimonial] = useState<any | null>(null);
 
   const testimonials = useQuery(api.testimonials.getTestimonials, 
     profile.userType === "business" ? { businessOwnerClerkId: profile.clerkUserId } : {}
@@ -56,11 +58,12 @@ export function TestimonialsDashboard({ profile }: TestimonialsDashboardProps) {
 
       <div className="grid gap-6">
         {testimonials?.map((testimonial) => (
-          <TestimonialCard 
-            key={testimonial._id} 
-            testimonial={testimonial} 
-            userType={profile.userType}
-          />
+          <button key={testimonial._id} onClick={() => setSelectedTestimonial(testimonial)} className="text-left">
+            <TestimonialCard 
+              testimonial={testimonial} 
+              userType={profile.userType}
+            />
+          </button>
         ))}
         {!testimonials?.length && (
           <div className="text-center py-12">
@@ -74,6 +77,14 @@ export function TestimonialsDashboard({ profile }: TestimonialsDashboardProps) {
           </div>
         )}
       </div>
+
+      {selectedTestimonial && (
+        <ReviewDetailsDialog 
+          testimonial={selectedTestimonial} 
+          currentUserId={profile.clerkUserId}
+          onClose={() => setSelectedTestimonial(null)}
+        />
+      )}
     </div>
   );
 }
@@ -149,18 +160,30 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
     title: "",
     description: "",
     rating: 5,
+    imageUrls: [] as string[],
   });
+  const [uploading, setUploading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const createTestimonial = useMutation(api.testimonials.createTestimonial);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let newlyUploaded: string[] = [];
+      if (selectedFiles.length) {
+        setUploading(true);
+        newlyUploaded = await uploadImagesWithUploadThing(selectedFiles);
+        setSelectedFiles([]);
+        setUploading(false);
+      }
+
       const data: any = {
         businessOwnerClerkId: testimonialData.businessOwnerClerkId,
         title: testimonialData.title,
         description: testimonialData.description,
         rating: testimonialData.rating,
+        imageUrls: [...testimonialData.imageUrls, ...newlyUploaded],
       };
 
       if (testimonialData.projectId && testimonialData.projectId !== "none") {
@@ -200,6 +223,61 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label>Images</Label>
+        <div className="flex items-center gap-2 mb-2">
+          <input
+            id="review-images"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              const files = Array.from(e.target.files || []);
+              setSelectedFiles(files);
+            }}
+            className="hidden"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => document.getElementById("review-images")?.click()}
+            disabled={uploading}
+          >
+            <ImageIcon className="h-4 w-4 mr-2" />
+            Select Images
+          </Button>
+          <Button
+            type="button"
+            onClick={async () => {
+              if (!selectedFiles.length) return;
+              try {
+                setUploading(true);
+                const urls = await uploadImagesWithUploadThing(selectedFiles);
+                setTestimonialData(prev => ({ ...prev, imageUrls: [...prev.imageUrls, ...urls] }));
+                setSelectedFiles([]);
+                toast.success("Images uploaded");
+              } catch (err) {
+                toast.error("Failed to upload images");
+              } finally {
+                setUploading(false);
+              }
+            }}
+            disabled={uploading || selectedFiles.length === 0}
+          >
+            {uploading ? "Uploading..." : `Upload ${selectedFiles.length || ""}`}
+          </Button>
+        </div>
+        {(testimonialData.imageUrls.length > 0 || selectedFiles.length > 0) && (
+          <div className="grid grid-cols-4 gap-2">
+            {testimonialData.imageUrls.map((url) => (
+              <img key={url} src={url} alt="uploaded" className="h-20 w-full object-cover rounded border" />
+            ))}
+            {selectedFiles.map((f, idx) => (
+              <img key={idx} src={URL.createObjectURL(f)} alt={f.name} className="h-20 w-full object-cover rounded border" />
+            ))}
+          </div>
+        )}
+      </div>
       <div>
         <Label htmlFor="business">Business</Label>
         <Select 
@@ -281,5 +359,101 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
         </Button>
       </div>
     </form>
+  );
+}
+
+function ReviewDetailsDialog({ testimonial, currentUserId, onClose }: { testimonial: any; currentUserId: string; onClose: () => void }) {
+  const [open, setOpen] = useState(true);
+  const isAuthor = testimonial.clientClerkId === currentUserId;
+  const [draft, setDraft] = useState({
+    title: testimonial.title,
+    description: testimonial.description,
+    rating: testimonial.rating,
+  });
+  const updateTestimonial = useMutation(api.testimonials.updateTestimonial);
+
+  const save = async () => {
+    if (!isAuthor) return;
+    await updateTestimonial({
+      testimonialId: testimonial._id,
+      title: draft.title,
+      description: draft.description,
+      rating: draft.rating,
+    });
+    setOpen(false);
+    onClose();
+    toast.success("Review updated");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) onClose(); }}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Review Details</DialogTitle>
+          <DialogDescription>
+            {isAuthor ? "You can edit your review." : "Read-only view."}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div>
+            <Label>Title</Label>
+            {isAuthor ? (
+              <Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+            ) : (
+              <div className="text-sm text-gray-900">{testimonial.title}</div>
+            )}
+          </div>
+          <div>
+            <Label>Rating</Label>
+            {isAuthor ? (
+              <div className="flex items-center gap-2">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setDraft({ ...draft, rating: i + 1 })}
+                    className="focus:outline-none"
+                  >
+                    <Star className={`h-6 w-6 ${i < draft.rating ? "text-yellow-400 fill-current" : "text-gray-300"}`} />
+                  </button>
+                ))}
+                <span className="text-sm text-gray-600">({draft.rating}/5)</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <Star key={i} className={`h-4 w-4 ${i < testimonial.rating ? "text-yellow-400 fill-current" : "text-gray-300"}`} />
+                ))}
+                <span className="text-sm text-gray-600">({testimonial.rating}/5)</span>
+              </div>
+            )}
+          </div>
+          <div>
+            <Label>Description</Label>
+            {isAuthor ? (
+              <Textarea rows={4} value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
+            ) : (
+              <p className="text-sm text-gray-700">{testimonial.description}</p>
+            )}
+          </div>
+          {!!testimonial.imageUrls?.length && (
+            <div>
+              <Label>Images</Label>
+              <div className="grid grid-cols-4 gap-2 mt-1">
+                {testimonial.imageUrls.map((url: string) => (
+                  <img key={url} src={url} alt="review" className="h-20 w-full object-cover rounded border" />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-2 justify-end mt-4">
+          <Button variant="outline" onClick={() => { setOpen(false); onClose(); }}>Close</Button>
+          {isAuthor && <Button onClick={save}>Save</Button>}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

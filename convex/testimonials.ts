@@ -10,6 +10,7 @@ const testimonialValidator = v.object({
   title: v.string(),
   description: v.string(),
   rating: v.number(),
+  imageUrls: v.optional(v.array(v.string())),
   isHighlighted: v.boolean(),
 });
 
@@ -48,6 +49,7 @@ export const createTestimonial = mutation({
     title: v.string(),
     description: v.string(),
     rating: v.number(),
+    imageUrls: v.optional(v.array(v.string())),
   },
   returns: v.id("testimonials"),
   handler: async (ctx, args) => {
@@ -94,5 +96,38 @@ export const toggleHighlight = mutation({
     await ctx.db.patch(args.testimonialId, {
       isHighlighted: !testimonial.isHighlighted,
     });
+  },
+});
+
+export const updateTestimonial = mutation({
+  args: {
+    testimonialId: v.id("testimonials"),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+    rating: v.optional(v.number()),
+    imageUrls: v.optional(v.array(v.string())),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const clerkUserId = identity.subject;
+
+    const { testimonialId, ...updates } = args;
+    const testimonial = await ctx.db.get(testimonialId);
+    if (!testimonial) throw new Error("Testimonial not found");
+
+    if (testimonial.clientClerkId !== clerkUserId) {
+      throw new Error("Only the author can update their testimonial");
+    }
+
+    // Simple rating bounds enforcement if provided
+    if (updates.rating !== undefined) {
+      const r = Math.max(1, Math.min(5, updates.rating));
+      updates.rating = r;
+    }
+
+    await ctx.db.patch(testimonialId, updates);
   },
 });

@@ -1,3 +1,5 @@
+
+do not create documentation unless it is explicitly asked for
 ---
 description: Guidelines and best practices for building Convex projects, including database schema design, queries, mutations, and real-world examples
 globs: **/*.ts,**/*.tsx,**/*.js,**/*.jsx

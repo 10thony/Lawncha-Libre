@@ -34,6 +34,15 @@ window.addEventListener('message', async (message) => {
       : null,
     // End of preview dev tools code.
   ].filter(Boolean),
+  server: {
+    proxy: {
+      // Proxy API requests in dev to Convex HTTP router
+      "/api/uploadthing": {
+        target: "http://localhost:3210",
+        changeOrigin: true,
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

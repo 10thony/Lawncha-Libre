@@ -46,6 +46,7 @@ export default defineSchema({
         v.literal("done")
       )
     })),
+    imageUrls: v.optional(v.array(v.string())),
     estimatedLength: v.number(), // in days
     estimatedStartDateTime: v.number(),
     estimatedEndDateTime: v.number(),
@@ -77,6 +78,7 @@ export default defineSchema({
     title: v.string(),
     description: v.string(),
     rating: v.number(), // 1-5 stars
+    imageUrls: v.optional(v.array(v.string())),
     isHighlighted: v.boolean(),
   })
     .index("by_business", ["businessOwnerClerkId"])

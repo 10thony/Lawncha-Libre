@@ -8,7 +8,8 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { Building2, Calendar, Clock, User, Plus, Edit, CheckCircle, Play, Circle, Check, X } from "lucide-react";
+import { Building2, Calendar, Clock, User, Plus, Edit, CheckCircle, Play, Circle, Check, X, Image as ImageIcon } from "lucide-react";
+import { uploadImagesWithUploadThing } from "@/lib/uploadthing";
 
 interface ProjectsDashboardProps {
   profile: any;
@@ -265,11 +266,14 @@ function CreateProjectForm({ clients, onSuccess }: any) {
     projectType: "",
     projectName: "",
     projectTasks: [] as string[],
+    imageUrls: [] as string[],
     estimatedLength: 1,
     estimatedStartDateTime: new Date().toISOString().split('T')[0],
     estimatedEndDateTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     notes: "",
   });
+  const [uploading, setUploading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [taskInput, setTaskInput] = useState("");
 
   const createProject = useMutation(api.projects.createProject);
@@ -294,11 +298,22 @@ function CreateProjectForm({ clients, onSuccess }: any) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // If there are any pending local files not yet uploaded, upload them now
+      let newlyUploaded: string[] = [];
+      if (selectedFiles.length) {
+        setUploading(true);
+        newlyUploaded = await uploadImagesWithUploadThing(selectedFiles);
+        setSelectedFiles([]);
+        setUploading(false);
+      }
+      const allImageUrls = [...projectData.imageUrls, ...newlyUploaded];
+
       await createProject({
         clientClerkId: projectData.clientClerkId,
         projectType: projectData.projectType,
         projectName: projectData.projectName,
         projectTasks: projectData.projectTasks,
+        imageUrls: allImageUrls,
         estimatedLength: projectData.estimatedLength,
         estimatedStartDateTime: new Date(projectData.estimatedStartDateTime).getTime(),
         estimatedEndDateTime: new Date(projectData.estimatedEndDateTime).getTime(),
@@ -350,6 +365,62 @@ function CreateProjectForm({ clients, onSuccess }: any) {
             required
           />
         </div>
+      </div>
+
+      <div>
+        <Label>Images</Label>
+        <div className="flex items-center gap-2 mb-2">
+          <input
+            id="project-images"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              const files = Array.from(e.target.files || []);
+              setSelectedFiles(files);
+            }}
+            className="hidden"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => document.getElementById("project-images")?.click()}
+            disabled={uploading}
+          >
+            <ImageIcon className="h-4 w-4 mr-2" />
+            Select Images
+          </Button>
+          <Button
+            type="button"
+            onClick={async () => {
+              if (!selectedFiles.length) return;
+              try {
+                setUploading(true);
+                const urls = await uploadImagesWithUploadThing(selectedFiles);
+                setProjectData(prev => ({ ...prev, imageUrls: [...prev.imageUrls, ...urls] }));
+                setSelectedFiles([]);
+                toast.success("Images uploaded");
+              } catch (err) {
+                toast.error("Failed to upload images");
+              } finally {
+                setUploading(false);
+              }
+            }}
+            disabled={uploading || selectedFiles.length === 0}
+          >
+            {uploading ? "Uploading..." : `Upload ${selectedFiles.length || ""}`}
+          </Button>
+        </div>
+        {(projectData.imageUrls.length > 0 || selectedFiles.length > 0) && (
+          <div className="grid grid-cols-4 gap-2">
+            {projectData.imageUrls.map((url) => (
+              <img key={url} src={url} alt="uploaded" className="h-20 w-full object-cover rounded border" />
+            ))}
+            {selectedFiles.map((f, idx) => (
+              <img key={idx} src={URL.createObjectURL(f)} alt={f.name} className="h-20 w-full object-cover rounded border" />
+            ))}
+          </div>
+        )}
       </div>
 
       <div>
@@ -443,6 +514,7 @@ function EditProjectForm({ project, onSuccess }: any) {
     projectType: project.projectType,
     projectName: project.projectName,
     projectTasks: project.projectTasks, // This is now an array of objects with name and status
+    imageUrls: project.imageUrls || [] as string[],
     estimatedLength: project.estimatedLength,
     estimatedStartDateTime: new Date(project.estimatedStartDateTime).toISOString().split('T')[0],
     estimatedEndDateTime: new Date(project.estimatedEndDateTime).toISOString().split('T')[0],
@@ -452,6 +524,8 @@ function EditProjectForm({ project, onSuccess }: any) {
     notes: project.notes || "",
   });
   const [taskInput, setTaskInput] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const updateProject = useMutation(api.projects.updateProject);
 
@@ -475,11 +549,21 @@ function EditProjectForm({ project, onSuccess }: any) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let newlyUploaded: string[] = [];
+      if (selectedFiles.length) {
+        setUploading(true);
+        newlyUploaded = await uploadImagesWithUploadThing(selectedFiles);
+        setSelectedFiles([]);
+        setUploading(false);
+      }
+      const allImageUrls = [...projectData.imageUrls, ...newlyUploaded];
+
       const updates: any = {
         projectId: project._id,
         projectType: projectData.projectType,
         projectName: projectData.projectName,
         projectTasks: projectData.projectTasks,
+        imageUrls: allImageUrls,
         estimatedLength: projectData.estimatedLength,
         estimatedStartDateTime: new Date(projectData.estimatedStartDateTime).getTime(),
         estimatedEndDateTime: new Date(projectData.estimatedEndDateTime).getTime(),
@@ -504,6 +588,71 @@ function EditProjectForm({ project, onSuccess }: any) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label>Images</Label>
+        <div className="flex items-center gap-2 mb-2">
+          <input
+            id="edit-project-images"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              const files = Array.from(e.target.files || []);
+              setSelectedFiles(files);
+            }}
+            className="hidden"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => document.getElementById("edit-project-images")?.click()}
+            disabled={uploading}
+          >
+            <ImageIcon className="h-4 w-4 mr-2" />
+            Select Images
+          </Button>
+          <Button
+            type="button"
+            onClick={async () => {
+              if (!selectedFiles.length) return;
+              try {
+                setUploading(true);
+                const urls = await uploadImagesWithUploadThing(selectedFiles);
+                setProjectData(prev => ({ ...prev, imageUrls: [...prev.imageUrls, ...urls] }));
+                setSelectedFiles([]);
+                toast.success("Images uploaded");
+              } catch (err) {
+                toast.error("Failed to upload images");
+              } finally {
+                setUploading(false);
+              }
+            }}
+            disabled={uploading || selectedFiles.length === 0}
+          >
+            {uploading ? "Uploading..." : `Upload ${selectedFiles.length || ""}`}
+          </Button>
+        </div>
+        {(projectData.imageUrls.length > 0 || selectedFiles.length > 0) && (
+          <div className="grid grid-cols-4 gap-2">
+            {projectData.imageUrls.map((url) => (
+              <div key={url} className="relative">
+                <img src={url} alt="uploaded" className="h-20 w-full object-cover rounded border" />
+                <button
+                  type="button"
+                  onClick={() => setProjectData(prev => ({ ...prev, imageUrls: prev.imageUrls.filter(u => u !== url) }))}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {selectedFiles.map((f, idx) => (
+              <img key={idx} src={URL.createObjectURL(f)} alt={f.name} className="h-20 w-full object-cover rounded border" />
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="projectType">Project Type</Label>

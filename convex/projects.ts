@@ -16,6 +16,7 @@ const projectValidator = v.object({
       v.literal("done")
     )
   })),
+  imageUrls: v.optional(v.array(v.string())),
   estimatedLength: v.number(),
   estimatedStartDateTime: v.number(),
   estimatedEndDateTime: v.number(),
@@ -75,6 +76,7 @@ export const createProject = mutation({
     projectType: v.string(),
     projectName: v.string(),
     projectTasks: v.array(v.string()), // Still accept array of strings for backward compatibility
+    imageUrls: v.optional(v.array(v.string())),
     estimatedLength: v.number(),
     estimatedStartDateTime: v.number(),
     estimatedEndDateTime: v.number(),
@@ -125,6 +127,7 @@ export const updateProject = mutation({
         v.literal("done")
       )
     }))),
+    imageUrls: v.optional(v.array(v.string())),
     estimatedLength: v.optional(v.number()),
     estimatedStartDateTime: v.optional(v.number()),
     estimatedEndDateTime: v.optional(v.number()),
