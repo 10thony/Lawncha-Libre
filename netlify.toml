@@ -7,17 +7,8 @@
   # Environment variables for build
   [build.environment]
     NODE_VERSION = "22.20.0"
-
-# Configure secrets scanning
-# Allow public keys to be in the build output (these are meant to be public)
-[build.secrets]
-  # These keys are public and safe to expose in client code
-  omit_keys = [
-    "VITE_CONVEX_URL",
-    "VITE_CLERK_PUBLISHABLE_KEY", 
-    "VITE_CLERK_FRONTEND_API_URL",
-    "VITE_UPLOADTHING_URL"
-  ]
+    # Configure secrets scanning - tell Netlify these VITE_ prefixed keys are public and safe
+    SECRETS_SCAN_OMIT_KEYS = "VITE_CONVEX_URL,VITE_CLERK_PUBLISHABLE_KEY,VITE_CLERK_FRONTEND_API_URL,VITE_UPLOADTHING_URL,VITE_UPLOADTHING_TOKEN"
 
 # SPA routing - redirect all requests to index.html
 [[redirects]]
