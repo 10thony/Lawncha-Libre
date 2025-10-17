@@ -347,3 +347,73 @@ export const getClients = query({
     return clientIds;
   },
 });
+
+export const createProjectFromIntakeForm = mutation({
+  args: {
+    intakeFormId: v.id("intakeForms"),
+    projectType: v.string(),
+    projectName: v.string(),
+    projectTasks: v.array(v.string()),
+    estimatedLength: v.number(),
+    estimatedStartDateTime: v.number(),
+    estimatedEndDateTime: v.number(),
+    notes: v.optional(v.string()),
+  },
+  returns: v.id("projects"),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const clerkUserId = identity.subject;
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", clerkUserId))
+      .unique();
+
+    if (!profile || profile.userType !== "business") {
+      throw new Error("Only business owners can create projects");
+    }
+
+    // Get the intake form
+    const intakeForm = await ctx.db.get(args.intakeFormId);
+    if (!intakeForm) throw new Error("Intake form not found");
+    
+    if (intakeForm.businessOwnerClerkId !== clerkUserId) {
+      throw new Error("You can only create projects from intake forms you've claimed");
+    }
+
+    if (intakeForm.status !== "claimed" && intakeForm.status !== "in_progress") {
+      throw new Error("Can only create projects from claimed intake forms");
+    }
+
+    // Convert array of strings to array of task objects with default "queued" status
+    const tasksWithStatus = args.projectTasks.map(taskName => ({
+      name: taskName,
+      status: "queued" as const
+    }));
+
+    // Create the project
+    const projectId = await ctx.db.insert("projects", {
+      businessOwnerClerkId: clerkUserId,
+      clientClerkId: intakeForm.clientClerkId || "unlinked", // Will be updated when client links
+      projectType: args.projectType,
+      projectName: args.projectName,
+      projectTasks: tasksWithStatus,
+      imageUrls: intakeForm.imageUrls,
+      estimatedLength: args.estimatedLength,
+      estimatedStartDateTime: args.estimatedStartDateTime,
+      estimatedEndDateTime: args.estimatedEndDateTime,
+      status: "planned",
+      approvalStatus: intakeForm.clientClerkId ? "pending" : "approved", // Auto-approve if no client linked yet
+      notes: args.notes,
+    });
+
+    // Update the intake form status to in_progress
+    await ctx.db.patch(args.intakeFormId, {
+      status: "in_progress",
+    });
+
+    return projectId;
+  },
+});

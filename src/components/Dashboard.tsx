@@ -8,6 +8,9 @@ import { Badge } from "./ui/badge";
 import { ProjectsDashboard } from "./ProjectsDashboard";
 import { AppointmentBooking } from "./AppointmentBooking";
 import { TestimonialsDashboard } from "./TestimonialsDashboard";
+import { RequestedQuotes } from "./RequestedQuotes";
+import { ClientIntakeForms } from "./ClientIntakeForms";
+import { VideoUploadDemo } from "./VideoUploadDemo";
 import { 
   Calendar, 
   FolderOpen, 
@@ -17,7 +20,9 @@ import {
   Phone, 
   Mail,
   MapPin,
-  Settings
+  Settings,
+  Quote,
+  FileVideo
 } from "lucide-react";
 
 interface DashboardProps {
@@ -50,6 +55,16 @@ export function Dashboard({ profile }: DashboardProps) {
     { id: "projects", label: "Projects", icon: FolderOpen },
     { id: "testimonials", label: "Reviews", icon: Star },
   ];
+
+  // Add quotes tab for business owners, intake forms tab for clients
+  if (profile.userType === "business") {
+    tabs.splice(3, 0, { id: "quotes", label: "Quote Requests", icon: Quote });
+  } else {
+    tabs.splice(3, 0, { id: "intake", label: "My Requests", icon: Quote });
+  }
+  
+  // Add video upload demo tab for testing
+  tabs.push({ id: "video-demo", label: "Video Upload Demo", icon: FileVideo });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -241,8 +256,20 @@ export function Dashboard({ profile }: DashboardProps) {
             <ProjectsDashboard profile={profile} />
           )}
 
+          {activeTab === "quotes" && profile.userType === "business" && (
+            <RequestedQuotes profile={profile} />
+          )}
+
+          {activeTab === "intake" && profile.userType === "client" && (
+            <ClientIntakeForms profile={profile} />
+          )}
+
           {activeTab === "testimonials" && (
             <TestimonialsDashboard profile={profile} />
+          )}
+
+          {activeTab === "video-demo" && (
+            <VideoUploadDemo />
           )}
         </div>
       </div>

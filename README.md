@@ -1,4 +1,4 @@
-# Lawncha Libre - Landscaping Website with Booking System
+# DoneRight Landscaping TX - Landscaping Website with Booking System
   
 This is a project built with [Convex](https://convex.dev) as its backend.
  You can find docs about Convex with useful information like how to deploy to production [here](https://docs.convex.dev).
@@ -15,7 +15,7 @@ The backend code is in the `convex` directory.
 
 ## App authentication
 
-Lawncha Libre uses [Convex Auth](https://auth.convex.dev/) with Anonymous auth for easy sign in. You may wish to change this before deploying your app.
+DoneRight Landscaping TX uses [Convex Auth](https://auth.convex.dev/) with Anonymous auth for easy sign in. You may wish to change this before deploying your app.
 
 ## Developing and deploying your app
 

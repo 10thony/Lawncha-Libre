@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { SignInForm } from "../SignInForm";
+import { IntakeForm } from "./IntakeForm";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { 
   Calendar, 
   Users, 
@@ -23,6 +25,7 @@ import {
 
 export function Homepage() {
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showIntakeModal, setShowIntakeModal] = useState(false);
 
   // Mock data for showcase
   const mockServices = [
@@ -38,7 +41,7 @@ export function Homepage() {
       client: "Sarah Johnson",
       rating: 5,
       title: "Exceptional Garden Transformation",
-      description: "Lawncha Libre completely transformed our backyard into a beautiful oasis. The team was professional, punctual, and exceeded our expectations.",
+      description: "DoneRight Landscaping TX completely transformed our backyard into a beautiful oasis. The team was professional, punctual, and exceeded our expectations.",
       highlighted: true
     },
     {
@@ -98,7 +101,7 @@ export function Homepage() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-green-600 mb-2">Welcome to Lawncha Libre</h1>
+            <h1 className="text-3xl font-bold text-green-600 mb-2">Welcome to DoneRight Landscaping TX</h1>
             <p className="text-gray-600">Sign in to manage your landscaping business or book services</p>
           </div>
           <Card>
@@ -119,6 +122,7 @@ export function Homepage() {
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
@@ -145,15 +149,24 @@ export function Homepage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              onClick={() => setShowSignIn(true)}
+              onClick={() => setShowIntakeModal(true)}
               className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
             >
-              Get Started
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <Quote className="mr-2 h-5 w-5" />
+              Get Free Quote
             </Button>
             <Button 
               size="lg" 
               variant="outline"
+              onClick={() => setShowSignIn(true)}
+              className="px-8 py-3"
+            >
+              Sign In / Sign Up
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button 
+              size="lg" 
+              variant="ghost"
               onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
               className="px-8 py-3"
             >
@@ -289,6 +302,54 @@ export function Homepage() {
             </div>
           </div>
 
+          {/* Quote Request Feature */}
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
+            <div>
+              <h3 className="text-2xl font-semibold mb-4 flex items-center">
+                <Quote className="h-6 w-6 text-green-600 mr-2" />
+                Easy Quote Requests
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Need landscaping work done? Simply fill out our intake form with your project details, 
+                and we'll connect you with qualified professionals who will provide competitive quotes.
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">Free quote requests</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">Upload project photos and videos</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">Multiple quotes from verified professionals</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">No obligation to accept any quotes</span>
+                </li>
+              </ul>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <h4 className="font-semibold mb-4">Ready to Get Started?</h4>
+              <p className="text-sm text-gray-600 mb-4">
+                Submit your project details and receive quotes from qualified landscapers in your area.
+              </p>
+              <Button 
+                onClick={() => setShowIntakeModal(true)}
+                className="w-full"
+              >
+                <Quote className="mr-2 h-4 w-4" />
+                Request Free Quote
+              </Button>
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                Takes less than 5 minutes
+              </p>
+            </div>
+          </div>
+
           {/* Testimonials Demo */}
           <div className="grid lg:grid-cols-2 gap-12">
             <div>
@@ -356,7 +417,7 @@ export function Homepage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-xl mb-8 opacity-90">
-            Join Lawncha Libre today and transform how you manage landscaping services.
+            Join DoneRight Landscaping TX today and transform how you manage landscaping services.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
@@ -384,7 +445,7 @@ export function Homepage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold text-green-600 mb-4">Lawncha Libre</h3>
+              <h3 className="text-xl font-bold text-green-600 mb-4">DoneRight Landscaping TX</h3>
               <p className="text-gray-600 text-sm">
                 Professional landscaping services and business management platform.
               </p>
@@ -416,7 +477,7 @@ export function Homepage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
-                  <span>info@lawnchalibr.com</span>
+                  <span>info@donerightlandscapingtx.com</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
@@ -426,10 +487,26 @@ export function Homepage() {
             </div>
           </div>
           <div className="border-t border-gray-200 mt-8 pt-8 text-center text-sm text-gray-600">
-            <p>&copy; 2024 Lawncha Libre. All rights reserved. | <span className="text-green-600">Demo data shown for illustration purposes.</span></p>
+            <p>&copy; 2024 DoneRight Landscaping TX. All rights reserved. | <span className="text-green-600">Demo data shown for illustration purposes.</span></p>
           </div>
         </div>
       </footer>
+
+      {/* Intake Form Modal */}
+      <Dialog open={showIntakeModal} onOpenChange={setShowIntakeModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center">Get Your Free Quote</DialogTitle>
+            <DialogDescription className="text-center">
+              Fill out the form below and we'll connect you with qualified landscaping professionals
+            </DialogDescription>
+          </DialogHeader>
+          <IntakeForm 
+            onSuccess={() => setShowIntakeModal(false)}
+            onCancel={() => setShowIntakeModal(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

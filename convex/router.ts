@@ -61,6 +61,10 @@ http.route({
             maxFileSize: "4MB",
             maxFileCount: 5,
           },
+          videoUploader: {
+            maxFileSize: "32MB",
+            maxFileCount: 3,
+          },
         };
 
         return new Response(JSON.stringify(fileRouter), {
@@ -90,6 +94,10 @@ http.route({
       imageUploader: {
         maxFileSize: "4MB",
         maxFileCount: 5,
+      },
+      videoUploader: {
+        maxFileSize: "32MB",
+        maxFileCount: 3,
       },
     };
 

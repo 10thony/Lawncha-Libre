@@ -84,4 +84,44 @@ export default defineSchema({
     .index("by_business", ["businessOwnerClerkId"])
     .index("by_client", ["clientClerkId"])
     .index("by_highlighted", ["isHighlighted"]),
+
+  // Quote Intake Forms
+  intakeForms: defineTable({
+    // Contact Information
+    firstName: v.string(),
+    lastName: v.string(),
+    email: v.string(),
+    phone: v.string(),
+    
+    // Project Details
+    projectDescription: v.string(),
+    imageUrls: v.optional(v.array(v.string())),
+    videoUrls: v.optional(v.array(v.string())),
+    
+    // Status and Linking
+    status: v.union(
+      v.literal("submitted"),
+      v.literal("claimed"),
+      v.literal("in_progress"),
+      v.literal("completed"),
+      v.literal("cancelled")
+    ),
+    
+    // Linking to profiles (optional until claimed/linked)
+    businessOwnerClerkId: v.optional(v.string()),
+    clientClerkId: v.optional(v.string()),
+    
+    // Timestamps
+    submittedAt: v.number(),
+    claimedAt: v.optional(v.number()),
+    linkedAt: v.optional(v.number()),
+    
+    // Additional notes from business owner
+    businessNotes: v.optional(v.string()),
+    estimatedQuote: v.optional(v.number()),
+  })
+    .index("by_status", ["status"])
+    .index("by_business_owner", ["businessOwnerClerkId"])
+    .index("by_client", ["clientClerkId"])
+    .index("by_submitted_date", ["submittedAt"]),
 });
