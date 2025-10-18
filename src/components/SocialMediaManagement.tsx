@@ -65,7 +65,9 @@ export function SocialMediaManagement() {
   });
 
   // Get user's Facebook credentials
-  const credentials = useQuery(api.encryption.getUserFacebookCredentials);
+  const credentials = useQuery(api.encryption.getUserFacebookCredentialsQuery, 
+    user ? { userId: user.id } : "skip"
+  );
 
   // Mutations
   const storeCredentials = useMutation(api.encryption.storeFacebookCredentials);

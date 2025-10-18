@@ -1,4 +1,4 @@
-import { internalAction, internalMutation } from "./_generated/server";
+import { internalAction, internalMutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
 
@@ -291,6 +291,20 @@ export const getUserFacebookCredentials = internalAction({
   },
   handler: async (ctx, args): Promise<any> => {
     return await ctx.runMutation(internal.encryption.getAllUserCredentials, { userId: args.userId });
+  },
+});
+
+// Public query to get user's Facebook credentials (for client-side access)
+export const getUserFacebookCredentialsQuery = query({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("facebookAppCredentials")
+      .withIndex("by_user", (q: any) => q.eq("userId", args.userId))
+      .order("desc")
+      .collect();
   },
 });
 
