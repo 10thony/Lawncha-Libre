@@ -15,8 +15,13 @@ import type {
 } from "convex/server";
 import type * as appointments from "../appointments.js";
 import type * as auth from "../auth.js";
+import type * as crons from "../crons.js";
+import type * as encryption from "../encryption.js";
 import type * as http from "../http.js";
 import type * as intakeForms from "../intakeForms.js";
+import type * as metaAuth from "../metaAuth.js";
+import type * as metaContent from "../metaContent.js";
+import type * as metaQueries from "../metaQueries.js";
 import type * as profiles from "../profiles.js";
 import type * as projects from "../projects.js";
 import type * as router from "../router.js";
@@ -33,8 +38,13 @@ import type * as testimonials from "../testimonials.js";
 declare const fullApi: ApiFromModules<{
   appointments: typeof appointments;
   auth: typeof auth;
+  crons: typeof crons;
+  encryption: typeof encryption;
   http: typeof http;
   intakeForms: typeof intakeForms;
+  metaAuth: typeof metaAuth;
+  metaContent: typeof metaContent;
+  metaQueries: typeof metaQueries;
   profiles: typeof profiles;
   projects: typeof projects;
   router: typeof router;

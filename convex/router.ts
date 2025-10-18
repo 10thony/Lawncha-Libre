@@ -1,5 +1,6 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
+import { api } from "./_generated/api";
 
 const http = httpRouter();
 
@@ -108,9 +109,88 @@ http.route({
   }),
 });
 
+// Facebook OAuth callback handler
+http.route({
+  path: "/api/auth/facebook/callback",
+  method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    try {
+      const url = new URL(req.url);
+      const code = url.searchParams.get("code");
+      const state = url.searchParams.get("state");
+      const error = url.searchParams.get("error");
+
+      // Handle OAuth errors
+      if (error) {
+        const errorDescription = url.searchParams.get("error_description") || "Unknown error";
+        return new Response(
+          JSON.stringify({ error, error_description: errorDescription }),
+          { 
+            status: 400,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+
+      if (!code || !state) {
+        return new Response(
+          JSON.stringify({ error: "Missing code or state parameter" }),
+          { 
+            status: 400,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+
+      // Call the Convex action to handle the callback
+      const result = await ctx.runAction(api.metaAuth.handleFacebookCallback, {
+        code,
+        state,
+      });
+
+      // Redirect to success page
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      const redirectUrl = new URL("/dashboard?social=connected", frontendUrl);
+      
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: redirectUrl.toString(),
+          ...corsHeaders,
+        },
+      });
+    } catch (error) {
+      console.error("Facebook OAuth callback error:", error);
+      
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      const redirectUrl = new URL("/dashboard?social=error", frontendUrl);
+      
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: redirectUrl.toString(),
+          ...corsHeaders,
+        },
+      });
+    }
+  }),
+});
+
 // Preflight CORS handler
 http.route({
   path: "/api/uploadthing",
+  method: "OPTIONS",
+  handler: httpAction(async () => {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders,
+    });
+  }),
+});
+
+// Preflight CORS handler for Facebook callback
+http.route({
+  path: "/api/auth/facebook/callback",
   method: "OPTIONS",
   handler: httpAction(async () => {
     return new Response(null, {

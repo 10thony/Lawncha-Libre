@@ -124,4 +124,90 @@ export default defineSchema({
     .index("by_business_owner", ["businessOwnerClerkId"])
     .index("by_client", ["clientClerkId"])
     .index("by_submitted_date", ["submittedAt"]),
+
+  // Meta/Facebook Integration Tables
+  
+  // Meta accounts - stores user's Facebook OAuth tokens and connected pages/IG accounts
+  metaAccounts: defineTable({
+    userId: v.string(), // Clerk userId
+    longLivedUserToken: v.string(),
+    tokenExpiresAt: v.optional(v.number()), // epoch timestamp
+    facebookUserId: v.string(),
+    connectedPages: v.array(v.object({
+      pageId: v.string(),
+      name: v.string(),
+      pageAccessToken: v.optional(v.string()),
+    })),
+    instagramBusinessAccountId: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_facebook_user", ["facebookUserId"]),
+
+  // Facebook app credentials - encrypted storage per user
+  facebookAppCredentials: defineTable({
+    userId: v.string(), // Clerk userId
+    encryptedAppId: v.string(), // Encrypted Facebook App ID
+    encryptedAppSecret: v.string(), // Encrypted Facebook App Secret
+    encryptedRedirectUri: v.string(), // Encrypted redirect URI
+    appName: v.optional(v.string()), // User-friendly app name
+    isActive: v.boolean(), // Whether this credential set is active
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_active", ["userId", "isActive"]),
+
+  // Instagram media posts
+  instagramMedia: defineTable({
+    id: v.string(), // Instagram media ID (unique)
+    userId: v.string(), // Clerk userId
+    pageId: v.string(), // Facebook page ID
+    caption: v.optional(v.string()),
+    mediaType: v.string(), // IMAGE, VIDEO, CAROUSEL_ALBUM
+    mediaUrl: v.string(),
+    permalink: v.string(),
+    timestamp: v.number(),
+    children: v.optional(v.array(v.object({
+      mediaType: v.string(),
+      mediaUrl: v.string(),
+    }))),
+    createdAt: v.number(),
+    fetchedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_page", ["pageId"])
+    .index("by_timestamp", ["timestamp"])
+    .index("by_media_id", ["id"]),
+
+  // Facebook page posts
+  facebookPosts: defineTable({
+    id: v.string(), // Facebook post ID (unique)
+    userId: v.string(), // Clerk userId
+    pageId: v.string(), // Facebook page ID
+    message: v.optional(v.string()),
+    permalinkUrl: v.string(),
+    createdTime: v.number(),
+    attachments: v.optional(v.array(v.object({
+      mediaType: v.string(),
+      mediaUrl: v.string(),
+    }))),
+    createdAt: v.number(),
+    fetchedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_page", ["pageId"])
+    .index("by_created_time", ["createdTime"])
+    .index("by_post_id", ["id"]),
+
+  // OAuth state management for CSRF protection
+  oauthStates: defineTable({
+    state: v.string(),
+    userId: v.string(), // Clerk userId
+    createdAt: v.number(),
+    expiresAt: v.number(),
+  })
+    .index("by_state", ["state"])
+    .index("by_user", ["userId"]),
 });

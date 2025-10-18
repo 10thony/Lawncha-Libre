@@ -11,6 +11,9 @@ import { TestimonialsDashboard } from "./TestimonialsDashboard";
 import { RequestedQuotes } from "./RequestedQuotes";
 import { ClientIntakeForms } from "./ClientIntakeForms";
 import { VideoUploadDemo } from "./VideoUploadDemo";
+import { SocialConnections } from "./SocialConnections";
+import { SocialFeed } from "./SocialFeed";
+import { SocialMediaManagement } from "./SocialMediaManagement";
 import { 
   Calendar, 
   FolderOpen, 
@@ -22,7 +25,10 @@ import {
   MapPin,
   Settings,
   Quote,
-  FileVideo
+  FileVideo,
+  Link,
+  Instagram,
+  Facebook
 } from "lucide-react";
 
 interface DashboardProps {
@@ -62,6 +68,11 @@ export function Dashboard({ profile }: DashboardProps) {
   } else {
     tabs.splice(3, 0, { id: "intake", label: "My Requests", icon: Quote });
   }
+  
+  // Add social media tabs
+  tabs.push({ id: "social-feed", label: "Social Feed", icon: Instagram });
+  tabs.push({ id: "social-settings", label: "Social Settings", icon: Link });
+  tabs.push({ id: "social-management", label: "Social Management", icon: Settings });
   
   // Add video upload demo tab for testing
   tabs.push({ id: "video-demo", label: "Video Upload Demo", icon: FileVideo });
@@ -266,6 +277,18 @@ export function Dashboard({ profile }: DashboardProps) {
 
           {activeTab === "testimonials" && (
             <TestimonialsDashboard profile={profile} />
+          )}
+
+          {activeTab === "social-feed" && (
+            <SocialFeed />
+          )}
+
+          {activeTab === "social-settings" && (
+            <SocialConnections />
+          )}
+
+          {activeTab === "social-management" && (
+            <SocialMediaManagement />
           )}
 
           {activeTab === "video-demo" && (
