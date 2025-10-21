@@ -6,13 +6,22 @@ export default defineSchema({
   profiles: defineTable({
     clerkUserId: v.string(),
     name: v.string(),
-    userType: v.union(v.literal("client"), v.literal("business")),
+    userType: v.union(v.literal("client"), v.literal("business"), v.literal("employee")),
     businessName: v.optional(v.string()),
     businessDescription: v.optional(v.string()),
     phone: v.optional(v.string()),
     address: v.optional(v.string()),
     services: v.optional(v.array(v.string())),
-  }).index("by_clerk_user", ["clerkUserId"]),
+    // Employee-specific fields
+    companyId: v.optional(v.id("profiles")), // Reference to the business owner's profile
+    employeeStatus: v.optional(v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected")
+    )),
+  }).index("by_clerk_user", ["clerkUserId"])
+    .index("by_company", ["companyId"])
+    .index("by_employee_status", ["employeeStatus"]),
 
   // Appointment slots and bookings
   appointments: defineTable({
@@ -65,10 +74,13 @@ export default defineSchema({
     ),
     rejectionReason: v.optional(v.string()),
     notes: v.optional(v.string()),
+    // Employee access
+    assignedEmployees: v.optional(v.array(v.string())), // Array of employee clerk IDs
   })
     .index("by_business", ["businessOwnerClerkId"])
     .index("by_client", ["clientClerkId"])
-    .index("by_approval_status", ["approvalStatus"]),
+    .index("by_approval_status", ["approvalStatus"])
+    .index("by_employee", ["assignedEmployees"]),
 
   // Testimonials/Reviews
   testimonials: defineTable({
@@ -210,4 +222,27 @@ export default defineSchema({
   })
     .index("by_state", ["state"])
     .index("by_user", ["userId"]),
+
+  // Employee requests
+  employeeRequests: defineTable({
+    employeeClerkId: v.string(),
+    companyId: v.id("profiles"), // Reference to the business owner's profile
+    firstName: v.string(),
+    lastName: v.string(),
+    email: v.string(),
+    phone: v.string(),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected")
+    ),
+    requestedAt: v.number(),
+    reviewedAt: v.optional(v.number()),
+    reviewedBy: v.optional(v.string()), // Clerk ID of the reviewer
+    rejectionReason: v.optional(v.string()),
+  })
+    .index("by_company", ["companyId"])
+    .index("by_employee", ["employeeClerkId"])
+    .index("by_status", ["status"])
+    .index("by_requested_date", ["requestedAt"]),
 });

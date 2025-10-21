@@ -197,20 +197,20 @@ export function SocialMediaManagement() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Social Media Management</h2>
-        <p className="text-gray-600 mt-1">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Social Media Management</h2>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
           Manage your Facebook app credentials for accessing Facebook Pages and Instagram Business accounts.
         </p>
       </div>
 
       {/* Security Notice */}
-      <Card className="border-blue-200 bg-blue-50">
+      <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
-            <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
+            <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
             <div>
-              <h3 className="font-medium text-blue-800 mb-1">Security Notice</h3>
-              <p className="text-sm text-blue-700">
+              <h3 className="font-medium text-blue-800 dark:text-blue-200 mb-1">Security Notice</h3>
+              <p className="text-sm text-blue-700 dark:text-blue-300">
                 Your Facebook app credentials are encrypted using AES-256-GCM encryption and stored securely. 
                 Only you can decrypt and use these credentials. We never store your credentials in plain text.
               </p>
@@ -352,19 +352,19 @@ export function SocialMediaManagement() {
                 value={formData.redirectUri}
                 onChange={(e) => setFormData({ ...formData, redirectUri: e.target.value })}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 This should match the redirect URI configured in your Facebook app settings.
               </p>
             </div>
 
             {/* Help Text */}
-            <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+            <div className="p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
               <div className="flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-gray-600 mt-0.5" />
-                <div className="text-sm text-gray-700">
+                <AlertCircle className="h-4 w-4 text-gray-600 dark:text-gray-400 mt-0.5" />
+                <div className="text-sm text-gray-700 dark:text-gray-300">
                   <p className="font-medium mb-1">How to get your Facebook App credentials:</p>
                   <ol className="list-decimal list-inside space-y-1 text-xs">
-                    <li>Go to <a href="https://developers.facebook.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Facebook Developers</a></li>
+                    <li>Go to <a href="https://developers.facebook.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">Facebook Developers</a></li>
                     <li>Create a new app or select an existing one</li>
                     <li>Go to Settings → Basic to find your App ID and App Secret</li>
                     <li>Add your redirect URI to Valid OAuth Redirect URIs</li>
@@ -415,10 +415,10 @@ export function SocialMediaManagement() {
               <Facebook className="h-8 w-8 text-gray-400" />
               <Instagram className="h-8 w-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
               No Facebook App Credentials
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               Add your Facebook app credentials to enable social media integration.
             </p>
             <Button onClick={handleAddCredential} className="flex items-center gap-2">
@@ -440,8 +440,8 @@ export function SocialMediaManagement() {
         <CardContent className="space-y-3">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="font-medium text-green-800">✅ Do</h4>
-              <ul className="text-sm text-gray-700 space-y-1">
+              <h4 className="font-medium text-green-800 dark:text-green-200">✅ Do</h4>
+              <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                 <li>• Use HTTPS for redirect URIs in production</li>
                 <li>• Keep your App Secret secure and never share it</li>
                 <li>• Use Test Users during development</li>
@@ -451,8 +451,8 @@ export function SocialMediaManagement() {
             </div>
             
             <div className="space-y-2">
-              <h4 className="font-medium text-red-800">❌ Don't</h4>
-              <ul className="text-sm text-gray-700 space-y-1">
+              <h4 className="font-medium text-red-800 dark:text-red-200">❌ Don't</h4>
+              <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                 <li>• Share your App Secret in code or logs</li>
                 <li>• Use HTTP redirect URIs in production</li>
                 <li>• Grant unnecessary permissions</li>

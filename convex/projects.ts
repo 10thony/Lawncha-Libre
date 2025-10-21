@@ -59,6 +59,14 @@ export const getMyProjects = query({
         .query("projects")
         .withIndex("by_business", (q) => q.eq("businessOwnerClerkId", clerkUserId))
         .collect();
+    } else if (profile.userType === "employee") {
+      // Employees can see projects they're assigned to
+      const allProjects = await ctx.db
+        .query("projects")
+        .collect();
+      projects = allProjects.filter(project => 
+        project.assignedEmployees?.includes(clerkUserId)
+      );
     } else {
       projects = await ctx.db
         .query("projects")
@@ -152,7 +160,38 @@ export const updateProject = mutation({
     const project = await ctx.db.get(projectId);
     
     if (!project) throw new Error("Project not found");
-    if (project.businessOwnerClerkId !== clerkUserId) {
+
+    // Get user profile to check permissions
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", clerkUserId))
+      .unique();
+
+    if (!profile) throw new Error("Profile not found");
+
+    // Check permissions
+    if (profile.userType === "business") {
+      // Business owners can update everything
+      if (project.businessOwnerClerkId !== clerkUserId) {
+        throw new Error("Not authorized to update this project");
+      }
+    } else if (profile.userType === "employee") {
+      // Employees can only update tasks and images for projects they're assigned to
+      if (!project.assignedEmployees?.includes(clerkUserId)) {
+        throw new Error("Not authorized to update this project");
+      }
+      // Remove fields that employees shouldn't be able to update
+      delete updates.projectType;
+      delete updates.projectName;
+      delete updates.estimatedLength;
+      delete updates.estimatedStartDateTime;
+      delete updates.estimatedEndDateTime;
+      delete updates.actualStartDateTime;
+      delete updates.actualEndDateTime;
+      delete updates.status;
+      delete updates.notes;
+    } else {
+      // Clients cannot update projects
       throw new Error("Not authorized to update this project");
     }
 
@@ -180,7 +219,28 @@ export const updateTaskStatus = mutation({
     const project = await ctx.db.get(args.projectId);
     
     if (!project) throw new Error("Project not found");
-    if (project.businessOwnerClerkId !== clerkUserId) {
+
+    // Get user profile to check permissions
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", clerkUserId))
+      .unique();
+
+    if (!profile) throw new Error("Profile not found");
+
+    // Check permissions
+    if (profile.userType === "business") {
+      // Business owners can update task status
+      if (project.businessOwnerClerkId !== clerkUserId) {
+        throw new Error("Not authorized to update this project");
+      }
+    } else if (profile.userType === "employee") {
+      // Employees can update task status for projects they're assigned to
+      if (!project.assignedEmployees?.includes(clerkUserId)) {
+        throw new Error("Not authorized to update this project");
+      }
+    } else {
+      // Clients cannot update task status
       throw new Error("Not authorized to update this project");
     }
 
@@ -415,5 +475,152 @@ export const createProjectFromIntakeForm = mutation({
     });
 
     return projectId;
+  },
+});
+
+// Employee-specific functions
+export const addTaskToProject = mutation({
+  args: {
+    projectId: v.id("projects"),
+    taskName: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const clerkUserId = identity.subject;
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+
+    // Get user profile to check permissions
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", clerkUserId))
+      .unique();
+
+    if (!profile) throw new Error("Profile not found");
+
+    // Check permissions - only business owners and assigned employees can add tasks
+    if (profile.userType === "business") {
+      if (project.businessOwnerClerkId !== clerkUserId) {
+        throw new Error("Not authorized to update this project");
+      }
+    } else if (profile.userType === "employee") {
+      if (!project.assignedEmployees?.includes(clerkUserId)) {
+        throw new Error("Not authorized to update this project");
+      }
+    } else {
+      throw new Error("Not authorized to update this project");
+    }
+
+    // Add the new task
+    const newTask = {
+      name: args.taskName,
+      status: "queued" as const
+    };
+
+    const updatedTasks = [...project.projectTasks, newTask];
+
+    await ctx.db.patch(args.projectId, {
+      projectTasks: updatedTasks
+    });
+  },
+});
+
+export const addImageToProject = mutation({
+  args: {
+    projectId: v.id("projects"),
+    imageUrl: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const clerkUserId = identity.subject;
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+
+    // Get user profile to check permissions
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", clerkUserId))
+      .unique();
+
+    if (!profile) throw new Error("Profile not found");
+
+    // Check permissions - only business owners and assigned employees can add images
+    if (profile.userType === "business") {
+      if (project.businessOwnerClerkId !== clerkUserId) {
+        throw new Error("Not authorized to update this project");
+      }
+    } else if (profile.userType === "employee") {
+      if (!project.assignedEmployees?.includes(clerkUserId)) {
+        throw new Error("Not authorized to update this project");
+      }
+    } else {
+      throw new Error("Not authorized to update this project");
+    }
+
+    // Add the new image
+    const currentImages = project.imageUrls || [];
+    const updatedImages = [...currentImages, args.imageUrl];
+
+    await ctx.db.patch(args.projectId, {
+      imageUrls: updatedImages
+    });
+  },
+});
+
+export const assignEmployeeToProject = mutation({
+  args: {
+    projectId: v.id("projects"),
+    employeeClerkId: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const clerkUserId = identity.subject;
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+
+    // Get user profile to check permissions
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", clerkUserId))
+      .unique();
+
+    if (!profile || profile.userType !== "business") {
+      throw new Error("Only business owners can assign employees to projects");
+    }
+
+    if (project.businessOwnerClerkId !== clerkUserId) {
+      throw new Error("Not authorized to update this project");
+    }
+
+    // Verify the employee belongs to this business
+    const employeeProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", args.employeeClerkId))
+      .unique();
+
+    if (!employeeProfile || employeeProfile.userType !== "employee" || employeeProfile.companyId !== profile._id) {
+      throw new Error("Invalid employee or employee does not belong to your company");
+    }
+
+    // Add employee to project
+    const currentEmployees = project.assignedEmployees || [];
+    if (!currentEmployees.includes(args.employeeClerkId)) {
+      const updatedEmployees = [...currentEmployees, args.employeeClerkId];
+      await ctx.db.patch(args.projectId, {
+        assignedEmployees: updatedEmployees
+      });
+    }
   },
 });

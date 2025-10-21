@@ -114,8 +114,8 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
       {profile.userType === "business" ? (
         // Business Owner View
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
               <Calendar className="h-5 w-5" />
               Create Appointment Slot
             </h2>
@@ -174,21 +174,21 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
             </form>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <h2 className="text-xl font-semibold mb-4">My Appointments</h2>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">My Appointments</h2>
             <div className="space-y-3">
               {myAppointments?.map((appointment) => (
-                <div key={appointment._id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={appointment._id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium">{formatDateTime(appointment.startDateTime)}</span>
+                      <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                      <span className="font-medium text-gray-900 dark:text-gray-100">{formatDateTime(appointment.startDateTime)}</span>
                       <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(appointment.status)}`}>
                         {appointment.status}
                       </span>
                     </div>
                     {appointment.notes && (
-                      <p className="text-sm text-gray-600">{appointment.notes}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.notes}</p>
                     )}
                   </div>
                   <div className="flex gap-2">
@@ -222,7 +222,7 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                 </div>
               ))}
               {!myAppointments?.length && (
-                <p className="text-gray-500 text-center py-8">No appointments yet</p>
+                <p className="text-gray-500 dark:text-gray-400 text-center py-8">No appointments yet</p>
               )}
             </div>
           </div>
@@ -230,8 +230,8 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
       ) : (
         // Client View
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
               <User className="h-5 w-5" />
               Book Appointment
             </h2>
@@ -254,11 +254,11 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
 
               {selectedBusinessId && (
                 <div className="space-y-3">
-                  <h3 className="font-medium">Available Appointments</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100">Available Appointments</h3>
                   {availableAppointments?.map((appointment: any) => (
-                    <div key={appointment._id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div key={appointment._id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700">
                       <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-gray-500" />
+                        <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                         <span>{formatDateTime(appointment.startDateTime)}</span>
                       </div>
                       <Dialog>
@@ -291,7 +291,7 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                     </div>
                   ))}
                   {!availableAppointments?.length && (
-                    <p className="text-gray-500 text-center py-4">No available appointments</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">No available appointments</p>
                   )}
                 </div>
               )}
@@ -302,17 +302,17 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
             <h2 className="text-xl font-semibold mb-4">My Bookings</h2>
             <div className="space-y-3">
               {myAppointments?.map((appointment) => (
-                <div key={appointment._id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={appointment._id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium">{formatDateTime(appointment.startDateTime)}</span>
+                      <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                      <span className="font-medium text-gray-900 dark:text-gray-100">{formatDateTime(appointment.startDateTime)}</span>
                       <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(appointment.status)}`}>
                         {appointment.status}
                       </span>
                     </div>
                     {appointment.notes && (
-                      <p className="text-sm text-gray-600">{appointment.notes}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.notes}</p>
                     )}
                   </div>
                   {appointment.status === "booked" && (
@@ -327,7 +327,7 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                 </div>
               ))}
               {!myAppointments?.length && (
-                <p className="text-gray-500 text-center py-8">No bookings yet</p>
+                <p className="text-gray-500 dark:text-gray-400 text-center py-8">No bookings yet</p>
               )}
             </div>
           </div>

@@ -30,7 +30,7 @@ export function ProjectsDashboard({ profile }: ProjectsDashboardProps) {
     <div className="space-y-6">
       {profile.userType === "business" && (
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold">Projects</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">Projects</h2>
           <Dialog open={showCreateProject} onOpenChange={setShowCreateProject}>
             <DialogTrigger asChild>
               <Button className="flex items-center gap-2">
@@ -63,7 +63,7 @@ export function ProjectsDashboard({ profile }: ProjectsDashboardProps) {
         {!myProjects?.length && (
           <div className="text-center py-12">
             <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No projects yet</p>
+            <p className="text-gray-500 dark:text-gray-400">No projects yet</p>
           </div>
         )}
       </div>
@@ -175,11 +175,11 @@ function ProjectCard({ project, userType, onEdit }: any) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-semibold">{project.projectName}</h3>
-          <p className="text-gray-600">{project.projectType}</p>
+          <p className="text-gray-600 dark:text-gray-400">{project.projectType}</p>
         </div>
         <div className="flex items-center gap-2">
           <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor(project.status)}`}>
@@ -199,7 +199,7 @@ function ProjectCard({ project, userType, onEdit }: any) {
       </div>
 
       <div className="grid md:grid-cols-2 gap-4 mb-4">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <User className="h-4 w-4" />
           <span>
             {userType === "business" 
@@ -208,15 +208,15 @@ function ProjectCard({ project, userType, onEdit }: any) {
             }
           </span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <Clock className="h-4 w-4" />
           <span>{project.estimatedLength} days estimated</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <Calendar className="h-4 w-4" />
           <span>Start: {formatDate(project.estimatedStartDateTime)}</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <Calendar className="h-4 w-4" />
           <span>End: {formatDate(project.estimatedEndDateTime)}</span>
         </div>
@@ -242,7 +242,7 @@ function ProjectCard({ project, userType, onEdit }: any) {
       {project.notes && (
         <div>
           <h4 className="font-medium mb-2">Notes:</h4>
-          <p className="text-gray-600 text-sm">{project.notes}</p>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">{project.notes}</p>
         </div>
       )}
 

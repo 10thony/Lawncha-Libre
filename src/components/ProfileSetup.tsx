@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
+import { EmployeeRegistration } from "./EmployeeRegistration";
 
 export function ProfileSetup() {
-  const [userType, setUserType] = useState<"client" | "business" | null>(null);
+  const [userType, setUserType] = useState<"client" | "business" | "employee" | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     businessName: "",
@@ -68,9 +69,9 @@ export function ProfileSetup() {
       {!userType ? (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-center mb-6">
-            Are you a client or a business owner?
+            What type of user are you?
           </h2>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-3 gap-4">
             <button
               onClick={() => setUserType("client")}
               className="p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors"
@@ -91,8 +92,20 @@ export function ProfileSetup() {
                 I provide landscaping services to clients
               </p>
             </button>
+            <button
+              onClick={() => setUserType("employee")}
+              className="p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors"
+            >
+              <div className="text-4xl mb-3">👷</div>
+              <h3 className="text-lg font-semibold mb-2">I'm an Employee</h3>
+              <p className="text-gray-600">
+                I work for a landscaping company
+              </p>
+            </button>
           </div>
         </div>
+      ) : userType === "employee" ? (
+        <EmployeeRegistration />
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="text-center mb-6">

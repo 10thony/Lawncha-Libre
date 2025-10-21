@@ -3,22 +3,26 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../../lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 relative overflow-hidden group",
   {
     variants: {
       variant: {
-        default: "bg-green-600 text-white hover:bg-green-700",
-        destructive: "bg-red-500 text-white hover:bg-red-600",
-        outline: "border border-gray-300 bg-white hover:bg-gray-50",
-        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
-        ghost: "hover:bg-gray-100",
-        link: "text-green-600 underline-offset-4 hover:underline",
+        default: "bg-primary text-primary-foreground hover:bg-primary-hover shadow-modern hover:shadow-modern-lg hover:scale-105 active:scale-95",
+        destructive: "bg-red-500 text-white hover:bg-red-600 shadow-modern hover:shadow-modern-lg hover:scale-105 active:scale-95",
+        outline: "border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm hover:shadow-md hover:scale-105 active:scale-95",
+        secondary: "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-sm hover:shadow-md hover:scale-105 active:scale-95",
+        ghost: "hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 active:scale-95",
+        link: "text-primary underline-offset-4 hover:underline",
+        glass: "glass text-gray-900 dark:text-gray-100 hover:bg-white/20 dark:hover:bg-black/20 shadow-glass hover:shadow-glass-dark hover:scale-105 active:scale-95",
+        neumorphism: "neumorphism text-gray-700 dark:text-gray-300 hover:shadow-neumorphism-inset active:shadow-neumorphism-inset",
+        gradient: "gradient-bg text-white shadow-modern-lg hover:shadow-modern-lg hover:scale-105 active:scale-95",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
+        sm: "h-9 rounded-md px-3 text-xs",
+        lg: "h-11 rounded-lg px-8 text-base",
         icon: "h-10 w-10",
+        xl: "h-12 rounded-lg px-10 text-lg",
       },
     },
     defaultVariants: {
