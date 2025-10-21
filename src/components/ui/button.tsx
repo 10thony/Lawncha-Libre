@@ -13,9 +13,9 @@ const buttonVariants = cva(
         secondary: "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-sm hover:shadow-md hover:scale-105 active:scale-95",
         ghost: "hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 active:scale-95",
         link: "text-primary underline-offset-4 hover:underline",
-        glass: "glass text-gray-900 dark:text-gray-100 hover:bg-white/20 dark:hover:bg-black/20 shadow-glass hover:shadow-glass-dark hover:scale-105 active:scale-95",
+        glass: "bg-white/10 dark:bg-black/10 backdrop-blur-md border border-white/20 dark:border-white/10 text-gray-900 dark:text-gray-100 hover:bg-white/20 dark:hover:bg-black/20 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95",
         neumorphism: "neumorphism text-gray-700 dark:text-gray-300 hover:shadow-neumorphism-inset active:shadow-neumorphism-inset",
-        gradient: "gradient-bg text-white shadow-modern-lg hover:shadow-modern-lg hover:scale-105 active:scale-95",
+        gradient: "bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95",
       },
       size: {
         default: "h-10 px-4 py-2",

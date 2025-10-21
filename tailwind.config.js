@@ -8,6 +8,20 @@ export default {
     './src/**/*.{ts,tsx}',
   ],
   prefix: "",
+  safelist: [
+    'gradient-bg',
+    'glass',
+    'animate-pulse-glow',
+    'gradient-text',
+    'neumorphism',
+    'neumorphism-inset',
+    'shadow-glass',
+    'shadow-glass-dark',
+    'shadow-modern',
+    'shadow-modern-lg',
+    'shadow-neumorphism',
+    'shadow-neumorphism-inset',
+  ],
   theme: {
     container: {
       center: true,

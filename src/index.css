@@ -77,16 +77,24 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Modern glassmorphism effects */
+/* Ensure custom classes are always included */
+.gradient-bg {
+  background: linear-gradient(135deg, #059669 0%, #0891b2 50%, #7c3aed 100%) !important;
+}
+
 .glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .dark .glass {
-  background: rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite !important;
 }
 
 /* Neumorphism effects */
@@ -126,6 +134,11 @@ body {
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(5, 150, 105, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(5, 150, 105, 0.8); }
 }
 
 .float {
