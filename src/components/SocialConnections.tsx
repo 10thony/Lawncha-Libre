@@ -39,7 +39,10 @@ export function SocialConnections() {
   // Get Meta content connection status
   const metaStatus = useQuery(api.metaQueries.getMetaContentConnectionStatus);
   const connectedPages = useQuery(api.metaQueries.getConnectedPages);
-  const facebookCredentials = useQuery(api.encryption.getUserFacebookCredentials);
+  const facebookCredentials = useQuery(
+    api.encryption.getUserFacebookCredentialsQuery,
+    user?.id ? { userId: user.id } : "skip"
+  );
 
   // Mutations
   const beginAuth = useMutation(api.metaAuth.beginFacebookContentAuth);

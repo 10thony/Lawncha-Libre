@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -27,6 +27,8 @@ import { VideoUploadDemo } from "./VideoUploadDemo";
 import { SocialConnections } from "./SocialConnections";
 import { SocialFeed } from "./SocialFeed";
 import { SocialMediaManagement } from "./SocialMediaManagement";
+import { FacebookProjectPorting } from "./FacebookProjectPorting";
+import { FacebookIntegrationHub } from "./FacebookIntegrationHub";
 import { EmployeeManagement } from "./EmployeeManagement";
 import { EmployeeDashboard } from "./EmployeeDashboard";
 import { 
@@ -57,6 +59,15 @@ export function Dashboard({ profile }: DashboardProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  // Read URL parameters to set initial tab
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, []);
 
   // If user is an employee, show the employee dashboard
   if (profile.userType === "employee") {
@@ -96,9 +107,8 @@ export function Dashboard({ profile }: DashboardProps) {
   // Employees don't get additional tabs beyond the basic ones
   
   // Add social media tabs
-  tabs.push({ id: "social-feed", label: "Social Feed", icon: Instagram });
-  tabs.push({ id: "social-settings", label: "Social Settings", icon: Link });
-  tabs.push({ id: "social-management", label: "Social Management", icon: Settings });
+  tabs.push({ id: "facebook-integration", label: "Facebook Integration", icon: Facebook });
+  tabs.push({ id: "social-feed", label: "Social Feed & Porting", icon: Instagram });
   
   // Add video upload demo tab for testing
   tabs.push({ id: "video-demo", label: "Video Upload Demo", icon: FileVideo });
@@ -512,6 +522,10 @@ export function Dashboard({ profile }: DashboardProps) {
 
           {activeTab === "social-management" && (
             <SocialMediaManagement />
+          )}
+
+          {activeTab === "facebook-integration" && (
+            <FacebookIntegrationHub />
           )}
 
           {activeTab === "video-demo" && (

@@ -70,10 +70,10 @@ export function SocialMediaManagement() {
   );
 
   // Mutations
-  const storeCredentials = useMutation(api.encryption.storeFacebookCredentials);
-  const updateCredentials = useMutation(api.encryption.updateFacebookCredentials);
-  const deleteCredentials = useMutation(api.encryption.deleteFacebookCredentials);
-  const validateCredentials = useMutation(api.encryption.validateFacebookCredentials);
+  const storeCredentials = useMutation(api.encryption.storeFacebookCredentialsAction);
+  const updateCredentials = useMutation(api.encryption.updateFacebookCredentialsAction);
+  const deleteCredentials = useMutation(api.encryption.deleteFacebookCredentialsAction);
+  const validateCredentials = useMutation(api.encryption.validateFacebookCredentialsAction);
 
   const handleAddCredential = () => {
     setIsAddingCredential(true);

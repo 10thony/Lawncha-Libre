@@ -76,11 +76,19 @@ export default defineSchema({
     notes: v.optional(v.string()),
     // Employee access
     assignedEmployees: v.optional(v.array(v.string())), // Array of employee clerk IDs
+    // Facebook post integration
+    isFromFacebookPost: v.optional(v.boolean()), // Indicates if this project was created from a Facebook post
+    facebookPostId: v.optional(v.string()), // Reference to the original Facebook post
+    facebookPostUrl: v.optional(v.string()), // URL to the original Facebook post
+    isPublicShowcase: v.optional(v.boolean()), // Whether this project should be shown on homepage
+    projectDescription: v.optional(v.string()), // Description from Facebook post or manually added
   })
     .index("by_business", ["businessOwnerClerkId"])
     .index("by_client", ["clientClerkId"])
     .index("by_approval_status", ["approvalStatus"])
-    .index("by_employee", ["assignedEmployees"]),
+    .index("by_employee", ["assignedEmployees"])
+    .index("by_public_showcase", ["isPublicShowcase"])
+    .index("by_facebook_post", ["facebookPostId"]),
 
   // Testimonials/Reviews
   testimonials: defineTable({

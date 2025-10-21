@@ -216,23 +216,6 @@ export const getRecentInstagramMedia = query({
   },
 });
 
-// Get user's Facebook app credentials (without decryption)
-export const getUserFacebookCredentials = query({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      return [];
-    }
-
-    const userId = identity.subject;
-    return await ctx.db
-      .query("facebookAppCredentials")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .order("desc")
-      .collect();
-  },
-});
 
 // Get recent Facebook posts (last 7 days)
 export const getRecentFacebookPosts = query({

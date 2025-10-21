@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { SignInForm } from "../SignInForm";
 import { IntakeForm } from "./IntakeForm";
 import { Button } from "./ui/button";
@@ -37,6 +39,9 @@ export function Homepage() {
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [showProjectModal, setShowProjectModal] = useState(false);
 
+  // Fetch real showcase projects from the database
+  const showcaseProjects = useQuery(api.facebookProjectPort.getShowcaseProjects, { limit: 50 });
+
   // Mock data for showcase
   const mockServices = [
     { icon: Leaf, name: "Lawn Care", description: "Professional lawn maintenance and fertilization" },
@@ -45,7 +50,29 @@ export function Homepage() {
     { icon: Flower, name: "Garden Design", description: "Custom landscape design and installation" }
   ];
 
-  // Mock project data for showcase
+  // Transform showcase projects to match the expected format
+  const transformedProjects = showcaseProjects?.map((project: any) => ({
+    id: project._id,
+    projectName: project.projectName,
+    projectType: project.projectType,
+    businessName: project.businessProfile?.businessName || "Landscaping Business",
+    clientName: "Client", // For showcase projects, we don't need specific client names
+    status: "completed",
+    estimatedLength: Math.ceil((project.actualEndDateTime - project.actualStartDateTime) / (24 * 60 * 60 * 1000)),
+    imageUrl: project.imageUrls?.[0] || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop",
+    description: project.projectDescription || "Beautiful landscaping project completed by our team.",
+    completedDate: new Date(project.actualEndDateTime).toISOString().split('T')[0],
+    fullDescription: project.projectDescription || "This project showcases our expertise in landscaping and outdoor design.",
+    tasks: project.projectTasks?.map((task: any) => task.name) || ["Project completed"],
+    beforeImages: [],
+    afterImages: project.imageUrls || [],
+    clientTestimonial: "Excellent work by our landscaping team!",
+    budget: "Contact for pricing",
+    facebookPostUrl: project.facebookPostUrl,
+    isFromFacebookPost: project.isFromFacebookPost
+  })) || [];
+
+  // Mock project data for showcase (fallback if no real projects)
   const mockProjects = [
     {
       id: 1,
@@ -241,17 +268,16 @@ export function Homepage() {
     }
   ];
 
-  const mockBusinesses = [
-    "Elite Landscaping",
-    "Premier Landscapes TX", 
-    "AquaScape Designs",
-    "Heritage Gardens",
-    "EcoScape Solutions",
-    "Sky Gardens TX"
-  ];
+  // Extract unique business names for filter from real data
+  const uniqueBusinesses = Array.from(new Set(
+    transformedProjects.map((project: any) => project.businessName)
+  ));
+
+  // Use real projects if available, otherwise fall back to mock data
+  const projectsToDisplay = transformedProjects.length > 0 ? transformedProjects : mockProjects;
 
   // Filter projects based on selected business and search term
-  const filteredProjects = mockProjects.filter(project => {
+  const filteredProjects = projectsToDisplay.filter((project: any) => {
     const matchesBusiness = selectedBusiness === "all" || project.businessName === selectedBusiness;
     const matchesSearch = project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.projectType.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -432,7 +458,7 @@ export function Homepage() {
                 className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="all">All Businesses</option>
-                {mockBusinesses.map((business) => (
+                {uniqueBusinesses.map((business) => (
                   <option key={business} value={business}>{business}</option>
                 ))}
               </select>
@@ -441,7 +467,7 @@ export function Homepage() {
 
           {/* Projects Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProjects.map((project, index) => (
+            {filteredProjects.map((project: any, index: number) => (
               <Card 
                 key={project.id} 
                 className="group hover:shadow-lg transition-all duration-300 animate-fade-in overflow-hidden cursor-pointer"

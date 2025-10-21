@@ -1,4 +1,4 @@
-import { internalAction, internalMutation, query } from "./_generated/server";
+import { internalAction, internalMutation, query, action, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
 
@@ -457,5 +457,85 @@ export const validateFacebookCredentials = internalAction({
         error: "Network error during validation",
       };
     }
+  },
+});
+
+// Public action wrappers for client-side access
+
+// Public action to store Facebook credentials
+export const storeFacebookCredentialsAction = action({
+  args: {
+    appId: v.string(),
+    appSecret: v.string(),
+    redirectUri: v.string(),
+    appName: v.optional(v.string()),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    return await ctx.runAction(internal.encryption.storeFacebookCredentials, {
+      userId: identity.subject,
+      ...args,
+    });
+  },
+});
+
+// Public action to update Facebook credentials
+export const updateFacebookCredentialsAction = action({
+  args: {
+    credentialId: v.id("facebookAppCredentials"),
+    appId: v.optional(v.string()),
+    appSecret: v.optional(v.string()),
+    redirectUri: v.optional(v.string()),
+    appName: v.optional(v.string()),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    return await ctx.runAction(internal.encryption.updateFacebookCredentials, {
+      ...args,
+      userId: identity.subject,
+    });
+  },
+});
+
+// Public action to delete Facebook credentials
+export const deleteFacebookCredentialsAction = action({
+  args: {
+    credentialId: v.id("facebookAppCredentials"),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    return await ctx.runAction(internal.encryption.deleteFacebookCredentials, args);
+  },
+});
+
+// Public action to validate Facebook credentials
+export const validateFacebookCredentialsAction = action({
+  args: {
+    appId: v.string(),
+    appSecret: v.string(),
+    redirectUri: v.string(),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    return await ctx.runAction(internal.encryption.validateFacebookCredentials, {
+      userId: identity.subject,
+      ...args,
+    });
   },
 });

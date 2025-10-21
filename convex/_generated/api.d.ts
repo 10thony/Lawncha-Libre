@@ -17,6 +17,7 @@ import type * as appointments from "../appointments.js";
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as encryption from "../encryption.js";
+import type * as facebookProjectPort from "../facebookProjectPort.js";
 import type * as http from "../http.js";
 import type * as intakeForms from "../intakeForms.js";
 import type * as metaAuth from "../metaAuth.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   crons: typeof crons;
   encryption: typeof encryption;
+  facebookProjectPort: typeof facebookProjectPort;
   http: typeof http;
   intakeForms: typeof intakeForms;
   metaAuth: typeof metaAuth;
