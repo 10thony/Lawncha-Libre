@@ -30,7 +30,7 @@ interface SidebarToggleProps {
 }
 
 interface SidebarItemProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   isActive?: boolean;
   onClick?: () => void;
   className?: string;

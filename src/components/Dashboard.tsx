@@ -86,7 +86,7 @@ export function Dashboard({ profile }: DashboardProps) {
   const activeProjects = myProjects?.filter(p => p.status === "in_progress").length || 0;
   const totalProjects = myProjects?.length || 0;
   const totalReviews = myTestimonials?.length || 0;
-  const averageRating = myTestimonials?.length > 0 
+  const averageRating = myTestimonials && myTestimonials.length > 0 
     ? (myTestimonials.reduce((sum, t) => sum + t.rating, 0) / myTestimonials.length).toFixed(1)
     : "0.0";
 
@@ -123,9 +123,10 @@ export function Dashboard({ profile }: DashboardProps) {
 
       {/* Sidebar */}
       <div className={`
-        ${isMobileSidebarOpen ? 'fixed inset-0 z-40 lg:relative lg:z-auto' : 'hidden lg:block'}
+        ${isMobileSidebarOpen ? 'fixed inset-0 z-40 lg:relative lg:z-auto' : 'hidden lg:flex'}
         ${isSidebarCollapsed ? 'lg:w-16' : 'lg:w-64'}
         transition-all duration-300 ease-in-out
+        lg:flex-col
       `}>
         <Sidebar className={`
           ${isMobileSidebarOpen ? 'w-64' : ''}
