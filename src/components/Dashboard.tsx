@@ -123,10 +123,10 @@ export function Dashboard({ profile }: DashboardProps) {
 
       {/* Sidebar */}
       <div className={`
-        ${isMobileSidebarOpen ? 'fixed inset-0 z-40 lg:relative lg:z-auto' : 'hidden lg:flex'}
+        ${isMobileSidebarOpen ? 'fixed inset-0 z-40' : 'hidden'}
+        lg:!block lg:!relative lg:!z-auto
         ${isSidebarCollapsed ? 'lg:w-16' : 'lg:w-64'}
         transition-all duration-300 ease-in-out
-        lg:flex-col
       `}>
         <Sidebar className={`
           ${isMobileSidebarOpen ? 'w-64' : ''}
