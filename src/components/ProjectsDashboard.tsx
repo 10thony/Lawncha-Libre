@@ -203,7 +203,7 @@ function ProjectCard({ project, userType, onEdit }: any) {
           <User className="h-4 w-4" />
           <span>
             {userType === "business" 
-              ? `Client ID: ${project.clientClerkId}`
+              ? project.clientClerkId ? `Client ID: ${project.clientClerkId}` : "Completed Project (No Client)"
               : `Business ID: ${project.businessOwnerClerkId}`
             }
           </span>
@@ -309,7 +309,7 @@ function CreateProjectForm({ clients, onSuccess }: any) {
       const allImageUrls = [...projectData.imageUrls, ...newlyUploaded];
 
       await createProject({
-        clientClerkId: projectData.clientClerkId,
+        clientClerkId: projectData.clientClerkId || null,
         projectType: projectData.projectType,
         projectName: projectData.projectName,
         projectTasks: projectData.projectTasks,
@@ -335,6 +335,7 @@ function CreateProjectForm({ clients, onSuccess }: any) {
             <SelectValue placeholder="Select a client" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="">No Client (Completed Project)</SelectItem>
             {clients.map((client: any) => (
               <SelectItem key={client.clerkUserId} value={client.clerkUserId}>
                 {client.name}
@@ -342,6 +343,9 @@ function CreateProjectForm({ clients, onSuccess }: any) {
             ))}
           </SelectContent>
         </Select>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Select "No Client" for projects completed before using our system
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

@@ -22,13 +22,20 @@ import {
   Flower,
   ArrowRight,
   Quote,
-  Info
+  Info,
+  Building2,
+  Filter,
+  Search
 } from "lucide-react";
 
 export function Homepage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
   const [showIntakeModal, setShowIntakeModal] = useState(false);
+  const [selectedBusiness, setSelectedBusiness] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [showProjectModal, setShowProjectModal] = useState(false);
 
   // Mock data for showcase
   const mockServices = [
@@ -37,6 +44,225 @@ export function Homepage() {
     { icon: TreePine, name: "Tree Services", description: "Tree removal, pruning, and planting" },
     { icon: Flower, name: "Garden Design", description: "Custom landscape design and installation" }
   ];
+
+  // Mock project data for showcase
+  const mockProjects = [
+    {
+      id: 1,
+      projectName: "Modern Backyard Oasis",
+      projectType: "Garden Design",
+      businessName: "Elite Landscaping",
+      clientName: "Sarah Johnson",
+      status: "completed",
+      estimatedLength: 5,
+      imageUrl: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop",
+      description: "Complete backyard transformation with modern landscaping, water features, and outdoor living space.",
+      completedDate: "2024-01-15",
+      fullDescription: "This stunning backyard transformation involved creating a modern outdoor oasis for a family of four. The project included installing a custom water feature with LED lighting, creating multiple seating areas with built-in fire pits, and designing a low-maintenance garden with native plants. The space now serves as both a relaxation area and entertainment space for hosting guests.",
+      tasks: [
+        "Site analysis and design consultation",
+        "Excavation and grading",
+        "Water feature installation with LED lighting",
+        "Custom fire pit construction",
+        "Native plant garden installation",
+        "Irrigation system setup",
+        "Outdoor lighting installation",
+        "Final cleanup and walkthrough"
+      ],
+      beforeImages: [
+        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop"
+      ],
+      afterImages: [
+        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
+      ],
+      clientTestimonial: "Elite Landscaping exceeded our expectations! The team was professional, punctual, and delivered exactly what we envisioned. Our backyard is now our favorite place to spend time.",
+      budget: "$15,000 - $25,000"
+    },
+    {
+      id: 2,
+      projectName: "Commercial Office Complex",
+      projectType: "Commercial Landscaping",
+      businessName: "Premier Landscapes TX",
+      clientName: "Downtown Development Corp",
+      status: "completed",
+      estimatedLength: 12,
+      imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
+      description: "Large-scale commercial landscaping project including trees, shrubs, and maintenance systems.",
+      completedDate: "2024-02-20",
+      fullDescription: "A comprehensive commercial landscaping project for a 50,000 sq ft office complex. The design focused on creating an impressive first impression while maintaining low maintenance requirements. The project included mature tree installation, seasonal flower beds, automated irrigation, and professional lighting to enhance the building's architecture.",
+      tasks: [
+        "Site survey and design planning",
+        "Large tree installation (20+ trees)",
+        "Seasonal flower bed installation",
+        "Automated irrigation system",
+        "Professional landscape lighting",
+        "Mulch and ground cover installation",
+        "Maintenance plan development",
+        "Final inspection and handover"
+      ],
+      beforeImages: [
+        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
+      ],
+      afterImages: [
+        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop"
+      ],
+      clientTestimonial: "Premier Landscapes transformed our office complex into a welcoming, professional environment. The quality of work and attention to detail was outstanding.",
+      budget: "$50,000 - $75,000"
+    },
+    {
+      id: 3,
+      projectName: "Residential Pool Area",
+      projectType: "Pool Landscaping",
+      businessName: "AquaScape Designs",
+      clientName: "Mike Rodriguez",
+      status: "completed",
+      estimatedLength: 8,
+      imageUrl: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop",
+      description: "Pool area landscaping with tropical plants, lighting, and privacy screening.",
+      completedDate: "2024-03-10",
+      fullDescription: "A tropical paradise was created around this residential pool area. The design incorporated heat-tolerant tropical plants, strategic privacy screening, and ambient lighting to create a resort-like atmosphere. The project included custom planters, decorative rock features, and a pergola for shade.",
+      tasks: [
+        "Pool area assessment and design",
+        "Tropical plant selection and installation",
+        "Privacy screening installation",
+        "Custom planter construction",
+        "Decorative rock feature placement",
+        "Ambient lighting installation",
+        "Pergola construction for shade",
+        "Pool area cleanup and finishing"
+      ],
+      beforeImages: [
+        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop"
+      ],
+      afterImages: [
+        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
+      ],
+      clientTestimonial: "AquaScape Designs created the perfect tropical retreat around our pool. We feel like we're on vacation every time we step outside!",
+      budget: "$20,000 - $35,000"
+    },
+    {
+      id: 4,
+      projectName: "Historic Garden Restoration",
+      projectType: "Garden Restoration",
+      businessName: "Heritage Gardens",
+      clientName: "Historic Society",
+      status: "completed",
+      estimatedLength: 15,
+      imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
+      description: "Restoration of historic garden with period-appropriate plants and design elements.",
+      completedDate: "2024-01-30",
+      fullDescription: "A meticulous restoration of a 1920s-era garden that had fallen into disrepair. The project involved extensive research into period-appropriate plants and design elements, careful restoration of original features, and installation of historically accurate plantings. The garden now serves as an educational resource for the community.",
+      tasks: [
+        "Historical research and documentation",
+        "Original feature restoration",
+        "Period-appropriate plant selection",
+        "Garden bed reconstruction",
+        "Pathway restoration",
+        "Historical marker installation",
+        "Educational signage placement",
+        "Community garden opening ceremony"
+      ],
+      beforeImages: [
+        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
+      ],
+      afterImages: [
+        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop"
+      ],
+      clientTestimonial: "Heritage Gardens brought our historic garden back to life with incredible attention to historical accuracy and detail. It's now a treasured community asset.",
+      budget: "$30,000 - $45,000"
+    },
+    {
+      id: 5,
+      projectName: "Drought-Resistant Landscape",
+      projectType: "Xeriscaping",
+      businessName: "EcoScape Solutions",
+      clientName: "Green Living LLC",
+      status: "completed",
+      estimatedLength: 6,
+      imageUrl: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop",
+      description: "Water-efficient landscaping design using native plants and sustainable materials.",
+      completedDate: "2024-02-15",
+      fullDescription: "An innovative xeriscaping project that transformed a water-intensive lawn into a beautiful, drought-resistant landscape. The design utilized native Texas plants, permeable paving materials, and efficient irrigation systems to create a sustainable outdoor space that requires minimal water and maintenance.",
+      tasks: [
+        "Water usage analysis and planning",
+        "Native plant selection and sourcing",
+        "Lawn removal and soil preparation",
+        "Native plant installation",
+        "Permeable paving installation",
+        "Efficient irrigation system setup",
+        "Mulch and ground cover application",
+        "Water conservation education session"
+      ],
+      beforeImages: [
+        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop"
+      ],
+      afterImages: [
+        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
+      ],
+      clientTestimonial: "EcoScape Solutions helped us create a beautiful, sustainable landscape that saves water and maintenance costs. Highly recommend their eco-friendly approach!",
+      budget: "$12,000 - $20,000"
+    },
+    {
+      id: 6,
+      projectName: "Rooftop Garden Installation",
+      projectType: "Rooftop Landscaping",
+      businessName: "Sky Gardens TX",
+      clientName: "Urban Living Complex",
+      status: "completed",
+      estimatedLength: 10,
+      imageUrl: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop",
+      description: "Rooftop garden installation with container plants, seating areas, and city views.",
+      completedDate: "2024-03-05",
+      fullDescription: "A stunning rooftop garden installation that transformed an unused rooftop space into a vibrant community garden. The project included weather-resistant container plantings, comfortable seating areas, and strategic plant placement to maximize city views while providing privacy and shade.",
+      tasks: [
+        "Rooftop structural assessment",
+        "Weather-resistant container selection",
+        "Container plant installation",
+        "Seating area construction",
+        "Privacy screening installation",
+        "City view optimization",
+        "Lighting and safety features",
+        "Community garden orientation"
+      ],
+      beforeImages: [
+        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop"
+      ],
+      afterImages: [
+        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
+      ],
+      clientTestimonial: "Sky Gardens TX created an amazing rooftop oasis for our residents. It's become the most popular amenity in our building!",
+      budget: "$25,000 - $40,000"
+    }
+  ];
+
+  const mockBusinesses = [
+    "Elite Landscaping",
+    "Premier Landscapes TX", 
+    "AquaScape Designs",
+    "Heritage Gardens",
+    "EcoScape Solutions",
+    "Sky Gardens TX"
+  ];
+
+  // Filter projects based on selected business and search term
+  const filteredProjects = mockProjects.filter(project => {
+    const matchesBusiness = selectedBusiness === "all" || project.businessName === selectedBusiness;
+    const matchesSearch = project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         project.projectType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         project.description.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesBusiness && matchesSearch;
+  });
+
+  const handleProjectClick = (project: any) => {
+    setSelectedProject(project);
+    setShowProjectModal(true);
+  };
 
   const mockTestimonials = [
     {
@@ -62,33 +288,6 @@ export function Homepage() {
       title: "Professional Tree Removal",
       description: "Quick and safe removal of a large oak tree. Clean up was thorough and pricing was fair. Would definitely recommend.",
       highlighted: true
-    }
-  ];
-
-  const mockProjects = [
-    {
-      id: 1,
-      name: "Residential Garden Makeover",
-      type: "Landscape Design",
-      status: "completed",
-      duration: "2 weeks",
-      client: "The Smiths"
-    },
-    {
-      id: 2,
-      name: "Commercial Lawn Maintenance",
-      type: "Ongoing Maintenance",
-      status: "in_progress",
-      duration: "Ongoing",
-      client: "Downtown Office Complex"
-    },
-    {
-      id: 3,
-      name: "Backyard Patio Installation",
-      type: "Hardscaping",
-      status: "planned",
-      duration: "1 week",
-      client: "Johnson Family"
     }
   ];
 
@@ -208,6 +407,123 @@ export function Homepage() {
         </div>
       </section>
 
+      {/* Projects Showcase */}
+      <section className="py-16 px-4 bg-gradient-to-b from-white/30 dark:from-gray-800/30 to-transparent">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-12 gradient-text">Featured Projects</h2>
+          
+          {/* Filter Controls */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center items-center">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search projects..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <select
+                value={selectedBusiness}
+                onChange={(e) => setSelectedBusiness(e.target.value)}
+                className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="all">All Businesses</option>
+                {mockBusinesses.map((business) => (
+                  <option key={business} value={business}>{business}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Projects Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProjects.map((project, index) => (
+              <Card 
+                key={project.id} 
+                className="group hover:shadow-lg transition-all duration-300 animate-fade-in overflow-hidden cursor-pointer"
+                style={{animationDelay: `${index * 0.1}s`}}
+                onClick={() => handleProjectClick(project)}
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img 
+                    src={project.imageUrl} 
+                    alt={project.projectName}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <Badge className="bg-green-500 text-white">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Completed
+                    </Badge>
+                  </div>
+                </div>
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 group-hover:text-primary transition-colors">
+                      {project.projectName}
+                    </h3>
+                    <Badge variant="outline" className="text-xs">
+                      {project.projectType}
+                    </Badge>
+                  </div>
+                  
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+                    {project.description}
+                  </p>
+                  
+                  <div className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      <span>{project.businessName}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      <span>{project.clientName}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      <span>{project.estimatedLength} days</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {filteredProjects.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-gray-400 dark:text-gray-600 mb-4">
+                <Search className="h-12 w-12 mx-auto" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No projects found</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Try adjusting your search terms or filter criteria
+              </p>
+            </div>
+          )}
+
+          <div className="text-center mt-8">
+            <Button 
+              size="lg" 
+              variant="outline"
+              onClick={() => {
+                setAuthMode("signin");
+                setShowAuthModal(true);
+              }}
+              className="px-8"
+            >
+              View All Projects
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-16 px-4 bg-gradient-to-b from-transparent to-white/30 dark:to-gray-800/30">
         <div className="max-w-6xl mx-auto">
@@ -271,7 +587,7 @@ export function Homepage() {
                 {mockProjects.map((project, index) => (
                   <div key={project.id} className="p-4 glass rounded-lg border-white/20 dark:border-white/10 animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
                     <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-medium text-gray-900 dark:text-gray-100">{project.name}</h5>
+                      <h5 className="font-medium text-gray-900 dark:text-gray-100">{project.projectName}</h5>
                       <Badge variant={
                         project.status === 'completed' ? 'default' : 
                         project.status === 'in_progress' ? 'secondary' : 'outline'
@@ -279,9 +595,9 @@ export function Homepage() {
                         {project.status.replace('_', ' ')}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Type: {project.type}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Duration: {project.duration}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Client: {project.client}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Type: {project.projectType}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Duration: {project.estimatedLength} days</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Client: {project.clientName}</p>
                   </div>
                 ))}
               </div>
@@ -545,6 +861,154 @@ export function Homepage() {
         mode={authMode}
         onModeChange={setAuthMode}
       />
+
+      {/* Project Details Modal */}
+      <Dialog open={showProjectModal} onOpenChange={setShowProjectModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {selectedProject && (
+            <div className="space-y-6">
+              {/* Project Header */}
+              <div className="text-center">
+                <DialogTitle className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                  {selectedProject.projectName}
+                </DialogTitle>
+                <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                  <Badge variant="outline">{selectedProject.projectType}</Badge>
+                  <span>•</span>
+                  <span>{selectedProject.estimatedLength} days</span>
+                  <span>•</span>
+                  <span>Completed {selectedProject.completedDate}</span>
+                </div>
+              </div>
+
+              {/* Main Image */}
+              <div className="relative h-64 rounded-lg overflow-hidden">
+                <img 
+                  src={selectedProject.imageUrl} 
+                  alt={selectedProject.projectName}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <Badge className="bg-green-500 text-white">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Completed Project
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Project Details Grid */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Left Column */}
+                <div className="space-y-6">
+                  {/* Business & Client Info */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Project Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Building2 className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{selectedProject.businessName}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Landscaping Company</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Users className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{selectedProject.clientName}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Client</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Clock className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{selectedProject.estimatedLength} days</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Project Duration</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg font-bold text-primary">{selectedProject.budget}</span>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Project Budget</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Client Testimonial */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Star className="h-5 w-5 text-yellow-500" />
+                        Client Testimonial
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <blockquote className="text-gray-700 dark:text-gray-300 italic">
+                        "{selectedProject.clientTestimonial}"
+                      </blockquote>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 font-medium">
+                        — {selectedProject.clientName}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-6">
+                  {/* Project Description */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Project Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        {selectedProject.fullDescription}
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Project Tasks */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Work Performed</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {selectedProject.tasks.map((task: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-gray-700 dark:text-gray-300 text-sm">{task}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 justify-center pt-6 border-t border-gray-200 dark:border-gray-700">
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowProjectModal(false)}
+                >
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowProjectModal(false);
+                    setShowIntakeModal(true);
+                  }}
+                >
+                  <Quote className="h-4 w-4 mr-2" />
+                  Get Similar Quote
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
