@@ -74,7 +74,7 @@ export function EmployeeRegistration() {
       {/* Header with Theme Toggle */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold gradient-text">DoneRight Landscaping TX</h2>
+          <h2 className="text-xl font-semibold gradient-text">Lawncha Libre</h2>
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <SignOutButton />

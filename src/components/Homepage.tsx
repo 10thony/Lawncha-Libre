@@ -296,7 +296,7 @@ export function Homepage() {
       client: "Sarah Johnson",
       rating: 5,
       title: "Exceptional Garden Transformation",
-      description: "DoneRight Landscaping TX completely transformed our backyard into a beautiful oasis. The team was professional, punctual, and exceeded our expectations.",
+      description: "Lawncha Libre completely transformed our backyard into a beautiful oasis. The team was professional, punctual, and exceeded our expectations.",
       highlighted: true
     },
     {
@@ -341,7 +341,7 @@ export function Homepage() {
       {/* Header with Theme Toggle */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold gradient-text">DoneRight Landscaping TX</h2>
+          <h2 className="text-xl font-semibold gradient-text">Lawncha Libre</h2>
           <div className="flex items-center gap-4">
             <ThemeToggle />
           </div>
@@ -783,7 +783,7 @@ export function Homepage() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-4xl font-bold mb-4 animate-fade-in">Ready to Get Started?</h2>
           <p className="text-xl mb-8 opacity-90 animate-fade-in" style={{animationDelay: '0.2s'}}>
-            Join DoneRight Landscaping TX today and transform how you manage landscaping services.
+            Join Lawncha Libre today and transform how you manage landscaping services.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{animationDelay: '0.4s'}}>
             <Button 
@@ -817,7 +817,7 @@ export function Homepage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold gradient-text mb-4">DoneRight Landscaping TX</h3>
+              <h3 className="text-xl font-bold gradient-text mb-4">Lawncha Libre</h3>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
                 Professional landscaping services and business management platform.
               </p>
@@ -849,7 +849,7 @@ export function Homepage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
-                  <span>info@donerightlandscapingtx.com</span>
+                  <span>info@lawnchalibre.com</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
@@ -859,7 +859,7 @@ export function Homepage() {
             </div>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-            <p>&copy; 2024 DoneRight Landscaping TX. All rights reserved. | <span className="gradient-text">Demo data shown for illustration purposes.</span></p>
+            <p>&copy; 2024 Lawncha Libre. All rights reserved. | <span className="gradient-text">Demo data shown for illustration purposes.</span></p>
           </div>
         </div>
       </footer>

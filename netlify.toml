@@ -1,4 +1,4 @@
-# Netlify configuration for DoneRight Landscaping TX
+# Netlify configuration for Lawncha Libre
 
 [build]
   command = "npm run build"

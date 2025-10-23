@@ -1,4 +1,4 @@
-# DoneRight Landscaping TX - Landscaping Website with Social Media Integration
+# Lawncha Libre - Landscaping Website with Social Media Integration
 
 A comprehensive landscaping business management platform built with modern web technologies, featuring appointment booking, project management, testimonials, and **Facebook/Instagram social media integration**.
 
