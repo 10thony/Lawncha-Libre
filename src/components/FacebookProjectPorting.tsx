@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useUser } from "@clerk/react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Button } from "./ui/button";
@@ -328,7 +328,7 @@ export function FacebookProjectPorting() {
                   id="projectName"
                   value={portingData.projectName}
                   onChange={(e) => setPortingData(prev => ({ ...prev, projectName: e.target.value }))}
-                  placeholder="e.g., Landscaping Project"
+                  placeholder="e.g., Deck build"
                 />
               </div>
               <div>
@@ -337,7 +337,7 @@ export function FacebookProjectPorting() {
                   id="projectType"
                   value={portingData.projectType}
                   onChange={(e) => setPortingData(prev => ({ ...prev, projectType: e.target.value }))}
-                  placeholder="e.g., Landscaping, Lawn Care"
+                  placeholder="e.g., Plumbing, Landscaping"
                 />
               </div>
             </div>

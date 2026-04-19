@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { vConnectedPage, vNestedMedia } from "./validators";
 
 export default defineSchema({
   // User profiles
@@ -153,11 +154,7 @@ export default defineSchema({
     longLivedUserToken: v.string(),
     tokenExpiresAt: v.optional(v.number()), // epoch timestamp
     facebookUserId: v.string(),
-    connectedPages: v.array(v.object({
-      pageId: v.string(),
-      name: v.string(),
-      pageAccessToken: v.optional(v.string()),
-    })),
+    connectedPages: v.array(vConnectedPage),
     instagramBusinessAccountId: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -189,10 +186,7 @@ export default defineSchema({
     mediaUrl: v.string(),
     permalink: v.string(),
     timestamp: v.number(),
-    children: v.optional(v.array(v.object({
-      mediaType: v.string(),
-      mediaUrl: v.string(),
-    }))),
+    children: v.optional(v.array(vNestedMedia)),
     createdAt: v.number(),
     fetchedAt: v.number(),
   })
@@ -209,10 +203,7 @@ export default defineSchema({
     message: v.optional(v.string()),
     permalinkUrl: v.string(),
     createdTime: v.number(),
-    attachments: v.optional(v.array(v.object({
-      mediaType: v.string(),
-      mediaUrl: v.string(),
-    }))),
+    attachments: v.optional(v.array(vNestedMedia)),
     createdAt: v.number(),
     fetchedAt: v.number(),
   })
@@ -230,6 +221,17 @@ export default defineSchema({
   })
     .index("by_state", ["state"])
     .index("by_user", ["userId"]),
+
+  // Time-limited invite links for employee onboarding (created by business owners)
+  employeeInvites: defineTable({
+    token: v.string(),
+    companyId: v.id("profiles"),
+    createdByClerkId: v.string(),
+    createdAt: v.number(),
+    expiresAt: v.number(),
+  })
+    .index("by_token", ["token"])
+    .index("by_company", ["companyId"]),
 
   // Employee requests
   employeeRequests: defineTable({

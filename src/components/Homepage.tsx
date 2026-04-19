@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { SignInForm } from "../SignInForm";
 import { IntakeForm } from "./IntakeForm";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
@@ -19,15 +18,19 @@ import {
   Phone, 
   Mail,
   Leaf,
-  Scissors,
-  TreePine,
-  Flower,
+  Hammer,
+  Wrench,
+  Zap,
   ArrowRight,
   Quote,
   Info,
   Building2,
   Filter,
-  Search
+  Search,
+  ChevronDown,
+  Workflow,
+  FolderKanban,
+  Handshake
 } from "lucide-react";
 
 export function Homepage() {
@@ -44,10 +47,10 @@ export function Homepage() {
 
   // Mock data for showcase
   const mockServices = [
-    { icon: Leaf, name: "Lawn Care", description: "Professional lawn maintenance and fertilization" },
-    { icon: Scissors, name: "Hedge Trimming", description: "Precision pruning and shaping services" },
-    { icon: TreePine, name: "Tree Services", description: "Tree removal, pruning, and planting" },
-    { icon: Flower, name: "Garden Design", description: "Custom landscape design and installation" }
+    { icon: Hammer, name: "Remodeling", description: "Kitchens, baths, additions, and whole-home renovations" },
+    { icon: Wrench, name: "Plumbing & mechanical", description: "Rough-in, fixtures, and HVAC coordination" },
+    { icon: Zap, name: "Electrical", description: "Panels, lighting, and code-compliant installations" },
+    { icon: Leaf, name: "Landscaping & outdoor", description: "Hardscapes, irrigation, planting, and outdoor living" }
   ];
 
   // Transform showcase projects to match the expected format
@@ -55,18 +58,18 @@ export function Homepage() {
     id: project._id,
     projectName: project.projectName,
     projectType: project.projectType,
-    businessName: project.businessProfile?.businessName || "Landscaping Business",
+    businessName: project.businessProfile?.businessName || "General Contractor",
     clientName: "Client", // For showcase projects, we don't need specific client names
     status: "completed",
     estimatedLength: Math.ceil((project.actualEndDateTime - project.actualStartDateTime) / (24 * 60 * 60 * 1000)),
     imageUrl: project.imageUrls?.[0] || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop",
-    description: project.projectDescription || "Beautiful landscaping project completed by our team.",
+    description: project.projectDescription || "Construction project completed by our team.",
     completedDate: new Date(project.actualEndDateTime).toISOString().split('T')[0],
-    fullDescription: project.projectDescription || "This project showcases our expertise in landscaping and outdoor design.",
+    fullDescription: project.projectDescription || "This project showcases our expertise in residential and commercial construction.",
     tasks: project.projectTasks?.map((task: any) => task.name) || ["Project completed"],
     beforeImages: [],
     afterImages: project.imageUrls || [],
-    clientTestimonial: "Excellent work by our landscaping team!",
+    clientTestimonial: "Excellent work by our contracting team!",
     budget: "Contact for pricing",
     facebookPostUrl: project.facebookPostUrl,
     isFromFacebookPost: project.isFromFacebookPost
@@ -76,89 +79,86 @@ export function Homepage() {
   const mockProjects = [
     {
       id: 1,
-      projectName: "Modern Backyard Oasis",
-      projectType: "Garden Design",
-      businessName: "Elite Landscaping",
+      projectName: "Kitchen & master bath remodel",
+      projectType: "Residential remodel",
+      businessName: "Apex Framework GC",
       clientName: "Sarah Johnson",
       status: "completed",
-      estimatedLength: 5,
-      imageUrl: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop",
-      description: "Complete backyard transformation with modern landscaping, water features, and outdoor living space.",
+      estimatedLength: 21,
+      imageUrl: "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=400&h=300&fit=crop",
+      description: "Full kitchen and primary bath renovation with new cabinets, finishes, and mechanical updates.",
       completedDate: "2024-01-15",
-      fullDescription: "This stunning backyard transformation involved creating a modern outdoor oasis for a family of four. The project included installing a custom water feature with LED lighting, creating multiple seating areas with built-in fire pits, and designing a low-maintenance garden with native plants. The space now serves as both a relaxation area and entertainment space for hosting guests.",
+      fullDescription: "A whole-room renovation coordinated by a single GC: demolition, structural checks, plumbing and electrical rough-in, cabinetry install, tile and countertops, fixtures, paint, and punch-list walkthrough. The homeowner stayed informed with a clear schedule and trade coordination.",
       tasks: [
-        "Site analysis and design consultation",
-        "Excavation and grading",
-        "Water feature installation with LED lighting",
-        "Custom fire pit construction",
-        "Native plant garden installation",
-        "Irrigation system setup",
-        "Outdoor lighting installation",
-        "Final cleanup and walkthrough"
+        "Design intake and scope lock",
+        "Demolition and debris removal",
+        "Plumbing and electrical rough-in",
+        "Cabinet and countertop installation",
+        "Tile, flooring, and trim",
+        "Fixtures and appliances",
+        "Final inspection and punch list"
       ],
       beforeImages: [
-        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop"
+        "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=400&h=300&fit=crop"
       ],
       afterImages: [
-        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
+        "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&h=300&fit=crop"
       ],
-      clientTestimonial: "Elite Landscaping exceeded our expectations! The team was professional, punctual, and delivered exactly what we envisioned. Our backyard is now our favorite place to spend time.",
-      budget: "$15,000 - $25,000"
+      clientTestimonial: "Apex coordinated every trade and kept the job on track. Our kitchen and bath feel brand new.",
+      budget: "$65,000 - $85,000"
     },
     {
       id: 2,
-      projectName: "Commercial Office Complex",
-      projectType: "Commercial Landscaping",
-      businessName: "Premier Landscapes TX",
+      projectName: "Office lobby & exterior refresh",
+      projectType: "Commercial TI",
+      businessName: "StructureFirst Builders",
       clientName: "Downtown Development Corp",
       status: "completed",
       estimatedLength: 12,
-      imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
-      description: "Large-scale commercial landscaping project including trees, shrubs, and maintenance systems.",
+      imageUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop",
+      description: "Tenant improvement for lobby, restrooms, and building entry with coordinated exterior updates.",
       completedDate: "2024-02-20",
-      fullDescription: "A comprehensive commercial landscaping project for a 50,000 sq ft office complex. The design focused on creating an impressive first impression while maintaining low maintenance requirements. The project included mature tree installation, seasonal flower beds, automated irrigation, and professional lighting to enhance the building's architecture.",
+      fullDescription: "A multi-phase commercial project: interior build-out of the lobby and restrooms, ADA compliance updates, new lighting and finishes, and exterior entry improvements including signage mounts and limited landscape at the approach. Scheduling minimized disruption to occupied floors.",
       tasks: [
-        "Site survey and design planning",
-        "Large tree installation (20+ trees)",
-        "Seasonal flower bed installation",
-        "Automated irrigation system",
-        "Professional landscape lighting",
-        "Mulch and ground cover installation",
-        "Maintenance plan development",
-        "Final inspection and handover"
+        "Site logistics and safety plan",
+        "Interior framing and finishes",
+        "Restroom and ADA upgrades",
+        "Lighting and low-voltage coordination",
+        "Exterior entry and canopy work",
+        "Limited landscape at building approach",
+        "Final commissioning and closeout"
       ],
       beforeImages: [
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop"
       ],
       afterImages: [
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop"
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
       ],
-      clientTestimonial: "Premier Landscapes transformed our office complex into a welcoming, professional environment. The quality of work and attention to detail was outstanding.",
-      budget: "$50,000 - $75,000"
+      clientTestimonial: "StructureFirst delivered a polished lobby and entry on schedule. Communication with our property manager was excellent.",
+      budget: "$180,000 - $240,000"
     },
     {
       id: 3,
-      projectName: "Residential Pool Area",
-      projectType: "Pool Landscaping",
-      businessName: "AquaScape Designs",
+      projectName: "Pool deck & outdoor living",
+      projectType: "Outdoor / hardscape",
+      businessName: "Summit Site Works",
       clientName: "Mike Rodriguez",
       status: "completed",
       estimatedLength: 8,
       imageUrl: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop",
-      description: "Pool area landscaping with tropical plants, lighting, and privacy screening.",
+      description: "Pool surround, paving, pergola, and planting package under one general contractor.",
       completedDate: "2024-03-10",
-      fullDescription: "A tropical paradise was created around this residential pool area. The design incorporated heat-tolerant tropical plants, strategic privacy screening, and ambient lighting to create a resort-like atmosphere. The project included custom planters, decorative rock features, and a pergola for shade.",
+      fullDescription: "Outdoor living scope: reinforced pool deck, drainage, paver layout, pergola and lighting, irrigation tie-in, and softscape for screening. One contract covered concrete, carpentry, electrical for fixtures, and landscape finish—typical GC coordination for exterior work.",
       tasks: [
-        "Pool area assessment and design",
-        "Tropical plant selection and installation",
-        "Privacy screening installation",
-        "Custom planter construction",
-        "Decorative rock feature placement",
-        "Ambient lighting installation",
-        "Pergola construction for shade",
-        "Pool area cleanup and finishing"
+        "Grading and drainage plan",
+        "Pool deck and paver installation",
+        "Pergola and exterior lighting",
+        "Irrigation and planting",
+        "Privacy screening",
+        "Safety and code review",
+        "Final landscape establishment"
       ],
       beforeImages: [
         "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop"
@@ -167,62 +167,60 @@ export function Homepage() {
         "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop",
         "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
       ],
-      clientTestimonial: "AquaScape Designs created the perfect tropical retreat around our pool. We feel like we're on vacation every time we step outside!",
-      budget: "$20,000 - $35,000"
+      clientTestimonial: "Summit handled hardscape, electrical, and planting without us juggling five different companies.",
+      budget: "$48,000 - $62,000"
     },
     {
       id: 4,
-      projectName: "Historic Garden Restoration",
-      projectType: "Garden Restoration",
-      businessName: "Heritage Gardens",
-      clientName: "Historic Society",
+      projectName: "Historic storefront restoration",
+      projectType: "Restoration",
+      businessName: "Heritage Build Partners",
+      clientName: "Main Street Historic Society",
       status: "completed",
       estimatedLength: 15,
-      imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
-      description: "Restoration of historic garden with period-appropriate plants and design elements.",
+      imageUrl: "https://images.unsplash.com/photo-1464146072230-87357e5a6d5b?w=400&h=300&fit=crop",
+      description: "Facade repair, window replication, and structural stabilization for a registered historic building.",
       completedDate: "2024-01-30",
-      fullDescription: "A meticulous restoration of a 1920s-era garden that had fallen into disrepair. The project involved extensive research into period-appropriate plants and design elements, careful restoration of original features, and installation of historically accurate plantings. The garden now serves as an educational resource for the community.",
+      fullDescription: "Restoration-focused GC work: documentation with the preservation board, masonry repair, custom window fabrication to match originals, structural reinforcement, and period-appropriate finishes. Subcontractors were vetted for historic sensitivity.",
       tasks: [
-        "Historical research and documentation",
-        "Original feature restoration",
-        "Period-appropriate plant selection",
-        "Garden bed reconstruction",
-        "Pathway restoration",
-        "Historical marker installation",
-        "Educational signage placement",
-        "Community garden opening ceremony"
+        "Historic review and approvals",
+        "Masonry and facade repair",
+        "Custom window installation",
+        "Structural stabilization",
+        "Interior shell prep for tenant",
+        "Walkthrough with preservation officer",
+        "Warranty and maintenance briefing"
       ],
       beforeImages: [
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
+        "https://images.unsplash.com/photo-1464146072230-87357e5a6d5b?w=400&h=300&fit=crop"
       ],
       afterImages: [
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop"
+        "https://images.unsplash.com/photo-1464146072230-87357e5a6d5b?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&h=300&fit=crop"
       ],
-      clientTestimonial: "Heritage Gardens brought our historic garden back to life with incredible attention to historical accuracy and detail. It's now a treasured community asset.",
-      budget: "$30,000 - $45,000"
+      clientTestimonial: "Heritage Build respected the original character and still brought the building up to modern code.",
+      budget: "$210,000 - $275,000"
     },
     {
       id: 5,
-      projectName: "Drought-Resistant Landscape",
-      projectType: "Xeriscaping",
+      projectName: "Drought-tolerant landscape",
+      projectType: "Landscaping",
       businessName: "EcoScape Solutions",
       clientName: "Green Living LLC",
       status: "completed",
       estimatedLength: 6,
       imageUrl: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop",
-      description: "Water-efficient landscaping design using native plants and sustainable materials.",
+      description: "Water-efficient design with native plantings—landscaping as part of a broader outdoor program.",
       completedDate: "2024-02-15",
-      fullDescription: "An innovative xeriscaping project that transformed a water-intensive lawn into a beautiful, drought-resistant landscape. The design utilized native Texas plants, permeable paving materials, and efficient irrigation systems to create a sustainable outdoor space that requires minimal water and maintenance.",
+      fullDescription: "Landscaping remains a core trade many GCs bundle with hardscape and irrigation. This project removed high-water turf, installed permeable paths, native beds, and efficient irrigation—often sequenced after hardscape by the same contractor team.",
       tasks: [
-        "Water usage analysis and planning",
-        "Native plant selection and sourcing",
-        "Lawn removal and soil preparation",
+        "Water budget and plant palette",
+        "Turf removal and soil prep",
+        "Permeable path installation",
         "Native plant installation",
-        "Permeable paving installation",
-        "Efficient irrigation system setup",
-        "Mulch and ground cover application",
-        "Water conservation education session"
+        "Irrigation upgrade",
+        "Mulch and establishment watering plan",
+        "Client care instructions"
       ],
       beforeImages: [
         "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop"
@@ -231,40 +229,39 @@ export function Homepage() {
         "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop",
         "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
       ],
-      clientTestimonial: "EcoScape Solutions helped us create a beautiful, sustainable landscape that saves water and maintenance costs. Highly recommend their eco-friendly approach!",
-      budget: "$12,000 - $20,000"
+      clientTestimonial: "EcoScape cut our water bill and the yard still looks intentional and finished.",
+      budget: "$18,000 - $28,000"
     },
     {
       id: 6,
-      projectName: "Rooftop Garden Installation",
-      projectType: "Rooftop Landscaping",
-      businessName: "Sky Gardens TX",
+      projectName: "Full roof replacement",
+      projectType: "Roofing & exteriors",
+      businessName: "RidgeTop Exteriors",
       clientName: "Urban Living Complex",
       status: "completed",
       estimatedLength: 10,
-      imageUrl: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop",
-      description: "Rooftop garden installation with container plants, seating areas, and city views.",
+      imageUrl: "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=400&h=300&fit=crop",
+      description: "Tear-off, decking repairs, underlayment, and architectural shingles with new gutters and downspouts.",
       completedDate: "2024-03-05",
-      fullDescription: "A stunning rooftop garden installation that transformed an unused rooftop space into a vibrant community garden. The project included weather-resistant container plantings, comfortable seating areas, and strategic plant placement to maximize city views while providing privacy and shade.",
+      fullDescription: "A weather-tight envelope project managed as a standalone GC contract: tear-off, substrate repairs, ice and water shield, shingle install, ventilation adjustments, and gutter replacement. Ideal for property managers who need documentation and warranty handoff.",
       tasks: [
-        "Rooftop structural assessment",
-        "Weather-resistant container selection",
-        "Container plant installation",
-        "Seating area construction",
-        "Privacy screening installation",
-        "City view optimization",
-        "Lighting and safety features",
-        "Community garden orientation"
+        "Roof inspection and scope",
+        "Tear-off and decking repair",
+        "Underlayment and flashing",
+        "Shingle installation",
+        "Gutter and downspout replacement",
+        "Cleanup and magnet sweep",
+        "Manufacturer warranty registration"
       ],
       beforeImages: [
-        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop"
+        "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=400&h=300&fit=crop"
       ],
       afterImages: [
-        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop"
+        "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&h=300&fit=crop"
       ],
-      clientTestimonial: "Sky Gardens TX created an amazing rooftop oasis for our residents. It's become the most popular amenity in our building!",
-      budget: "$25,000 - $40,000"
+      clientTestimonial: "RidgeTop kept residents informed and left the site clean every night. The new roof passed inspection first try.",
+      budget: "$95,000 - $125,000"
     }
   ];
 
@@ -295,24 +292,24 @@ export function Homepage() {
       id: 1,
       client: "Sarah Johnson",
       rating: 5,
-      title: "Exceptional Garden Transformation",
-      description: "Lawncha Libre completely transformed our backyard into a beautiful oasis. The team was professional, punctual, and exceeded our expectations.",
+      title: "Smooth kitchen remodel",
+      description: "Buildcha Libre helped us line up a great contractor for our kitchen. Clear updates, realistic timeline, and the crew showed up when they said they would.",
       highlighted: true
     },
     {
       id: 2,
       client: "Mike Chen",
       rating: 5,
-      title: "Reliable Lawn Care Service",
-      description: "Been using their weekly lawn service for 6 months. Always on time, great communication, and my lawn has never looked better.",
+      title: "Commercial job done right",
+      description: "We used the platform for a lobby refresh at our building. Bids were easy to compare and the GC we picked handled TI and exterior details without drama.",
       highlighted: false
     },
     {
       id: 3,
       client: "Emily Rodriguez",
       rating: 4,
-      title: "Professional Tree Removal",
-      description: "Quick and safe removal of a large oak tree. Clean up was thorough and pricing was fair. Would definitely recommend.",
+      title: "Outdoor project, one point of contact",
+      description: "Pool deck and plantings were coordinated together—no more guessing which subcontractor was next. Fair pricing and solid cleanup.",
       highlighted: true
     }
   ];
@@ -341,7 +338,7 @@ export function Homepage() {
       {/* Header with Theme Toggle */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold gradient-text">Lawncha Libre</h2>
+          <h2 className="text-xl font-semibold gradient-text">Buildcha Libre</h2>
           <div className="flex items-center gap-4">
             <ThemeToggle />
           </div>
@@ -367,11 +364,11 @@ export function Homepage() {
         
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <h1 className="text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6 animate-fade-in">
-            Professional Landscaping
+            General Contracting
             <span className="gradient-text block">Made Simple</span>
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto animate-fade-in" style={{animationDelay: '0.2s'}}>
-            Connect with trusted landscaping professionals or manage your landscaping business with our comprehensive platform.
+            Connect homeowners and businesses with trusted contractors—or run your remodeling, trades, and landscaping jobs from one place.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{animationDelay: '0.4s'}}>
             <Button 
@@ -398,7 +395,7 @@ export function Homepage() {
             <Button 
               size="xl" 
               variant="ghost"
-              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
               className="px-8 py-4 hover:scale-105"
             >
               Learn More
@@ -429,6 +426,110 @@ export function Homepage() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* App flow: quotes, clients, and projects */}
+      <section id="how-it-works" className="py-16 px-4 bg-gradient-to-b from-emerald-50/80 via-white/60 to-cyan-50/40 dark:from-gray-900/80 dark:via-gray-900/60 dark:to-gray-900/40 border-y border-emerald-100/80 dark:border-gray-700/80">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 dark:bg-primary/20 px-4 py-1.5 text-sm font-medium text-primary mb-4">
+              <Workflow className="h-4 w-4" />
+              How the platform fits together
+            </div>
+            <h2 className="text-4xl font-bold mb-4 gradient-text">From quotes and clients to live projects</h2>
+            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-lg">
+              Quote requests are stored as intake forms. Businesses claim them, add an estimate, then convert the work into a project.
+              You can also start a project for a client you already have from a booking or your client list.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 mb-8">
+            <div className="relative rounded-2xl border border-emerald-200/80 dark:border-emerald-900/50 bg-white/70 dark:bg-gray-800/70 p-6 shadow-sm backdrop-blur-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Quote className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Quote request → project</h3>
+              </div>
+              <ol className="space-y-4">
+                {[
+                  { step: "1", title: "Client submits intake", body: "The public form creates a quote request with contact info, description, and optional photos or videos." },
+                  { step: "2", title: "Business claims & quotes", body: "An owner claims the request, adds notes, and can record an estimated price for the prospect." },
+                  { step: "3", title: "Convert to project", body: "From the claimed request, the owner defines tasks, schedule, and scope. Media from the intake comes along; when the client has an account, they are tied to the project for approval." },
+                ].map((item) => (
+                  <li key={item.step} className="flex gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-sm font-bold text-emerald-800 dark:text-emerald-200">
+                      {item.step}
+                    </span>
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">{item.title}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{item.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="relative rounded-2xl border border-violet-200/80 dark:border-violet-900/50 bg-white/70 dark:bg-gray-800/70 p-6 shadow-sm backdrop-blur-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Handshake className="h-6 w-6 text-violet-600 dark:text-violet-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Known client → project</h3>
+              </div>
+              <ol className="space-y-4">
+                {[
+                  { step: "A", title: "After a booking", body: "When a client books an available slot, you can spin up a project from that appointment with their account already attached." },
+                  { step: "B", title: "From your dashboard", body: "Create a new project and choose a client you already work with—or mark work as historical with no linked client." },
+                  { step: "C", title: "Same project record", body: "Either path uses the same project model: tasks, dates, status, and client approval when the client is on the platform." },
+                ].map((item) => (
+                  <li key={item.step} className="flex gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/50 text-sm font-bold text-violet-800 dark:text-violet-200">
+                      {item.step}
+                    </span>
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">{item.title}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{item.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center gap-2 mb-6">
+            <ChevronDown className="h-7 w-7 text-primary" aria-hidden />
+            <span className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Both paths converge</span>
+          </div>
+
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 p-6 md:p-8 shadow-md max-w-4xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-stretch md:justify-between gap-6">
+              <div className="flex-1 flex flex-col items-center text-center p-4 rounded-xl bg-gray-50/80 dark:bg-gray-900/50">
+                <FolderKanban className="h-10 w-10 text-primary mb-2" />
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Project</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Planned scope, task list, timeline, and notes in one place.</p>
+              </div>
+              <div className="hidden md:flex items-center justify-center text-gray-300 dark:text-gray-600">
+                <ArrowRight className="h-6 w-6" />
+              </div>
+              <div className="flex md:hidden justify-center text-gray-300 dark:text-gray-600">
+                <ChevronDown className="h-6 w-6" />
+              </div>
+              <div className="flex-1 flex flex-col items-center text-center p-4 rounded-xl bg-gray-50/80 dark:bg-gray-900/50">
+                <Users className="h-10 w-10 text-primary mb-2" />
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Client approval</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Linked clients review pending projects; then work moves forward with full visibility.</p>
+              </div>
+              <div className="hidden md:flex items-center justify-center text-gray-300 dark:text-gray-600">
+                <ArrowRight className="h-6 w-6" />
+              </div>
+              <div className="flex md:hidden justify-center text-gray-300 dark:text-gray-600">
+                <ChevronDown className="h-6 w-6" />
+              </div>
+              <div className="flex-1 flex flex-col items-center text-center p-4 rounded-xl bg-gray-50/80 dark:bg-gray-900/50">
+                <CheckCircle className="h-10 w-10 text-primary mb-2" />
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Delivery & completion</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Track tasks through the queue, run the job, and mark the project complete.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -563,7 +664,7 @@ export function Homepage() {
                 Smart Appointment Booking
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Clients can easily view available time slots and book appointments with landscaping professionals. 
+                Clients can easily view available time slots and book appointments with your team. 
                 Business owners can manage their calendar and availability in real-time.
               </p>
               <div className="space-y-2">
@@ -634,8 +735,8 @@ export function Homepage() {
                 Project Management
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Business owners can create, track, and manage landscaping projects from initial consultation 
-                to completion. Keep clients informed with real-time updates and progress tracking.
+                Business owners can create, track, and manage projects from estimate through punch list—
+                remodels, trades, exteriors, and outdoor work. Keep clients informed with real-time updates.
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
@@ -666,8 +767,8 @@ export function Homepage() {
                 Easy Quote Requests
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Need landscaping work done? Simply fill out our intake form with your project details, 
-                and we'll connect you with qualified professionals who will provide competitive quotes.
+                Planning a repair, remodel, or outdoor project? Fill out our intake form with your details, 
+                and we'll connect you with qualified contractors who can provide competitive quotes.
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
@@ -691,7 +792,7 @@ export function Homepage() {
             <Card variant="glass" className="p-6 animate-fade-in" style={{animationDelay: '0.2s'}}>
               <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">Ready to Get Started?</h4>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Submit your project details and receive quotes from qualified landscapers in your area.
+                Submit your project details and receive quotes from qualified contractors in your area.
               </p>
               <Button 
                 onClick={() => setShowIntakeModal(true)}
@@ -783,7 +884,7 @@ export function Homepage() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-4xl font-bold mb-4 animate-fade-in">Ready to Get Started?</h2>
           <p className="text-xl mb-8 opacity-90 animate-fade-in" style={{animationDelay: '0.2s'}}>
-            Join Lawncha Libre today and transform how you manage landscaping services.
+            Join Buildcha Libre today and transform how you manage contracting work.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{animationDelay: '0.4s'}}>
             <Button 
@@ -817,18 +918,18 @@ export function Homepage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold gradient-text mb-4">Lawncha Libre</h3>
+              <h3 className="text-xl font-bold gradient-text mb-4">Buildcha Libre</h3>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
-                Professional landscaping services and business management platform.
+                Quotes, scheduling, and project management for general contractors and the clients who hire them.
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">Services</h4>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li>Lawn Care</li>
-                <li>Garden Design</li>
-                <li>Tree Services</li>
-                <li>Maintenance</li>
+                <li>Remodeling & additions</li>
+                <li>Electrical & plumbing</li>
+                <li>Roofing & exteriors</li>
+                <li>Landscaping & outdoor</li>
               </ul>
             </div>
             <div>
@@ -849,7 +950,7 @@ export function Homepage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
-                  <span>info@lawnchalibre.com</span>
+                  <span>info@buildchalibre.com</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
@@ -859,7 +960,7 @@ export function Homepage() {
             </div>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-            <p>&copy; 2024 Lawncha Libre. All rights reserved. | <span className="gradient-text">Demo data shown for illustration purposes.</span></p>
+            <p>&copy; 2026 Buildcha Libre. All rights reserved. | <span className="gradient-text">Demo data shown for illustration purposes.</span></p>
           </div>
         </div>
       </footer>
@@ -870,7 +971,7 @@ export function Homepage() {
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center">Get Your Free Quote</DialogTitle>
             <DialogDescription className="text-center">
-              Fill out the form below and we'll connect you with qualified landscaping professionals
+              Fill out the form below and we'll connect you with qualified contractors
             </DialogDescription>
           </DialogHeader>
           <IntakeForm 
@@ -937,7 +1038,7 @@ export function Homepage() {
                         <Building2 className="h-5 w-5 text-primary" />
                         <div>
                           <p className="font-medium text-gray-900 dark:text-gray-100">{selectedProject.businessName}</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Landscaping Company</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">General contractor</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">

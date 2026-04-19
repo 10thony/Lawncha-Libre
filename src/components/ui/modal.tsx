@@ -2,7 +2,11 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { SignInForm } from "../../SignInForm";
+import { SignUp } from "@clerk/react";
+import { clerkAuthAppearance, SignInForm } from "../../SignInForm";
+
+const postAuthUrl =
+  typeof window !== "undefined" ? `${window.location.origin}/` : "/";
 
 interface ModalProps {
   isOpen: boolean;
@@ -178,31 +182,18 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
         {/* Auth Content */}
         <div className="min-h-[400px]">
           {mode === "signin" ? (
-            <SignInForm />
+            <SignInForm forceRedirectUrl={postAuthUrl} />
           ) : (
-            <SignUpForm />
+            <div className="w-full flex justify-center">
+              <SignUp
+                forceRedirectUrl={postAuthUrl}
+                signInForceRedirectUrl={postAuthUrl}
+                appearance={clerkAuthAppearance}
+              />
+            </div>
           )}
         </div>
       </div>
     </Modal>
-  );
-}
-
-// Create a simple SignUpForm component if it doesn't exist
-function SignUpForm() {
-  return (
-    <div className="w-full flex justify-center">
-      <div className="text-center py-8">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-          Sign Up Coming Soon
-        </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
-          We're working on bringing you the best sign-up experience.
-        </p>
-        <p className="text-sm text-gray-500 dark:text-gray-500">
-          For now, please use the sign-in option.
-        </p>
-      </div>
-    </div>
   );
 }

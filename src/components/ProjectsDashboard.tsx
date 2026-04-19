@@ -7,7 +7,17 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+
+/** Sentinel for Radix Select — empty string is reserved for clearing the selection */
+const NO_CLIENT_SELECT_VALUE = "__no_client__";
 import { Building2, Calendar, Clock, User, Plus, Edit, CheckCircle, Play, Circle, Check, X, Image as ImageIcon } from "lucide-react";
 import { uploadImagesWithUploadThing } from "@/lib/uploadthing";
 
@@ -41,6 +51,9 @@ export function ProjectsDashboard({ profile }: ProjectsDashboardProps) {
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Create New Project</DialogTitle>
+                <DialogDescription>
+                  Fill in the details below to create a project for a client or as a completed (historical) job.
+                </DialogDescription>
               </DialogHeader>
               <CreateProjectForm 
                 clients={clientsWithApprovedAppointments || []}
@@ -74,6 +87,7 @@ export function ProjectsDashboard({ profile }: ProjectsDashboardProps) {
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Edit Project</DialogTitle>
+              <DialogDescription>Update project details, tasks, dates, and status.</DialogDescription>
             </DialogHeader>
             <EditProjectForm 
               project={editingProject}
@@ -330,12 +344,20 @@ function CreateProjectForm({ clients, onSuccess }: any) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="client">Client</Label>
-        <Select value={projectData.clientClerkId} onValueChange={(value) => setProjectData(prev => ({ ...prev, clientClerkId: value }))}>
+        <Select
+          value={projectData.clientClerkId ? projectData.clientClerkId : NO_CLIENT_SELECT_VALUE}
+          onValueChange={(value) =>
+            setProjectData((prev) => ({
+              ...prev,
+              clientClerkId: value === NO_CLIENT_SELECT_VALUE ? "" : value,
+            }))
+          }
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select a client" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No Client (Completed Project)</SelectItem>
+            <SelectItem value={NO_CLIENT_SELECT_VALUE}>No Client (Completed Project)</SelectItem>
             {clients.map((client: any) => (
               <SelectItem key={client.clerkUserId} value={client.clerkUserId}>
                 {client.name}
@@ -355,7 +377,7 @@ function CreateProjectForm({ clients, onSuccess }: any) {
             id="projectType"
             value={projectData.projectType}
             onChange={(e) => setProjectData(prev => ({ ...prev, projectType: e.target.value }))}
-            placeholder="e.g., Garden Design, Lawn Installation"
+            placeholder="e.g., Remodeling, Electrical, Landscaping"
             required
           />
         </div>
@@ -856,6 +878,9 @@ function ProjectApprovalButtons({ project }: any) {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Reject Project</DialogTitle>
+              <DialogDescription>
+                Provide a clear reason so the business understands what to change.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useEffect, useState } from "react";
+import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { EmployeeRegistration } from "./EmployeeRegistration";
@@ -20,7 +20,22 @@ import {
   X
 } from "lucide-react";
 
-export function ProfileSetup() {
+type EmployeeInviteInfo = {
+  valid: true;
+  companyId: string;
+  companyName: string;
+  expiresAt: number;
+};
+
+type ProfileSetupProps = {
+  employeeInviteToken?: string | null;
+  employeeInviteInfo?: EmployeeInviteInfo | null;
+};
+
+export function ProfileSetup({
+  employeeInviteToken,
+  employeeInviteInfo,
+}: ProfileSetupProps) {
   const [userType, setUserType] = useState<"client" | "business" | "employee" | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -33,6 +48,26 @@ export function ProfileSetup() {
   const [serviceInput, setServiceInput] = useState("");
 
   const createProfile = useMutation(api.profiles.createProfile);
+
+  const inviteReady =
+    !employeeInviteToken ||
+    employeeInviteInfo !== undefined;
+
+  const applyingEmployeeInvite =
+    employeeInviteInfo?.valid === true && userType !== "employee";
+
+  useEffect(() => {
+    if (!employeeInviteToken) return;
+    if (employeeInviteInfo === null) {
+      toast.error("This employee invitation link is invalid or has expired.");
+    }
+  }, [employeeInviteToken, employeeInviteInfo]);
+
+  useEffect(() => {
+    if (employeeInviteInfo?.valid) {
+      setUserType("employee");
+    }
+  }, [employeeInviteInfo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +116,7 @@ export function ProfileSetup() {
       {/* Header with Theme Toggle */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold gradient-text">Lawncha Libre</h2>
+          <h2 className="text-xl font-semibold gradient-text">Buildcha Libre</h2>
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <SignOutButton />
@@ -99,7 +134,14 @@ export function ProfileSetup() {
           </p>
         </div>
 
-        {!userType ? (
+        {!inviteReady || applyingEmployeeInvite ? (
+          <div className="flex justify-center py-24">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 dark:border-gray-700"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent absolute top-0 left-0"></div>
+            </div>
+          </div>
+        ) : !userType ? (
           <div className="space-y-8">
             <h2 className="text-2xl font-semibold text-center text-gray-900 dark:text-gray-100">
               What type of user are you?
@@ -115,7 +157,7 @@ export function ProfileSetup() {
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">I'm a Client</h3>
                   <p className="text-gray-600 dark:text-gray-400">
-                    I'm looking for landscaping services for my property
+                    I'm looking to hire a contractor for a home or commercial project
                   </p>
                 </CardContent>
               </Card>
@@ -130,7 +172,7 @@ export function ProfileSetup() {
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">I'm a Business Owner</h3>
                   <p className="text-gray-600 dark:text-gray-400">
-                    I provide landscaping services to clients
+                    I run a contracting business and serve clients directly
                   </p>
                 </CardContent>
               </Card>
@@ -145,14 +187,22 @@ export function ProfileSetup() {
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">I'm an Employee</h3>
                   <p className="text-gray-600 dark:text-gray-400">
-                    I work for a landscaping company
+                    I work for a general contractor or subcontractor
                   </p>
                 </CardContent>
               </Card>
             </div>
           </div>
         ) : userType === "employee" ? (
-          <EmployeeRegistration />
+          <EmployeeRegistration
+            inviteToken={employeeInviteInfo?.valid ? employeeInviteToken! : undefined}
+            lockedCompanyId={
+              employeeInviteInfo?.valid ? employeeInviteInfo.companyId : undefined
+            }
+            lockedCompanyName={
+              employeeInviteInfo?.valid ? employeeInviteInfo.companyName : undefined
+            }
+          />
         ) : (
           <Card className="max-w-2xl mx-auto">
             <CardHeader className="text-center">
@@ -161,7 +211,7 @@ export function ProfileSetup() {
               </CardTitle>
               <CardDescription className="text-gray-600 dark:text-gray-400">
                 {userType === "client" 
-                  ? "Tell us about yourself so we can connect you with the right landscapers"
+                  ? "Tell us about yourself so we can connect you with the right contractors"
                   : "Tell us about your business so clients can find you"
                 }
               </CardDescription>
@@ -209,7 +259,7 @@ export function ProfileSetup() {
                         value={formData.businessDescription}
                         onChange={(e) => setFormData(prev => ({ ...prev, businessDescription: e.target.value }))}
                         rows={3}
-                        placeholder="Describe your landscaping services..."
+                        placeholder="Describe your services and trade focus..."
                         className="mt-2"
                       />
                     </div>
@@ -221,7 +271,7 @@ export function ProfileSetup() {
                           type="text"
                           value={serviceInput}
                           onChange={(e) => setServiceInput(e.target.value)}
-                          placeholder="e.g., Garden Design, Lawn Care"
+                          placeholder="e.g., Remodeling, Roofing, Landscaping"
                           className="flex-1"
                         />
                         <Button

@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUser } from "@clerk/react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import type { Id } from "../../convex/_generated/dataModel";
 import { toast } from "sonner";
+import { clearStoredEmployeeInviteToken } from "../employeeInvite";
 import { ThemeToggle } from "./ui/theme-toggle";
 import { SignOutButton } from "../SignOutButton";
 import { Button } from "./ui/button";
@@ -17,7 +20,19 @@ import {
   ArrowLeft
 } from "lucide-react";
 
-export function EmployeeRegistration() {
+type EmployeeRegistrationProps = {
+  /** Server-validated invite; when set, company is fixed to the inviter's business. */
+  inviteToken?: string;
+  lockedCompanyId?: Id<"profiles">;
+  lockedCompanyName?: string;
+};
+
+export function EmployeeRegistration({
+  inviteToken,
+  lockedCompanyId,
+  lockedCompanyName,
+}: EmployeeRegistrationProps) {
+  const { user } = useUser();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -28,7 +43,32 @@ export function EmployeeRegistration() {
 
   const createEmployeeRequest = useMutation(api.profiles.createEmployeeRequest);
   const createProfile = useMutation(api.profiles.createProfile);
-  const businessOwners = useQuery(api.profiles.getBusinessOwners);
+  const businessOwners = useQuery(
+    api.profiles.getBusinessOwners,
+    lockedCompanyId ? "skip" : {}
+  );
+
+  useEffect(() => {
+    if (!user) return;
+    const email = user.primaryEmailAddress?.emailAddress ?? "";
+    const first = user.firstName ?? "";
+    const last = user.lastName ?? "";
+    setFormData((prev) => ({
+      ...prev,
+      email: prev.email || email,
+      firstName: prev.firstName || first,
+      lastName: prev.lastName || last,
+    }));
+  }, [user]);
+
+  useEffect(() => {
+    if (lockedCompanyId) {
+      setFormData((prev) => ({
+        ...prev,
+        companyId: lockedCompanyId as unknown as string,
+      }));
+    }
+  }, [lockedCompanyId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,30 +79,33 @@ export function EmployeeRegistration() {
     }
 
     try {
-      // First create the employee profile
+      const companyId = formData.companyId as Id<"profiles">;
+
       await createProfile({
         name: `${formData.firstName} ${formData.lastName}`,
         userType: "employee",
         phone: formData.phone,
-        companyId: formData.companyId as any,
+        companyId,
+        ...(inviteToken ? { employeeInviteToken: inviteToken } : {}),
       });
 
-      // Then create the employee request
       await createEmployeeRequest({
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
-        companyId: formData.companyId as any,
+        companyId,
+        ...(inviteToken ? { employeeInviteToken: inviteToken } : {}),
       });
-      
+
+      clearStoredEmployeeInviteToken();
       toast.success("Employee request submitted successfully! The company owner will review your request.");
       setFormData({
         firstName: "",
         lastName: "",
         email: "",
         phone: "",
-        companyId: "",
+        companyId: lockedCompanyId ? (lockedCompanyId as unknown as string) : "",
       });
     } catch (error: any) {
       toast.error(error.message || "Failed to submit employee request");
@@ -74,7 +117,7 @@ export function EmployeeRegistration() {
       {/* Header with Theme Toggle */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold gradient-text">Lawncha Libre</h2>
+          <h2 className="text-xl font-semibold gradient-text">Buildcha Libre</h2>
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <SignOutButton />
@@ -88,7 +131,7 @@ export function EmployeeRegistration() {
             Employee Registration
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            Join a landscaping company and start your journey
+            Join a contracting company and start your journey
           </p>
         </div>
         
@@ -99,10 +142,26 @@ export function EmployeeRegistration() {
               Complete Your Profile
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-400">
-              Fill out your information to request access to a landscaping company
+              Fill out your information to request access to a contracting company
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {lockedCompanyId && lockedCompanyName && (
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <Building2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-emerald-800 dark:text-emerald-200 text-sm font-medium mb-1">
+                      Invited to join
+                    </p>
+                    <p className="text-emerald-700 dark:text-emerald-300 text-sm">
+                      You&apos;re registering to join{" "}
+                      <span className="font-semibold">{lockedCompanyName}</span>.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
                 <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
@@ -185,21 +244,30 @@ export function EmployeeRegistration() {
                 <Label htmlFor="company" className="text-gray-900 dark:text-gray-100">
                   Company *
                 </Label>
-                <Select value={formData.companyId} onValueChange={(value) => setFormData(prev => ({ ...prev, companyId: value }))}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select a company" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {businessOwners?.map((business) => (
-                      <SelectItem key={business._id} value={business._id}>
-                        <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4" />
-                          {business.businessName || business.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {lockedCompanyId ? (
+                  <Input
+                    id="company"
+                    readOnly
+                    value={lockedCompanyName ?? ""}
+                    className="mt-2 bg-muted/50"
+                  />
+                ) : (
+                  <Select value={formData.companyId} onValueChange={(value) => setFormData(prev => ({ ...prev, companyId: value }))}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select a company" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {businessOwners?.map((business) => (
+                        <SelectItem key={business._id} value={business._id}>
+                          <div className="flex items-center gap-2">
+                            <Building2 className="h-4 w-4" />
+                            {business.businessName || business.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <Button

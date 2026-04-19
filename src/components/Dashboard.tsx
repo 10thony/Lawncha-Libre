@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useUser } from "@clerk/react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Button } from "./ui/button";
@@ -142,10 +142,10 @@ export function Dashboard({ profile }: DashboardProps) {
                 {!isSidebarCollapsed && (
                   <div>
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                      Lawncha Libre
+                      Buildcha Libre
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Landscaping
+                      General contracting
                     </p>
                   </div>
                 )}

@@ -240,7 +240,7 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                 <Label htmlFor="business">Select Business</Label>
                 <Select value={selectedBusinessId} onValueChange={setSelectedBusinessId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Choose a landscaper" />
+                    <SelectValue placeholder="Choose a contractor" />
                   </SelectTrigger>
                   <SelectContent>
                     {businessOwners?.map((business) => (
@@ -411,7 +411,7 @@ function CreateProjectDialog({ appointment, isOpen, onClose }: any) {
                 id="projectType"
                 value={projectData.projectType}
                 onChange={(e) => setProjectData(prev => ({ ...prev, projectType: e.target.value }))}
-                placeholder="e.g., Garden Design, Lawn Installation"
+                placeholder="e.g., Kitchen remodel, Roofing, Landscaping"
                 required
               />
             </div>

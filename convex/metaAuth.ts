@@ -1,5 +1,6 @@
 import { action, internalAction, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import { vConnectedPage } from "./validators";
 import { api, internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 
@@ -234,7 +235,7 @@ export const validateOAuthState = internalMutation({
   handler: async (ctx, args) => {
     const stateRecord = await ctx.db
       .query("oauthStates")
-      .withIndex("by_state", (q: any) => q.eq("state", args.state))
+      .withIndex("by_state", (q) => q.eq("state", args.state))
       .first();
 
     if (!stateRecord) {
@@ -257,11 +258,7 @@ export const createMetaAccount = internalMutation({
     longLivedUserToken: v.string(),
     tokenExpiresAt: v.optional(v.number()),
     facebookUserId: v.string(),
-    connectedPages: v.array(v.object({
-      pageId: v.string(),
-      name: v.string(),
-      pageAccessToken: v.optional(v.string()),
-    })),
+    connectedPages: v.array(vConnectedPage),
     instagramBusinessAccountId: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -279,11 +276,7 @@ export const updateMetaAccount = internalMutation({
     longLivedUserToken: v.string(),
     tokenExpiresAt: v.optional(v.number()),
     facebookUserId: v.string(),
-    connectedPages: v.array(v.object({
-      pageId: v.string(),
-      name: v.string(),
-      pageAccessToken: v.optional(v.string()),
-    })),
+    connectedPages: v.array(vConnectedPage),
     instagramBusinessAccountId: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -302,7 +295,7 @@ export const cleanupOAuthState = internalMutation({
   handler: async (ctx, args) => {
     const stateRecord = await ctx.db
       .query("oauthStates")
-      .withIndex("by_state", (q: any) => q.eq("state", args.state))
+      .withIndex("by_state", (q) => q.eq("state", args.state))
       .first();
 
     if (stateRecord) {
@@ -319,7 +312,7 @@ export const getMetaAccountByUser = internalMutation({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("metaAccounts")
-      .withIndex("by_user", (q: any) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .first();
   },
 });
@@ -442,7 +435,7 @@ export const deleteUserInstagramMedia = internalMutation({
   handler: async (ctx, args) => {
     const media = await ctx.db
       .query("instagramMedia")
-      .withIndex("by_user", (q: any) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
 
     for (const item of media) {
@@ -459,7 +452,7 @@ export const deleteUserFacebookPosts = internalMutation({
   handler: async (ctx, args) => {
     const posts = await ctx.db
       .query("facebookPosts")
-      .withIndex("by_user", (q: any) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
 
     for (const post of posts) {

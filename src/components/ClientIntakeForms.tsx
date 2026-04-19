@@ -419,7 +419,7 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
               {searchTerm ? "Try adjusting your search terms." : "You haven't submitted any quote requests yet."}
             </p>
             <p className="text-sm text-gray-500">
-              Visit our homepage to submit a new quote request for your landscaping project.
+              Visit our homepage to submit a new quote request for your project.
             </p>
           </CardContent>
         </Card>

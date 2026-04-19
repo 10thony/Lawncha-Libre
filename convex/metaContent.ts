@@ -1,6 +1,16 @@
 import { action, internalAction, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
+import type {
+  FacebookPostDoc,
+  FbGraphAttachment,
+  FbGraphFeedPost,
+  Id,
+  IgGraphCarouselChild,
+  IgGraphMediaItem,
+  InstagramMediaDoc,
+  MetaAccountDoc,
+} from "./types";
 
 /**
  * Meta Content Fetching Actions
@@ -15,20 +25,48 @@ import { api, internal } from "./_generated/api";
  * - Facebook Page feed: https://developers.facebook.com/docs/graph-api/reference/page/feed/
  */
 
+type MetaGraphPaged<T> = {
+  data?: T[];
+  paging?: { cursors?: { after?: string } };
+  error?: { message?: string };
+};
+
+function asIgMediaItems(
+  raw: MetaGraphPaged<Record<string, unknown>>
+): IgGraphMediaItem[] {
+  return (raw.data ?? []) as IgGraphMediaItem[];
+}
+
+function asFbFeedPosts(
+  raw: MetaGraphPaged<Record<string, unknown>>
+): FbGraphFeedPost[] {
+  return (raw.data ?? []) as FbGraphFeedPost[];
+}
+
 // Fetch Instagram media for user
 export const fetchInstagramMedia = action({
   args: {
     afterCursor: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
-  handler: async (ctx, args) => {
+  handler: async (
+    ctx,
+    args
+  ): Promise<{
+    media: (InstagramMediaDoc | Id<"instagramMedia">)[];
+    nextCursor: string | undefined;
+    hasMore: boolean;
+  }> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
     }
 
     const userId = identity.subject;
-    const metaAccount: any = await ctx.runMutation(internal.metaAuth.getMetaAccountByUser, { userId });
+    const metaAccount: MetaAccountDoc | null = await ctx.runMutation(
+      internal.metaAuth.getMetaAccountByUser,
+      { userId }
+    );
 
     if (!metaAccount) {
       throw new Error("No Meta account found. Please connect Facebook first.");
@@ -53,24 +91,27 @@ export const fetchInstagramMedia = action({
     }
 
     const response = await fetch(mediaUrl.toString());
-    const data = await response.json();
+    const data = (await response.json()) as MetaGraphPaged<Record<string, unknown>>;
 
     if (data.error) {
       throw new Error(`Instagram API error: ${data.error.message}`);
     }
 
-    const mediaItems = data.data || [];
+    const mediaItems = asIgMediaItems(data);
     const nextCursor = data.paging?.cursors?.after;
 
     // Store media items in database
-    const storedItems = [];
+    const storedItems: (InstagramMediaDoc | Id<"instagramMedia">)[] = [];
     for (const item of mediaItems) {
       try {
-        const storedItem: any = await ctx.runMutation(internal.metaContent.storeInstagramMedia, {
+        const storedItem: InstagramMediaDoc | Id<"instagramMedia"> = await ctx.runMutation(
+          internal.metaContent.storeInstagramMedia,
+          {
           userId,
           pageId: metaAccount.connectedPages[0]?.pageId || "",
           mediaData: item,
-        });
+        }
+        );
         storedItems.push(storedItem);
       } catch (error) {
         console.warn(`Failed to store Instagram media ${item.id}:`, error);
@@ -92,21 +133,31 @@ export const fetchFacebookPosts = action({
     afterCursor: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
-  handler: async (ctx, args) => {
+  handler: async (
+    ctx,
+    args
+  ): Promise<{
+    posts: (FacebookPostDoc | Id<"facebookPosts">)[];
+    nextCursor: string | undefined;
+    hasMore: boolean;
+  }> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
     }
 
     const userId = identity.subject;
-    const metaAccount: any = await ctx.runMutation(internal.metaAuth.getMetaAccountByUser, { userId });
+    const metaAccount: MetaAccountDoc | null = await ctx.runMutation(
+      internal.metaAuth.getMetaAccountByUser,
+      { userId }
+    );
 
     if (!metaAccount) {
       throw new Error("No Meta account found. Please connect Facebook first.");
     }
 
     // Find the page access token
-    const page = metaAccount.connectedPages.find((p: any) => p.pageId === args.pageId);
+    const page = metaAccount.connectedPages.find((p) => p.pageId === args.pageId);
     if (!page) {
       throw new Error("Page not found in connected pages");
     }
@@ -126,24 +177,27 @@ export const fetchFacebookPosts = action({
     }
 
     const response = await fetch(postsUrl.toString());
-    const data = await response.json();
+    const data = (await response.json()) as MetaGraphPaged<Record<string, unknown>>;
 
     if (data.error) {
       throw new Error(`Facebook API error: ${data.error.message}`);
     }
 
-    const posts = data.data || [];
+    const posts = asFbFeedPosts(data);
     const nextCursor = data.paging?.cursors?.after;
 
     // Store posts in database
-    const storedPosts = [];
+    const storedPosts: (FacebookPostDoc | Id<"facebookPosts">)[] = [];
     for (const post of posts) {
       try {
-        const storedPost: any = await ctx.runMutation(internal.metaContent.storeFacebookPost, {
-          userId,
-          pageId: args.pageId,
-          postData: post,
-        });
+        const storedPost: FacebookPostDoc | Id<"facebookPosts"> = await ctx.runMutation(
+          internal.metaContent.storeFacebookPost,
+          {
+            userId,
+            pageId: args.pageId,
+            postData: post,
+          }
+        );
         storedPosts.push(storedPost);
       } catch (error) {
         console.warn(`Failed to store Facebook post ${post.id}:`, error);
@@ -185,7 +239,7 @@ export const storeInstagramMedia = internalMutation({
     // Check if media already exists
     const existing = await ctx.db
       .query("instagramMedia")
-      .withIndex("by_media_id", (q: any) => q.eq("id", mediaData.id))
+      .withIndex("by_media_id", (q) => q.eq("id", mediaData.id))
       .first();
 
     if (existing) {
@@ -195,7 +249,7 @@ export const storeInstagramMedia = internalMutation({
         mediaUrl: mediaData.media_url,
         permalink: mediaData.permalink,
         fetchedAt: now,
-        children: mediaData.children?.data?.map((child: any) => ({
+        children: mediaData.children?.data?.map((child: IgGraphCarouselChild) => ({
           mediaType: child.media_type,
           mediaUrl: child.media_url,
         })) || undefined,
@@ -204,10 +258,11 @@ export const storeInstagramMedia = internalMutation({
     }
 
     // Create new record
-    const children = mediaData.children?.data?.map((child: any) => ({
-      mediaType: child.media_type,
-      mediaUrl: child.media_url,
-    })) || undefined;
+    const children =
+      mediaData.children?.data?.map((child: IgGraphCarouselChild) => ({
+        mediaType: child.media_type,
+        mediaUrl: child.media_url,
+      })) || undefined;
     
     return await ctx.db.insert("instagramMedia", {
       id: mediaData.id,
@@ -250,7 +305,7 @@ export const storeFacebookPost = internalMutation({
     // Check if post already exists
     const existing = await ctx.db
       .query("facebookPosts")
-      .withIndex("by_post_id", (q: any) => q.eq("id", postData.id))
+      .withIndex("by_post_id", (q) => q.eq("id", postData.id))
       .first();
 
     if (existing) {
@@ -259,7 +314,7 @@ export const storeFacebookPost = internalMutation({
         message: postData.message,
         permalinkUrl: postData.permalink_url,
         fetchedAt: now,
-        attachments: postData.attachments?.data?.map((attachment: any) => ({
+        attachments: postData.attachments?.data?.map((attachment: FbGraphAttachment) => ({
           mediaType: attachment.media_type,
           mediaUrl: attachment.media_url,
         })) || undefined,
@@ -268,10 +323,11 @@ export const storeFacebookPost = internalMutation({
     }
 
     // Create new record
-    const attachments = postData.attachments?.data?.map((attachment: any) => ({
-      mediaType: attachment.media_type,
-      mediaUrl: attachment.media_url,
-    })) || undefined;
+    const attachments =
+      postData.attachments?.data?.map((attachment: FbGraphAttachment) => ({
+        mediaType: attachment.media_type,
+        mediaUrl: attachment.media_url,
+      })) || undefined;
     
     return await ctx.db.insert("facebookPosts", {
       id: postData.id,

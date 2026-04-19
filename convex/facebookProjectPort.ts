@@ -1,6 +1,7 @@
 import { query, mutation, action } from "./_generated/server";
 import { v } from "convex/values";
-import { api, internal } from "./_generated/api";
+import { api } from "./_generated/api";
+import type { BulkPortFacebookPostResult, ProjectId } from "./types";
 
 /**
  * Facebook Post to Project Porting System
@@ -197,17 +198,20 @@ export const bulkPortFacebookPostsToProjects = mutation({
       isPublicShowcase: v.optional(v.boolean()),
     })),
   },
-  handler: async (ctx, args): Promise<any[]> => {
+  handler: async (ctx, args): Promise<BulkPortFacebookPostResult[]> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
     }
 
-    const results: any[] = [];
-    
+    const results: BulkPortFacebookPostResult[] = [];
+
     for (const postData of args.posts) {
       try {
-        const projectId: any = await ctx.runMutation(api.facebookProjectPort.portFacebookPostToProject, postData);
+        const projectId: ProjectId = await ctx.runMutation(
+          api.facebookProjectPort.portFacebookPostToProject,
+          postData
+        );
         results.push({
           facebookPostId: postData.facebookPostId,
           projectId,

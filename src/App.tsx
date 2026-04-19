@@ -1,14 +1,29 @@
-import { SignedIn, SignedOut, useUser } from "@clerk/clerk-react";
+import { useEffect, useState } from "react";
+import { Show, useUser } from "@clerk/react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { SignInForm } from "./SignInForm";
-import { SignOutButton } from "./SignOutButton";
 import { Toaster } from "sonner";
 import { ProfileSetup } from "./components/ProfileSetup";
 import { Dashboard } from "./components/Dashboard";
 import { Homepage } from "./components/Homepage";
 import { Badge } from "./components/ui/badge";
-import { ThemeToggle } from "./components/ui/theme-toggle";
+import {
+  clearStoredEmployeeInviteToken,
+  readStoredEmployeeInviteToken,
+  storeEmployeeInviteToken,
+} from "./employeeInvite";
+
+function getInitialEmployeeInviteToken(): string | null {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = params.get("invite");
+  if (fromUrl) {
+    storeEmployeeInviteToken(fromUrl);
+    window.history.replaceState({}, "", window.location.pathname);
+    return fromUrl;
+  }
+  return readStoredEmployeeInviteToken();
+}
 
 export default function App() {
   return (
@@ -24,6 +39,28 @@ export default function App() {
 function Content() {
   const { isLoaded, isSignedIn } = useUser();
   const profile = useQuery(api.profiles.getCurrentProfile);
+  const [employeeInviteToken, setEmployeeInviteToken] = useState<string | null>(
+    getInitialEmployeeInviteToken
+  );
+
+  const employeeInviteInfo = useQuery(
+    api.profiles.getEmployeeInviteByToken,
+    employeeInviteToken ? { token: employeeInviteToken } : "skip"
+  );
+
+  useEffect(() => {
+    if (profile) {
+      clearStoredEmployeeInviteToken();
+      setEmployeeInviteToken(null);
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    if (employeeInviteToken && employeeInviteInfo === null) {
+      clearStoredEmployeeInviteToken();
+      setEmployeeInviteToken(null);
+    }
+  }, [employeeInviteToken, employeeInviteInfo]);
 
   if (!isLoaded || (isSignedIn && profile === undefined)) {
     return (
@@ -38,13 +75,15 @@ function Content() {
 
   return (
     <>
-      <SignedOut>
+      <Show when="signed-out">
         <Homepage />
-      </SignedOut>
-      
-      <SignedIn>
+      </Show>
+      <Show when="signed-in">
         {!profile ? (
-          <ProfileSetup />
+          <ProfileSetup
+            employeeInviteToken={employeeInviteToken}
+            employeeInviteInfo={employeeInviteInfo}
+          />
         ) : profile.userType === "employee" && profile.employeeStatus !== "approved" ? (
           <div className="flex justify-center items-center min-h-[400px]">
             <div className="text-center space-y-4 animate-fade-in">
@@ -64,7 +103,7 @@ function Content() {
         ) : (
           <Dashboard profile={profile} />
         )}
-      </SignedIn>
+      </Show>
     </>
   );
 }

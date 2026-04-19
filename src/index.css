@@ -49,6 +49,12 @@
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 160 84% 39%;
+
+  /* Clerk (<SignIn />, etc.): readable text and inputs when the app is in dark mode */
+  --clerk-color-foreground: #fafafa;
+  --clerk-color-muted-foreground: #a1a1aa;
+  --clerk-color-input: #27272a;
+  --clerk-color-input-foreground: #fafafa;
 }
 
 .accent-text {
@@ -147,7 +153,21 @@ body {
 
 /* only use this to update the style of the auth input fields. use a different class for all other input fields */
 .auth-input-field {
-  @apply w-full px-4 py-3 rounded-container bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200 shadow-sm hover:shadow-md;
+  @apply w-full px-4 py-3 rounded-container bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-zinc-100 placeholder:text-gray-500 dark:placeholder:text-zinc-400 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200 shadow-sm hover:shadow-md;
+}
+
+/* Autofill often forces low-contrast text on dark fields; align with field foreground */
+.auth-input-field:-webkit-autofill,
+.auth-input-field:-webkit-autofill:hover,
+.auth-input-field:-webkit-autofill:focus {
+  -webkit-text-fill-color: #171717;
+  transition: background-color 9999s ease-out 0s;
+}
+
+.dark .auth-input-field:-webkit-autofill,
+.dark .auth-input-field:-webkit-autofill:hover,
+.dark .auth-input-field:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fafafa;
 }
 
 /* only use this to update the style of the auth buttons. use the button class for all other buttons */

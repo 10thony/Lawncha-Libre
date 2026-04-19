@@ -1,6 +1,12 @@
 import { internalAction, internalMutation, query, action, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
+import type {
+  DecryptedFacebookAppCredentials,
+  FacebookAppCredentialsDoc,
+  FacebookCredentialValidationResult,
+  Id,
+} from "./types";
 
 /**
  * Encryption Utilities for Facebook App Credentials
@@ -145,7 +151,7 @@ export const storeEncryptedCredentials = internalMutation({
     // Deactivate any existing credentials for this user
     const existingCredentials = await ctx.db
       .query("facebookAppCredentials")
-      .withIndex("by_user", (q: any) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
 
     for (const cred of existingCredentials) {
@@ -175,7 +181,7 @@ export const storeFacebookCredentials = internalAction({
     redirectUri: v.string(),
     appName: v.optional(v.string()),
   },
-  handler: async (ctx, args): Promise<any> => {
+  handler: async (ctx, args): Promise<Id<"facebookAppCredentials">> => {
     // Validate inputs
     if (!args.appId || args.appId.length < 10) {
       throw new Error("Invalid Facebook App ID");
@@ -224,7 +230,7 @@ export const getEncryptedCredentials = internalMutation({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("facebookAppCredentials")
-      .withIndex("by_user_active", (q: any) => 
+      .withIndex("by_user_active", (q) =>
         q.eq("userId", args.userId).eq("isActive", true)
       )
       .first();
@@ -236,8 +242,11 @@ export const getActiveFacebookCredentials = internalAction({
   args: {
     userId: v.string(),
   },
-  handler: async (ctx, args) => {
-    const credentials: any = await ctx.runMutation(internal.encryption.getEncryptedCredentials, { userId: args.userId });
+  handler: async (ctx, args): Promise<DecryptedFacebookAppCredentials | null> => {
+    const credentials: FacebookAppCredentialsDoc | null =
+      (await ctx.runMutation(internal.encryption.getEncryptedCredentials, {
+        userId: args.userId,
+      })) ?? null;
 
     if (!credentials) {
       return null;
@@ -278,7 +287,7 @@ export const getAllUserCredentials = internalMutation({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("facebookAppCredentials")
-      .withIndex("by_user", (q: any) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .order("desc")
       .collect();
   },
@@ -289,7 +298,7 @@ export const getUserFacebookCredentials = internalAction({
   args: {
     userId: v.string(),
   },
-  handler: async (ctx, args): Promise<any> => {
+  handler: async (ctx, args): Promise<FacebookAppCredentialsDoc[]> => {
     return await ctx.runMutation(internal.encryption.getAllUserCredentials, { userId: args.userId });
   },
 });
@@ -302,7 +311,7 @@ export const getUserFacebookCredentialsQuery = query({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("facebookAppCredentials")
-      .withIndex("by_user", (q: any) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .order("desc")
       .collect();
   },
@@ -323,8 +332,8 @@ export const deleteFacebookCredentials = internalAction({
   args: {
     credentialId: v.id("facebookAppCredentials"),
   },
-  handler: async (ctx, args): Promise<any> => {
-    return await ctx.runMutation(internal.encryption.deleteCredentials, { credentialId: args.credentialId });
+  handler: async (ctx, args): Promise<void> => {
+    await ctx.runMutation(internal.encryption.deleteCredentials, { credentialId: args.credentialId });
   },
 });
 
@@ -355,7 +364,7 @@ export const updateFacebookCredentials = internalAction({
     redirectUri: v.optional(v.string()),
     appName: v.optional(v.string()),
   },
-  handler: async (ctx, args): Promise<any> => {
+  handler: async (ctx, args): Promise<void> => {
     const { credentialId, userId, ...updates } = args;
     const now = Date.now();
 
@@ -401,7 +410,7 @@ export const updateFacebookCredentials = internalAction({
       updateData.appName = updates.appName;
     }
 
-    return await ctx.runMutation(internal.encryption.updateCredentials, {
+    await ctx.runMutation(internal.encryption.updateCredentials, {
       credentialId,
       updateData,
     });
@@ -416,7 +425,7 @@ export const validateFacebookCredentials = internalAction({
     appSecret: v.string(),
     redirectUri: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<FacebookCredentialValidationResult> => {
     try {
       // Test the credentials by making a simple API call
       const testUrl = new URL("https://graph.facebook.com/v19.0/oauth/access_token");
@@ -470,7 +479,7 @@ export const storeFacebookCredentialsAction = action({
     redirectUri: v.string(),
     appName: v.optional(v.string()),
   },
-  handler: async (ctx, args): Promise<any> => {
+  handler: async (ctx, args): Promise<Id<"facebookAppCredentials">> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
@@ -492,13 +501,13 @@ export const updateFacebookCredentialsAction = action({
     redirectUri: v.optional(v.string()),
     appName: v.optional(v.string()),
   },
-  handler: async (ctx, args): Promise<any> => {
+  handler: async (ctx, args): Promise<void> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
     }
 
-    return await ctx.runAction(internal.encryption.updateFacebookCredentials, {
+    await ctx.runAction(internal.encryption.updateFacebookCredentials, {
       ...args,
       userId: identity.subject,
     });
@@ -510,13 +519,13 @@ export const deleteFacebookCredentialsAction = action({
   args: {
     credentialId: v.id("facebookAppCredentials"),
   },
-  handler: async (ctx, args): Promise<any> => {
+  handler: async (ctx, args): Promise<void> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
     }
 
-    return await ctx.runAction(internal.encryption.deleteFacebookCredentials, args);
+    await ctx.runAction(internal.encryption.deleteFacebookCredentials, args);
   },
 });
 
@@ -527,7 +536,7 @@ export const validateFacebookCredentialsAction = action({
     appSecret: v.string(),
     redirectUri: v.string(),
   },
-  handler: async (ctx, args): Promise<any> => {
+  handler: async (ctx, args): Promise<FacebookCredentialValidationResult> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");

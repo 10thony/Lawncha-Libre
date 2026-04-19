@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useUser } from "@clerk/react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Button } from "./ui/button";
@@ -29,7 +29,7 @@ import { toast } from "sonner";
  * Facebook App Setup Wizard
  * 
  * This component guides clients through setting up their own Facebook Developer app
- * for integration with Lawncha Libre.
+ * for integration with Buildcha Libre.
  */
 
 interface SetupStep {
@@ -80,7 +80,7 @@ export function FacebookAppSetupWizard() {
     {
       id: "test-connection",
       title: "Test Connection",
-      description: "Verify your app works with Lawncha Libre",
+      description: "Verify your app works with Buildcha Libre",
       completed: false
     }
   ];
@@ -207,7 +207,7 @@ export function FacebookAppSetupWizard() {
               <Settings className="h-16 w-16 text-blue-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Create Facebook App</h3>
               <p className="text-gray-600 mb-6">
-                Create a new Facebook app for your landscaping business.
+                Create a new Facebook app for your contracting business.
               </p>
             </div>
 
@@ -244,7 +244,7 @@ export function FacebookAppSetupWizard() {
                   <h4 className="font-medium">Fill in App Information</h4>
                   <div className="bg-gray-50 rounded-lg p-4 mt-2">
                     <div className="space-y-2 text-sm">
-                      <div><strong>App Name:</strong> [Your Business Name] Landscaping App</div>
+                      <div><strong>App Name:</strong> [Your Business Name] Contractor App</div>
                       <div><strong>App Contact Email:</strong> [Your business email]</div>
                       <div><strong>App Purpose:</strong> Business management and social media integration</div>
                     </div>
@@ -339,7 +339,7 @@ export function FacebookAppSetupWizard() {
                   id="appName"
                   value={appCredentials.appName}
                   onChange={(e) => setAppCredentials(prev => ({ ...prev, appName: e.target.value }))}
-                  placeholder="My Landscaping App"
+                  placeholder="My Contractor App"
                 />
               </div>
 
@@ -438,7 +438,7 @@ export function FacebookAppSetupWizard() {
               <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Test Connection</h3>
               <p className="text-gray-600 mb-6">
-                Save your credentials and test the connection to Lawncha Libre.
+                Save your credentials and test the connection to Buildcha Libre.
               </p>
             </div>
 
@@ -491,7 +491,7 @@ export function FacebookAppSetupWizard() {
           Facebook App Setup Wizard
         </CardTitle>
         <CardDescription>
-          Follow these steps to set up your Facebook Developer app for integration with Lawncha Libre.
+          Follow these steps to set up your Facebook Developer app for integration with Buildcha Libre.
         </CardDescription>
       </CardHeader>
       <CardContent>

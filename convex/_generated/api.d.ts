@@ -27,6 +27,8 @@ import type * as profiles from "../profiles.js";
 import type * as projects from "../projects.js";
 import type * as router from "../router.js";
 import type * as testimonials from "../testimonials.js";
+import type * as types from "../types.js";
+import type * as validators from "../validators.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -51,6 +53,8 @@ declare const fullApi: ApiFromModules<{
   projects: typeof projects;
   router: typeof router;
   testimonials: typeof testimonials;
+  types: typeof types;
+  validators: typeof validators;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

@@ -268,7 +268,7 @@ export function IntakeForm({ onSuccess, onCancel }: IntakeFormProps) {
               value={formData.projectDescription}
               onChange={handleInputChange}
               required
-              placeholder="Please describe your landscaping project in detail. Include the size of the area, type of work needed, timeline, and any specific requirements..."
+              placeholder="Describe your project in detail: scope (e.g. remodel, repair, outdoor work), location, timeline, budget range, and any plans or permits already in place..."
               rows={6}
             />
           </div>
@@ -377,7 +377,7 @@ export function IntakeForm({ onSuccess, onCancel }: IntakeFormProps) {
               <div className="text-sm text-blue-800">
                 <p className="font-medium mb-1">What happens next?</p>
                 <ul className="space-y-1 text-blue-700">
-                  <li>• We'll review your request and match you with qualified landscapers</li>
+                  <li>• We'll review your request and match you with qualified contractors</li>
                   <li>• You'll receive quotes from interested professionals within 24 hours</li>
                   <li>• Compare quotes and choose the best fit for your project</li>
                   <li>• Your information is secure and won't be shared without permission</li>

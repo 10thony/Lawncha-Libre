@@ -427,11 +427,15 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
                                   className="w-full p-2 border rounded-md"
                                 >
                                   <option value="">Select project type</option>
-                                  <option value="lawn-care">Lawn Care</option>
-                                  <option value="landscaping">Landscaping</option>
-                                  <option value="tree-services">Tree Services</option>
-                                  <option value="garden-design">Garden Design</option>
-                                  <option value="hardscaping">Hardscaping</option>
+                                  <option value="remodeling">Remodeling & additions</option>
+                                  <option value="electrical">Electrical</option>
+                                  <option value="plumbing">Plumbing</option>
+                                  <option value="hvac">HVAC</option>
+                                  <option value="roofing">Roofing & exteriors</option>
+                                  <option value="landscaping">Landscaping & outdoor</option>
+                                  <option value="concrete-hardscape">Concrete & hardscape</option>
+                                  <option value="carpentry">Carpentry</option>
+                                  <option value="painting">Painting</option>
                                   <option value="maintenance">Maintenance</option>
                                   <option value="other">Other</option>
                                 </select>

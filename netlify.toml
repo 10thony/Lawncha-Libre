@@ -1,4 +1,4 @@
-# Netlify configuration for Lawncha Libre
+# Netlify configuration for Buildcha Libre
 
 [build]
   command = "npm run build"
@@ -6,5 +6,11 @@
 
 [build.environment]
   SECRETS_SCAN_ENABLED = "false"
+
+# SPA: invite links and deep paths should serve the app shell
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 

@@ -1,5 +1,27 @@
 import { query, mutation } from "./_generated/server";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
+
+function randomInviteToken(): string {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function getValidInviteForToken(
+  ctx: QueryCtx | MutationCtx,
+  token: string
+): Promise<{ companyId: Id<"profiles"> } | null> {
+  const invite = await ctx.db
+    .query("employeeInvites")
+    .withIndex("by_token", (q) => q.eq("token", token))
+    .unique();
+  if (!invite || invite.expiresAt <= Date.now()) {
+    return null;
+  }
+  return { companyId: invite.companyId };
+}
 
 export const getCurrentProfile = query({
   args: {},
@@ -47,6 +69,8 @@ export const createProfile = mutation({
     address: v.optional(v.string()),
     services: v.optional(v.array(v.string())),
     companyId: v.optional(v.id("profiles")),
+    /** When set, must match a valid employee invite for `companyId` (employee onboarding via invite link). */
+    employeeInviteToken: v.optional(v.string()),
   },
   returns: v.id("profiles"),
   handler: async (ctx, args) => {
@@ -63,9 +87,22 @@ export const createProfile = mutation({
       throw new Error("Profile already exists");
     }
 
+    const { employeeInviteToken, ...profileFields } = args;
+
+    if (
+      args.userType === "employee" &&
+      args.companyId &&
+      employeeInviteToken
+    ) {
+      const invite = await getValidInviteForToken(ctx, employeeInviteToken);
+      if (!invite || invite.companyId !== args.companyId) {
+        throw new Error("Invalid or expired employee invitation");
+      }
+    }
+
     return await ctx.db.insert("profiles", {
       clerkUserId: identity.subject,
-      ...args,
+      ...profileFields,
       employeeStatus: args.userType === "employee" ? "pending" : undefined,
     });
   },
@@ -110,11 +147,21 @@ export const createEmployeeRequest = mutation({
     email: v.string(),
     phone: v.string(),
     companyId: v.id("profiles"),
+    employeeInviteToken: v.optional(v.string()),
   },
   returns: v.id("employeeRequests"),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
+
+    const { employeeInviteToken, ...requestFields } = args;
+
+    if (employeeInviteToken) {
+      const invite = await getValidInviteForToken(ctx, employeeInviteToken);
+      if (!invite || invite.companyId !== args.companyId) {
+        throw new Error("Invalid or expired employee invitation");
+      }
+    }
 
     // Check if company exists and is a business
     const company = await ctx.db.get(args.companyId);
@@ -137,8 +184,79 @@ export const createEmployeeRequest = mutation({
       employeeClerkId: identity.subject,
       requestedAt: Date.now(),
       status: "pending",
-      ...args,
+      ...requestFields,
     });
+  },
+});
+
+export const createEmployeeInvite = mutation({
+  args: {
+    expiresInDays: v.optional(v.number()),
+  },
+  returns: v.object({
+    token: v.string(),
+  }),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", identity.subject))
+      .unique();
+
+    if (!profile || profile.userType !== "business") {
+      throw new Error("Only business owners can create employee invites");
+    }
+
+    const days = args.expiresInDays ?? 30;
+    const expiresAt = Date.now() + days * 24 * 60 * 60 * 1000;
+    const token = randomInviteToken();
+
+    await ctx.db.insert("employeeInvites", {
+      token,
+      companyId: profile._id,
+      createdByClerkId: identity.subject,
+      createdAt: Date.now(),
+      expiresAt,
+    });
+
+    return { token };
+  },
+});
+
+export const getEmployeeInviteByToken = query({
+  args: { token: v.string() },
+  returns: v.union(
+    v.object({
+      valid: v.literal(true),
+      companyId: v.id("profiles"),
+      companyName: v.string(),
+      expiresAt: v.number(),
+    }),
+    v.null()
+  ),
+  handler: async (ctx, args) => {
+    const invite = await ctx.db
+      .query("employeeInvites")
+      .withIndex("by_token", (q) => q.eq("token", args.token))
+      .unique();
+
+    if (!invite || invite.expiresAt <= Date.now()) {
+      return null;
+    }
+
+    const company = await ctx.db.get(invite.companyId);
+    if (!company || company.userType !== "business") {
+      return null;
+    }
+
+    return {
+      valid: true as const,
+      companyId: invite.companyId,
+      companyName: company.businessName || company.name,
+      expiresAt: invite.expiresAt,
+    };
   },
 });
 

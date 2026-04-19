@@ -541,7 +541,7 @@ export function SocialFeed() {
                               id="projectName"
                               value={portingData.projectName}
                               onChange={(e) => setPortingData(prev => ({ ...prev, projectName: e.target.value }))}
-                              placeholder="e.g., Landscaping Project"
+                              placeholder="e.g., Kitchen remodel"
                             />
                           </div>
                           <div>
@@ -550,7 +550,7 @@ export function SocialFeed() {
                               id="projectType"
                               value={portingData.projectType}
                               onChange={(e) => setPortingData(prev => ({ ...prev, projectType: e.target.value }))}
-                              placeholder="e.g., Landscaping, Lawn Care"
+                              placeholder="e.g., Remodeling, Landscaping"
                             />
                           </div>
                           <div>

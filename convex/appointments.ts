@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import type { AppointmentDoc } from "./types";
 
 export const getAvailableAppointments = query({
   args: {
@@ -192,7 +193,9 @@ export const updateAppointmentStatus = mutation({
       throw new Error("Not authorized to update this appointment");
     }
 
-    const updates: any = { status: args.status };
+    const updates: Partial<
+      Pick<AppointmentDoc, "status" | "clientClerkId" | "notes">
+    > = { status: args.status };
     
     // If cancelling, remove client
     if (args.status === "cancelled" || args.status === "available") {

@@ -1,4 +1,4 @@
-import { useClerk, useUser } from "@clerk/clerk-react";
+import { useClerk, useUser } from "@clerk/react";
 
 export function SignOutButton() {
   const { isSignedIn } = useUser();

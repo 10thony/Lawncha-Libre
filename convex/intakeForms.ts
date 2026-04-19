@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import type { IntakeFormDoc } from "./types";
 
 export const createIntakeForm = mutation({
   args: {
@@ -284,7 +285,9 @@ export const updateIntakeFormStatus = mutation({
       throw new Error("Only the business owner who claimed this form can update it");
     }
 
-    const updateData: any = {
+    const updateData: Partial<
+      Pick<IntakeFormDoc, "status" | "businessNotes" | "estimatedQuote">
+    > = {
       status: args.status,
     };
 
