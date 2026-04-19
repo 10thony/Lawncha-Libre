@@ -18,6 +18,7 @@ import {
 import { MobileSidebarToggle } from "./ui/mobile-sidebar-toggle";
 import { ThemeToggle } from "./ui/theme-toggle";
 import { SignOutButton } from "../SignOutButton";
+import { BrandIdentity } from "./BrandIdentity";
 import { ProjectsDashboard } from "./ProjectsDashboard";
 import { AppointmentBooking } from "./AppointmentBooking";
 import { TestimonialsDashboard } from "./TestimonialsDashboard";
@@ -136,18 +137,19 @@ export function Dashboard({ profile }: DashboardProps) {
           <SidebarContent>
             <SidebarHeader>
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                  <Building2 className="h-4 w-4 text-white" />
-                </div>
                 {!isSidebarCollapsed && (
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                      Buildcha Libre
-                    </h2>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      General contracting
-                    </p>
-                  </div>
+                  <BrandIdentity
+                    logoClassName="h-10 w-10"
+                    nameClassName="text-lg font-semibold gradient-text"
+                    showTagline
+                  />
+                )}
+                {isSidebarCollapsed && (
+                  <img
+                    src="/atheca-logo-transparent.png"
+                    alt="Atheca logo"
+                    className="h-8 w-8 object-contain drop-shadow-[0_0_12px_rgba(34,211,238,0.35)]"
+                  />
                 )}
               </div>
             </SidebarHeader>

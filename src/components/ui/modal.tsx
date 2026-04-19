@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { SignUp } from "@clerk/react";
-import { clerkAuthAppearance, SignInForm } from "../../SignInForm";
+import { clerkAuthAppearance, clerkAuthLocalization, SignInForm } from "../../SignInForm";
 
 const postAuthUrl =
   typeof window !== "undefined" ? `${window.location.origin}/` : "/";
@@ -189,6 +189,7 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
                 forceRedirectUrl={postAuthUrl}
                 signInForceRedirectUrl={postAuthUrl}
                 appearance={clerkAuthAppearance}
+                localization={clerkAuthLocalization}
               />
             </div>
           )}

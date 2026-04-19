@@ -29,7 +29,7 @@ import { toast } from "sonner";
  * Facebook App Setup Wizard
  * 
  * This component guides clients through setting up their own Facebook Developer app
- * for integration with Buildcha Libre.
+ * for integration with Atheca.
  */
 
 interface SetupStep {
@@ -80,7 +80,7 @@ export function FacebookAppSetupWizard() {
     {
       id: "test-connection",
       title: "Test Connection",
-      description: "Verify your app works with Buildcha Libre",
+      description: "Verify your app works with Atheca",
       completed: false
     }
   ];
@@ -438,7 +438,7 @@ export function FacebookAppSetupWizard() {
               <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Test Connection</h3>
               <p className="text-gray-600 mb-6">
-                Save your credentials and test the connection to Buildcha Libre.
+                Save your credentials and test the connection to Atheca.
               </p>
             </div>
 
@@ -491,7 +491,7 @@ export function FacebookAppSetupWizard() {
           Facebook App Setup Wizard
         </CardTitle>
         <CardDescription>
-          Follow these steps to set up your Facebook Developer app for integration with Buildcha Libre.
+          Follow these steps to set up your Facebook Developer app for integration with Atheca.
         </CardDescription>
       </CardHeader>
       <CardContent>

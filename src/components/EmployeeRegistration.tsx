@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { clearStoredEmployeeInviteToken } from "../employeeInvite";
 import { ThemeToggle } from "./ui/theme-toggle";
 import { SignOutButton } from "../SignOutButton";
+import { BrandIdentity } from "./BrandIdentity";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
@@ -117,7 +118,10 @@ export function EmployeeRegistration({
       {/* Header with Theme Toggle */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold gradient-text">Buildcha Libre</h2>
+          <BrandIdentity
+            logoClassName="h-10 w-10"
+            nameClassName="text-2xl font-bold gradient-text"
+          />
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <SignOutButton />

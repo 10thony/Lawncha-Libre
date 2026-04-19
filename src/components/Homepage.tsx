@@ -8,6 +8,7 @@ import { Badge } from "./ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { AuthModal } from "./ui/modal";
 import { ThemeToggle } from "./ui/theme-toggle";
+import { BrandIdentity } from "./BrandIdentity";
 import { 
   Calendar, 
   Users, 
@@ -293,7 +294,7 @@ export function Homepage() {
       client: "Sarah Johnson",
       rating: 5,
       title: "Smooth kitchen remodel",
-      description: "Buildcha Libre helped us line up a great contractor for our kitchen. Clear updates, realistic timeline, and the crew showed up when they said they would.",
+      description: "Atheca helped us line up a great contractor for our kitchen. Clear updates, realistic timeline, and the crew showed up when they said they would.",
       highlighted: true
     },
     {
@@ -336,9 +337,12 @@ export function Homepage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-violet-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Header with Theme Toggle */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-cyan-200/80 dark:border-cyan-800 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold gradient-text">Buildcha Libre</h2>
+          <BrandIdentity
+            logoClassName="h-12 w-12"
+            nameClassName="text-2xl font-bold gradient-text"
+          />
           <div className="flex items-center gap-4">
             <ThemeToggle />
           </div>
@@ -364,8 +368,8 @@ export function Homepage() {
         
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <h1 className="text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6 animate-fade-in">
-            General Contracting
-            <span className="gradient-text block">Made Simple</span>
+            Built for Tradies,
+            <span className="gradient-text block">made for Customers</span>
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto animate-fade-in" style={{animationDelay: '0.2s'}}>
             Connect homeowners and businesses with trusted contractors—or run your remodeling, trades, and landscaping jobs from one place.
@@ -816,7 +820,7 @@ export function Homepage() {
                 Customer Reviews & Testimonials
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Build trust with potential clients through authentic customer reviews. 
+                Build trust with potential clients through authentic customer reviews.
                 Business owners can highlight their best testimonials to showcase their expertise.
               </p>
               <ul className="space-y-2">
@@ -884,7 +888,7 @@ export function Homepage() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-4xl font-bold mb-4 animate-fade-in">Ready to Get Started?</h2>
           <p className="text-xl mb-8 opacity-90 animate-fade-in" style={{animationDelay: '0.2s'}}>
-            Join Buildcha Libre today and transform how you manage contracting work.
+            Join Atheca today and transform how you manage contracting work.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{animationDelay: '0.4s'}}>
             <Button 
@@ -918,7 +922,11 @@ export function Homepage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold gradient-text mb-4">Buildcha Libre</h3>
+              <BrandIdentity
+                logoClassName="h-12 w-12"
+                nameClassName="text-2xl font-bold gradient-text"
+                className="mb-4"
+              />
               <p className="text-gray-600 dark:text-gray-400 text-sm">
                 Quotes, scheduling, and project management for general contractors and the clients who hire them.
               </p>
@@ -950,7 +958,7 @@ export function Homepage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
-                  <span>info@buildchalibre.com</span>
+                  <span>info@atheca.com</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
@@ -960,7 +968,7 @@ export function Homepage() {
             </div>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-            <p>&copy; 2026 Buildcha Libre. All rights reserved. | <span className="gradient-text">Demo data shown for illustration purposes.</span></p>
+            <p>&copy; 2026 Atheca. All rights reserved. | <span className="gradient-text">Demo data shown for illustration purposes.</span></p>
           </div>
         </div>
       </footer>

@@ -1,4 +1,4 @@
-# Netlify configuration for Buildcha Libre
+# Netlify configuration for Atheca
 
 [build]
   command = "npm run build"

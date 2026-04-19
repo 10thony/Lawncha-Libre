@@ -3,6 +3,21 @@ import { SignIn } from "@clerk/react";
 const defaultPostAuthUrl =
   typeof window !== "undefined" ? `${window.location.origin}/` : "/";
 
+export const clerkAuthLocalization = {
+  signIn: {
+    start: {
+      title: "Sign in to Atheca",
+      subtitle: "Access your account to continue.",
+    },
+  },
+  signUp: {
+    start: {
+      title: "Create your Atheca account",
+      subtitle: "Set up your profile and start managing work.",
+    },
+  },
+} as const;
+
 /** Shared with `SignUp` in the auth modal so sign-in and sign-up match visually. */
 export const clerkAuthAppearance = {
   elements: {
@@ -45,6 +60,7 @@ export function SignInForm({ forceRedirectUrl = defaultPostAuthUrl }: SignInForm
         forceRedirectUrl={forceRedirectUrl}
         signUpForceRedirectUrl={forceRedirectUrl}
         appearance={clerkAuthAppearance}
+        localization={clerkAuthLocalization}
       />
     </div>
   );
