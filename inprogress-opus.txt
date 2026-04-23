@@ -1,0 +1,125 @@
+OPUS PROJECT UI VARIANT TRACKER
+================================
+5 new distinctive designs (paths /3 /4 /5 /6 /7) that MUST NOT reuse
+anything from inprogress.txt or inprogress-openai.txt.
+
+Already-used palettes / fonts / layouts to avoid:
+  1. /1 WAR ROOM      — black + amber, JetBrains Mono, 3-col dense rows                     [ACCEPTED]
+  2. /2 DOSSIER       — tan paper + red stamp, Courier + Special Elite + Baskerville,
+                        centered file-folders                                                [ACCEPTED]
+  3. /9 BRUTALIST     — cream + orange/hot-pink posters, Archivo Black + IBM Plex Sans,
+                        bordered card grid                                                   [ACCEPTED]
+  4. /10 TRANSIT      — dark navy + amber, Chivo/Chivo Mono, departure-board table           [ACCEPTED]
+  Rejected but still off-limits for reuse:
+  - Blueprint (indigo + cyan, IBM Plex Mono + Barlow, dot-grid drafting)
+  - Field Notes (cream + olive/terra-cotta, Zilla Slab + Caveat notebook)
+  - Control Room (navy + cyan/magenta, Space Grotesk + Share Tech, LED rings)
+
+=============================================================================
+NEW DESIGNS
+=============================================================================
+
+DESIGN 6 — STUDIO (/3)                                        [COMPLETED]
+  Aesthetic:    High-end editorial gallery / art-book catalogue
+  Background:   Warm ivory (#f6f2eb) with faint 12-col vertical rule overlay
+  Primary:      Oxblood burgundy (#5c1d1f) italic accents
+  Secondary:    Dove gray (#6b635c, #9a8f83), manuscript tan (#c7b9ab)
+  Typography:   "Instrument Serif" display (ital) + "Inter Tight" body
+  Layout:       Full-width entries; 100px serif index numeral in outer gutter,
+                wide editorial column, bordered "wall label" spec card on the right
+  Progress:     Hair-thin rule with 3px burgundy segment + roman-numeral count
+  Tasks:        Italic catalogue list with roman numerals, pill-shape chips
+  Empty state:  Em-dash serif mark + "No works currently exhibited."
+  UNIQUE:       Roman-numeral counts, gallery wall-label pin, pull-quote notes,
+                "Vernissage/Closing/Opened" vocabulary, plate numbers
+
+DESIGN 7 — LEDGER (/4)                                        [COMPLETED]
+  Aesthetic:    Double-entry accounting book / auditor's ledger
+  Background:   Bone paper (#f4ede0), 30px horizontal ruled lines, red left margin rule
+  Primary:      Oxblood red (#8b1c1c) debit side, forest green (#0f4c3a) credit side
+  Secondary:    Ink black (#1c1712), clerk brown (#5a4d3c)
+  Typography:   "Libre Caslon Text" serif + "Geist Mono" figures, tabular numerals
+  Layout:       Shell with red margin rule; Folio/page block; two-column ledger
+                body (Debit · Scheduled  |  Credit · Performed); page-total row
+  Progress:     20-cell gauge with diagonal-hatched forest-green fill
+  Tasks:        Debit/Credit columns with DR/CR amount chips, reference nos.
+  Empty state:  Red "BOOKS CLOSED" double-rule stamp rotated -3°
+  UNIQUE:       DR/CR dual-column tasks, folio/page labels, signature lines,
+                accounting vocabulary (posted, WIP, voided, memo)
+
+DESIGN 8 — CARTOGRAPHY (/5)                                   [COMPLETED]
+  Aesthetic:    Vintage topographic survey plate / USGS chart
+  Background:   Map ivory (#ede5d0), fine 80px grid + layered concentric
+                contour-line rings in opposing corners
+  Primary:      Deep teal (#0f4c48, #1a2b2a)
+  Secondary:    Ochre (#c89430), elevation brown (#8a5a2b), forest (#276749)
+  Typography:   "DM Serif Display" (ital) + "Azeret Mono" coordinates
+  Layout:       Navy topbar with ochre active; title block with compass rose;
+                Region grid (2-up), each region has cartouche name card,
+                4 corner stamps, contour topo overlay, elevation bar, scale bar
+  Progress:     10-step elevation-band bar (sage → dark forest)
+  Tasks:        Waypoint list with W-01 coord, compass bearing (NNE 047°), state chip
+  Empty state:  "Uncharted territory" flanked by red ✕ survey markers
+  UNIQUE:       Compass rose w/ red magnetic-declination needle, lat/long
+                coord stamps, scale bar, contour shaded regions, bearings
+
+DESIGN 9 — BROADSHEET (/6)                                    [COMPLETED]
+  Aesthetic:    Broadsheet front page, "Atheca Chronicle" since 1899
+  Background:   Newsprint cream (#f1ead6) with fine 3px halftone grain
+  Primary:      Ink black (#16110a), single red splash (#a8201a) for urgency
+  Secondary:    Newsroom brown (#5a4a30), subtle green (#2a5a2c) for filed
+  Typography:   "UnifrakturCook" blackletter masthead + "Playfair Display" headlines
+                + "Crimson Pro" serif body + "Oswald" kickers/bylines
+  Layout:       Edition strip → blackletter masthead → dateline → 3-col lede block
+                (lede article | briefing sidebar | inside-this-edition index) →
+                2-col article grid (column rule) with drop-cap ledes, pull quotes
+  Progress:     "Column inches" percentage + dispatch stat strip (filed/on desk)
+  Tasks:        Numbered dispatches with stringer byline em line, chip or select
+  Empty state:  "Late city edition — No Copy on the Wire."
+  UNIQUE:       Blackletter masthead, drop-cap first letters, multi-col column rules,
+                byline/stringer vocabulary, Vol/No/date dateline, red kickers
+
+DESIGN 10 — RISO (/7)                                         [COMPLETED]
+  Aesthetic:    Two-color risograph print zine with misregistration and paper grain
+  Background:   Off-white #f6f2eb with 3-layer dot noise (ink / blue / pink specks)
+                and registration crosshair marks in upper corners
+  Primary:      Fluorescent pink (#ff3e88) + cobalt blue (#2640d8) with
+                mix-blend-mode: multiply overprints
+  Secondary:    Ink black (#1a1818)
+  Typography:   "Unbounded" chunky geometric sans (900 weight) + "DM Mono" tags
+  Layout:       Bordered topbar → hero with giant pink+blue number, skewed pink/blue
+                title slabs → 4-cell run-total strip (vertically offset, alternating
+                pink/blue) → staggered 2-up card grid, each card on 6px pink + 12px
+                blue dual drop-shadows, gently rotated
+  Progress:     Halftone dot-pattern bar, pink dots over black dots (clip-path fill)
+  Tasks:        Checklist rows with boxed number → ✓ → pink ◐; print-shop vocabulary
+                (dry/wet/bin, pulled clean, plates, dialed in)
+  Empty state:  "Edition Sold Out" with pink/blue duotone title and crosshair icon
+  UNIQUE:       Multiply-blend overprints, staggered rotated cards, halftone dots,
+                registration crosshairs, press-shop language, duo drop-shadows
+
+=============================================================================
+CROSS-DESIGN UNIQUENESS VERIFICATION
+=============================================================================
+Colors:       ivory+burgundy / bone+oxblood+forest / map-ivory+teal+ochre /
+              newsprint+ink+red / off-white+pink+cobalt — no palette overlap
+Type:         Instrument Serif+Inter Tight / Libre Caslon+Geist Mono /
+              DM Serif Display+Azeret Mono / UnifrakturCook+Playfair+Crimson+Oswald /
+              Unbounded+DM Mono — all distinct display+body pairings
+Layout:       serif gallery rows w/ wall label / ruled-line DR+CR ledger /
+              topographic region grid w/ compass / blackletter front page
+              w/ column-ruled 2-col article body / staggered riso cards w/
+              offset drop-shadows — all structurally different
+Progress:     3px serif rule / 20-cell hatched gauge / 10-band elevation /
+              column-inches % / halftone-dot clip-path — all different
+Tasks:        roman-numeral italic list / DR/CR dual-column entries /
+              waypoints w/ bearings / numbered dispatches w/ stringers /
+              pink boxed checklist w/ dry/wet tags — all different
+Empty state:  "No works currently exhibited." em-dash /
+              "BOOKS CLOSED" rotated red stamp /
+              "Uncharted territory" w/ ✕ markers /
+              "No Copy on the Wire." red kicker /
+              "Edition Sold Out" pink+blue duotone w/ crosshair — all different
+Vocabulary:   gallery/commission/vernissage | ledger/DR/CR/folio/posted |
+              survey/waypoint/bearing/contour | dispatch/byline/stringer/deck |
+              run/plate/press/impression/proof — zero vocabulary overlap

@@ -1,0 +1,234 @@
+the projects view screen looks to AI generated (first image).
+
+
+SEQUENTIALLY generate 5 COMPLETELY UNIQUE UI designs for our projects component. feel free to break out of the current color scheme and get crazy intuitive with it.
+
+after each generation use npx convex dev --once and other available checks to validate the app is working and everything is properly loading before moving to the next step.
+
+keep an inprogress-opus.txt to track what styles you've created to avoid reuse.
+
+study the entities both rejected and accepted in @inprogress.txt to get an idea of what abides by good standards and what to avoid. make sure not to reuse anything already accepted. see the images attatched for our four accepted styles
+
+
+the new projects design components should be reachable via the following path convention,
+
+/6 /7 /8 /9 /10
+
+stub the files so the app renders properly as you develop to enable verification. 
+use the @browser tool to take a snapshot of the page and verify it it matches te standards dictated below and does not repeat content layout structure or colors with anything within the inprogress-opus.txt
+
+
+
+use the skill below to help you
+---
+name: pm-frontend-design
+description: >
+  Create distinctive, production-grade frontend interfaces for project
+  management tools. Use this skill when the user asks to build PM-related
+  components, pages, or applications — dashboards, kanban boards, timelines,
+  task views, team overviews, etc. Generates creative, polished code that
+  avoids generic AI aesthetics and generic PM tool clones.
+license: Complete terms in LICENSE.txt
+---
+PM Frontend Design Skill
+This skill guides creation of distinctive, production-grade project management
+interfaces. PM tools are among the most visually homogenized software
+categories — Linear, Notion, Jira, Asana, Monday all blend together. The goal
+is to escape that gravitational pull while remaining genuinely usable by real
+teams. This is not a portfolio toy; it must be functional AND unforgettable.
+
+Implement real, working code with exceptional attention to aesthetic detail,
+information hierarchy, and interaction quality.
+
+Phase 1 — Domain Understanding
+Before any code, understand the PM context deeply:
+
+Scope: What is being built? (Single component? Full dashboard? Onboarding
+flow? Data-dense list? Empty state?)
+Data model: What entities are in play? (Projects, tasks, sprints, epics,
+users, milestones, blockers, labels, priorities?)
+User role: Who is looking at this? (IC contributor, team lead, exec
+stakeholder, external client?) The information hierarchy must serve them.
+Workflow moment: What is the user trying to do right now? Create
+something? Triage? Review progress? Find a blocker? Design for the action,
+not the entity.
+Team size & complexity: Solo freelancer vs. 200-person org have radically
+different density needs.
+Phase 2 — Aesthetic Direction
+Commit to a bold, specific aesthetic direction before writing a single line.
+PM tools are functional, but function without form is forgettable. Pick a
+direction and execute it with conviction:
+
+PM-Specific Aesthetic Archetypes
+Use these as springboards, not templates. Twist them. Combine unexpectedly.
+
+Direction	Vibe
+War Room	High-contrast, dense, military-grid precision. For power users.
+Studio	Editorial whitespace, serif type, gallery-like task display.
+Terminal	Monospace everything, phosphor glow, CLI aesthetic with GUI power.
+Blueprint	Technical drafting, grid lines, annotation-style labels, ink-on-paper
+Dossier	Classified document energy, redaction aesthetics, archival type.
+Control Room	Ambient dark UI, glowing indicators, mission-critical density.
+Field Notes	Handwritten texture, paper grain, tactile and humanist.
+Ledger	Accounting heritage, ruled lines, tabular clarity, serif numbers.
+Cartography	Spatial, map-like hierarchy, territory and region metaphors.
+Brutalist PM	Raw structure exposed, unstyled-ish but deliberate, anti-corporate.
+Never default to: rounded cards on white/gray backgrounds, blue primary
+buttons, Inter or Space Grotesk, purple gradient hero sections, or any layout
+that could appear in a SaaS template marketplace.
+
+Typography Rules
+Choose a display/heading font that carries personality: condensed
+grotesques, slab serifs, geometric serifs, wide-tracking caps, or monospace
+can all work depending on direction.
+Pair with a data/body font optimized for dense information: tabular
+figures, legibility at small sizes, clear differentiation between characters
+(1, l, I; 0, O).
+Use type scale intentionally: PM tools often need 5–7 levels of hierarchy
+(page title → section → task title → metadata → label → timestamp →
+placeholder). Define all of them.
+Avoid: Inter, Roboto, Arial, system-ui as primary choices. These are
+acceptable as data fonts only if the display font carries the identity.
+Color & Theme
+Commit to a dominant palette with 1–2 sharp accent colors. PM tools live
+in grayscale; the accent must work hard.
+Define semantic color rigorously: status colors (todo, in progress,
+blocked, done, cancelled) must be distinct, accessible, and on-brand.
+Use CSS custom properties for every token: colors, spacing, radii,
+shadows, transitions.
+Consider information-layer coloring: use color to encode data (priority,
+assignee, project) rather than just decoration.
+Light and dark themes should be considered from the start, even if only one
+is implemented. PM tools are used at 11pm.
+Motion & Interaction
+Task state changes deserve micro-animation: completing a task, moving a
+card, collapsing a section.
+Data loading should feel intentional: skeleton states, progressive
+disclosure, not spinners.
+Drag interactions (if kanban/list): visual feedback on drag start, drop
+target highlighting, satisfying snap-to-place.
+Dense views: staggered load animations only if performance allows. Never
+animate what users will interact with 200 times/day — animation fatigue is
+real in PM tools.
+High-impact moments: project creation, milestone completion, sprint close
+— these deserve ceremony.
+Use CSS animations for static components. Use Motion (Framer Motion) for
+React when interaction state is involved.
+Spatial Composition
+Density is a design choice, not a default. Know whether this view should
+be breathable or packed.
+PM interfaces often need multi-pane layouts: sidebar + main + detail
+panel. Handle this intentionally.
+Hierarchy through space: the most important action on the screen should
+command the most visual weight and position.
+Grid discipline: establish a clear grid (4pt or 8pt base unit) and
+maintain it. PM tool messiness comes from inconsistent spacing.
+Consider progressive disclosure: don't show all metadata at once. Surface
+on hover, expand on click, reveal on need.
+Visual Details & Atmosphere
+Empty states are a design moment, not an afterthought. PM tools live in
+empty states.
+Status indicators: custom, on-brand. Not Bootstrap badges. Not Tailwind
+defaults.
+Data visualization: progress rings, burndown micro-charts, workload
+bars — even tiny inline sparklines should match the aesthetic.
+Backgrounds: avoid flat white/gray. Subtle grid, ruled lines, paper
+texture, or gradient depth all work depending on direction.
+Borders and dividers: use deliberately. A single well-placed rule can do
+more than a card shadow.
+Phase 3 — PM Component Patterns
+When building specific component types, follow these quality standards:
+
+Task / Issue Row
+Must display: title, status, assignee, priority, due date — without feeling
+cluttered.
+Status must be scannable at a glance (icon + color, not text alone).
+Hover state must reveal secondary actions without layout shift.
+Consider: inline editing, keyboard navigation, bulk selection.
+Kanban Board
+Column headers must communicate WIP limit, count, and status clearly.
+Cards must balance information density with drag usability.
+Column overflow behavior must be designed (scroll vs. collapse).
+Empty columns need character, not just a dashed border.
+Timeline / Gantt
+Date axis must handle variable zoom (day/week/month/quarter).
+Bar overlaps and dependencies must be legible.
+Today indicator must be obvious without being garish.
+"Now" context (what's overdue, what's this week) must be immediately clear.
+Dashboard / Overview
+Every metric must answer a question a real user asks.
+Avoid vanity metrics (total tasks created since forever).
+Prioritize: what needs attention NOW, what's at risk, what's on track.
+Charts must use the design system palette, not default chart library colors.
+Sidebar / Navigation
+Active state must be unmistakable.
+Project list with status indicators (health, unread, overdue) at a glance.
+Collapse behavior must be smooth and preserve context.
+Keyboard shortcuts should be discoverable.
+Forms (Task Creation, Project Setup)
+Minimize required fields. Progressive disclosure for advanced options.
+Smart defaults based on context.
+Validation must be helpful, not punitive.
+Submission must feel satisfying — this is a workflow moment.
+Phase 4 — Implementation Standards
+Code Quality
+Production-grade: no placeholder logic, no TODO comments left in delivered
+code, no console.log debris.
+Semantic HTML: use <time>, <progress>, <details>, <dialog> where
+appropriate. Screen readers exist.
+Accessibility: keyboard navigation, ARIA labels on icon-only buttons, focus
+rings that match the design system (not the browser default).
+Responsive: define breakpoints appropriate to PM tools (mobile is real;
+tablets exist; wide monitors are common).
+CSS Architecture
+CSS custom properties for all design tokens.
+BEM, CSS Modules, or Tailwind — pick one, use it consistently.
+No magic numbers. Every value should be derivable from the token system.
+Avoid !important. If you need it, the architecture is wrong.
+State & Data
+Use realistic mock data that reflects actual PM tool complexity: multiple
+projects, varied statuses, realistic names, real-feeling dates.
+Handle loading, empty, error, and populated states for every data-dependent
+component.
+If React: prefer controlled components, clear prop interfaces, typed if
+possible (TypeScript preferred).
+Performance Considerations
+PM tools are used all day. Heavy animations on frequently-used components
+will cause fatigue and CPU drain. Restrain motion on repeated interactions.
+Virtualize long lists if the component implies unbounded data (task lists,
+activity feeds).
+Lazy-load heavy panels (detail views, reports).
+Output Format
+Deliver:
+
+A brief design rationale (3–5 sentences): aesthetic direction chosen,
+why it fits the PM context, what makes it distinctive.
+Working implementation code: complete, runnable, properly formatted.
+Usage notes (if needed): how to extend, what props/data it expects, any
+dependencies required.
+Do not deliver:
+
+Partial components with "you can add X here" gaps.
+Generic styling that could apply to any SaaS product.
+Inaccessible icon-only interfaces with no labels.
+Dashboard widgets that show fake data without acknowledging it's mock data.
+The Standard
+The test: would a design-literate PM or engineering lead look at this and say
+"who made this?" — not because it's bizarre, but because it has a point of
+view? PM tools don't have to be boring. The best ones aren't.
+
+Every component should feel like it was designed for a specific team, with a
+specific culture, solving a specific problem. Generic is the enemy.
+
+text
+
+---
+
+Key changes from the original and why:
+
+- **PM-specific archetypes** replace generic aesthetic moods — "War Room" and "Ledger" are more actionable than "brutalist" when designing a task list.
+- **Domain understanding phase** added — you can't design a good PM interface without knowing the data model and workflow moment.
+- **Component pattern section** gives concrete quality bars for the specific UI patterns that appear in PM tools (kanban, timeline, task rows, dashboards).
+- **Motion guidance adjusted** for PM context — animation fatigue is a real concern in tools used 8 hours a day, so the guidance is more nuanced than "add animations."
+- **Semantic color section** added — status colors are a PM-specific design system concern that the original skill didn't address.
+- **Output format** is explicit — no more "here's a skeleton, extend it yourself."

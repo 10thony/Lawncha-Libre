@@ -1,0 +1,197 @@
+STYLE PERSONALIZATION TRANSPOSITION — TASK CHECKLIST
+=====================================================
+
+STATUS: IN PROGRESS
+LAST UPDATED: 2026-04-22
+
+OBJECTIVE
+---------
+Iterate through every component in the application and ensure it respects the
+user's selected personalization style (selectedStyleId from PersonalizationContext).
+Each style must be transposed LOYALLY from the original proof-of-concept files —
+not approximated or simplified. The POC files are the source of truth for color
+palettes, typography, spacing, border treatments, and layout motifs.
+
+IMPORTANT: After finishing each component, VERIFY IN THE BROWSER TAB that the
+transposed style matches the original POC concept. Do not mark a component
+complete until visually confirmed.
+
+
+REFERENCE: STYLE PROOF-OF-CONCEPT FILES
+-----------------------------------------
+These files define the canonical visual language for each style. Every new
+transposition must draw from these directly:
+
+  src/components/style-poc-warroom.tsx    → "warroom"   (dark tactical, amber highlights, monospace, operational framing)
+  src/components/style-poc-dossier.tsx    → "dossier"   (paper/manila, Courier Prime, red stamps, file tabs)
+  src/components/style-poc-brutalist.tsx  → "brutalist"  (heavy outlines, Archivo Black, loud color blocks, poster aesthetic)
+  src/components/style-poc-transit.tsx    → "transit"    (dark teal, Chivo, LED status badges, arrival-board columns)
+  src/components/style-poc-cartography.tsx→ (standalone) (parchment, DM Serif Display, compass rose, topographic)
+  src/components/style-poc-ledger.tsx     → (standalone) (double-entry bookkeeping, ruled lines, Geist Mono)
+  src/components/style-poc-studio.tsx     → (standalone) (editorial magazine, Instrument Serif, wall labels)
+
+  Style tokens are in: src/components/personalization-config.ts
+  Context/provider:    src/components/personalization-context.tsx
+  Current style ID:    usePersonalization().selectedStyleId
+
+
+COMPLETED
+---------
+[x] Projects page (Dashboard "projects" tab)
+    - Dashboard.tsx now imports StyledProjectsView which switches between:
+      warroom  → <ProjectsWarRoom embedded />
+      dossier  → <ProjectsDossier embedded />
+      brutalist→ <ProjectsBrutalist embedded />
+      transit  → <ProjectsTransit embedded />
+      default  → <ProjectsDashboard /> (signature style)
+    - Each POC accepts `embedded` prop to suppress standalone top nav when inside dashboard
+    - Verified in browser: all 4 non-default styles render correctly
+
+[x] Personalization Studio (src/components/PersonalizationStudio.tsx)
+    - Already uses LANDING_STYLE_TOKENS CSS variables for self-theming
+    - Style tile selector works and persists to context + Convex remote
+
+
+REMAINING — COMPONENTS TO TRANSPOSE
+-------------------------------------
+Each component below needs a styled variant for: warroom, dossier, brutalist, transit.
+The "signature" style is the existing default (no changes needed for signature).
+
+For each, you must:
+  1. Read the component and understand its data shape and interactions
+  2. For each style, create a transposed version faithful to the POC's visual language
+  3. Wire a style-switcher wrapper (like StyledProjectsView) in Dashboard.tsx
+  4. VERIFY IN BROWSER that the result matches the POC concept
+  5. Check off below when confirmed
+
+[ ] Dashboard shell (sidebar, header, footer)
+    File: src/components/Dashboard.tsx
+    Notes: The sidebar, top header bar, and user info section should adapt to the
+    selected style. Warroom = dark sidebar with amber accents, monospace labels.
+    Dossier = manila/paper sidebar with red trim. Brutalist = heavy border sidebar
+    with oversized labels. Transit = dark rounded sidebar with pill-shaped nav items.
+
+[ ] Overview tab (profile card, quick stats cards)
+    File: src/components/Dashboard.tsx (inline in the component, activeTab === "overview")
+    Notes: The 3 stat cards (appointments, projects, reviews) and profile card need
+    styled variants. Each style has its own stat block treatment — refer to the POCs'
+    stats bars for the correct motif.
+
+[ ] Appointments / Booking
+    File: src/components/AppointmentBooking.tsx
+    Notes: Calendar views, booking forms, status badges. Transpose the card/form
+    patterns from each style POC.
+
+[ ] Testimonials / Reviews
+    File: src/components/TestimonialsDashboard.tsx
+    Notes: Review cards with ratings, star displays. Dossier = stamp/seal treatment.
+    Warroom = classified intel style. Brutalist = oversized rating numbers.
+
+[ ] Requested Quotes
+    File: src/components/RequestedQuotes.tsx
+    Notes: Quote request cards/list. Business-only tab.
+
+[ ] Employee Management
+    File: src/components/EmployeeManagement.tsx
+    Notes: Employee list, invite flows. Business-only tab.
+
+[ ] Employee Dashboard
+    File: src/components/EmployeeDashboard.tsx
+    Notes: Separate dashboard for employee role users. Needs full shell transposition.
+
+[ ] Business Management
+    File: src/components/BusinessManagement.tsx
+    Notes: Business profiles listing. Business-only tab.
+
+[ ] Client Intake Forms
+    File: src/components/ClientIntakeForms.tsx
+    Notes: Client-facing request forms. Client-only tab.
+
+[ ] Social Feed
+    File: src/components/SocialFeed.tsx
+    Notes: Social media feed display.
+
+[ ] Social Connections
+    File: src/components/SocialConnections.tsx
+    Notes: Connected accounts management.
+
+[ ] Social Media Management
+    File: src/components/SocialMediaManagement.tsx
+    Notes: Post scheduling and management.
+
+[ ] Facebook Integration Hub
+    File: src/components/FacebookIntegrationHub.tsx
+    Notes: Facebook-specific tools.
+
+[ ] Video Upload Demo
+    File: src/components/VideoUploadDemo.tsx
+    Notes: Video upload interface.
+
+[ ] Homepage (public landing)
+    File: src/components/Homepage.tsx
+    Notes: The public-facing homepage. Already has some style token integration
+    via the personalization context. Needs full faithful transposition per style.
+
+[ ] Brand Identity component
+    File: src/components/BrandIdentity.tsx
+    Notes: Logo + brand name display used in sidebar and homepage. Should adapt
+    typography and layout to the active style.
+
+[ ] Profile Setup (onboarding)
+    File: src/components/ProfileSetup.tsx
+    Notes: New user onboarding flow. Lower priority but should eventually match.
+
+[ ] Intake Form (public)
+    File: src/components/IntakeForm.tsx
+    Notes: Public intake form. Should match homepage style.
+
+
+DESIGN PRINCIPLES FOR TRANSPOSITION
+------------------------------------
+1. LOYAL TO THE POC: Do not invent new aesthetics. Copy the palette, typography,
+   spacing, and border treatment from the proof-of-concept files exactly.
+
+2. FUNCTIONAL PARITY: Every interactive element (buttons, selects, inputs, modals)
+   must work identically across styles. Only the visual treatment changes.
+
+3. FONT LOADING: Each style uses specific Google Fonts. Ensure the correct
+   @import or <link> tags are present. Do not substitute fonts.
+     - warroom:   JetBrains Mono
+     - dossier:   Courier Prime, Special Elite, Libre Baskerville
+     - brutalist:  Archivo Black, IBM Plex Sans
+     - transit:    Chivo, Chivo Mono
+
+4. NO GENERIC AI AESTHETICS: Avoid Inter, Roboto, purple gradients, rounded
+   everything. Each style has a SPECIFIC personality. Respect it.
+
+5. VERIFY WITH BROWSER: After every component transposition, open the browser
+   tab and visually confirm the style matches the POC concept. Screenshot if needed.
+
+6. EMBEDDED MODE: When a styled component renders inside the Dashboard content
+   area, suppress any standalone navigation (top bars with route links).
+   Use the `embedded` prop pattern established in the Projects POCs.
+
+
+FILE INVENTORY
+--------------
+Personalization system files:
+  src/components/personalization-config.ts   — Style definitions + tokens
+  src/components/personalization-context.tsx  — React context + Convex sync
+  src/components/PersonalizationStudio.tsx    — Style selector UI
+
+Style POC reference files:
+  src/components/style-poc-warroom.tsx
+  src/components/style-poc-dossier.tsx
+  src/components/style-poc-brutalist.tsx
+  src/components/style-poc-transit.tsx
+  src/components/style-poc-cartography.tsx
+  src/components/style-poc-ledger.tsx
+  src/components/style-poc-studio.tsx
+
+Shared utilities:
+  src/components/projects-variant-utils.ts   — Project data helpers + mock data
+
+Application shell:
+  src/App.tsx          — Routes (standalone POC pages + main content)
+  src/main.tsx         — Providers (PersonalizationProvider wraps app)
+  src/config/toolbeltNav.ts — Sidebar navigation config

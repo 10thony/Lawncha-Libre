@@ -1,0 +1,79 @@
+PROJECT UI VARIANT TRACKER
+===========================
+Tracks each unique design to prevent reuse of colors, layouts, and structures.
+All 5 designs completed and verified.
+
+---
+
+DESIGN 1 — WAR ROOM (/1)  [COMPLETED]
+  Aesthetic: Military command center / tactical operations
+  Background: Jet black (#0a0a0a)
+  Primary accent: Amber/Orange (#f59e0b, #fbbf24)
+  Secondary: Stone grays (#78716c, #57534e)
+  Typography: JetBrains Mono (monospace), all-caps labels, wide letter-spacing
+  Layout: Horizontal stats bar at top, column-header row, then full-width project rows in a 3-column grid (operation info | task roster | status panel)
+  Status indicators: Horizontal gauge bars with percentage, colored dots for tasks, bordered badges
+  Structure: Dense data-table style, no cards, hard borders, military grid precision
+  Unique elements: OP-001 indexing, "STANDING BY" empty state, amber horizontal rule separator
+
+---
+
+DESIGN 2 — BLUEPRINT (/2)  [REJECT]
+  Aesthetic: Technical drafting / architectural schematic
+  Background: Deep indigo (#0b1a2e) with dot-grid pattern (24px)
+  Primary accent: Cyan (#67e8f9)
+  Secondary: Steel blue dims (#4a7094, #2d5070)
+  Typography: IBM Plex Mono + Barlow Condensed headers
+  Layout: Title block header (drawing number, operator, scale, REV block), legend bar stats, then 2-column card grid
+  Status indicators: Bordered type badges + solid approval pills, SVG circle indicators for tasks
+  Structure: Card grid with dotted borders, expandable task schedules, annotation-style corner labels
+  Unique elements: "NO DRAWINGS ON FILE" empty state, dashed borders, tick marks on progress bar
+
+---
+
+DESIGN 3 — FIELD NOTES (/3)  [REJECT]
+  Aesthetic: Warm notebook / handwritten field journal
+  Background: Cream/kraft paper (#f7f3eb) with ruled lines every 32px, red margin line at left
+  Primary accent: Olive green (#5c6b3e), Terra cotta (#b45930)
+  Secondary: Warm browns (#7c5a3c), soft blue (#3b6b9c)
+  Typography: Zilla Slab (slab-serif headers), Source Serif 4 (body), Caveat (handwritten annotations)
+  Layout: Vertical notebook-style, single column entries, margin annotations, top stats with handwritten labels
+  Status indicators: Tinted pill badges, checkbox-style task items, rounded progress bar
+  Structure: Full-width notebook entries, no grid/cards, ruled-line background, handwritten checklist tasks
+  Unique elements: "Notebook is empty" empty state, margin annotations, Caveat cursive labels, line-through for completed
+
+---
+
+DESIGN 4 — CONTROL ROOM (/4)  [REJECTED]
+  Aesthetic: NASA/SpaceX mission control, sci-fi monitoring station
+  Background: Ultra-dark navy (#020617)
+  Primary accent: Cyan (#22d3ee) with glow/drop-shadow effects
+  Secondary: Magenta (#e879f9), Green (#4ade80), Amber (#fbbf24)
+  Typography: Space Grotesk (condensed sans-serif) + Share Tech Mono (data readouts)
+  Layout: 4-column data row per project (ring cell | info | tasks | status), horizontal indicator strip at top
+  Status indicators: SVG circular progress rings, glowing LED dots, bordered status badges with LED insets
+  Structure: Full-width horizontal rows (not cards), LED-lit indicator bar, abbreviated task statuses (QUE/ACT/CPL)
+  Unique elements: "AWAITING SIGNAL" pulsing empty state, progress ring SVGs, glow effects, compact task abbreviations
+
+---
+
+DESIGN 5 — DOSSIER (/5)  [COMPLETED]
+  Aesthetic: Classified documents / intelligence agency file room
+  Background: Aged paper tan (#e8e2d6), manila folder accents (#eee4c8)
+  Primary accent: Red (#c0392b) for stamps and alerts
+  Secondary: Navy blue (#2c5282), Forest green (#276749)
+  Typography: Courier Prime (typewriter body), Special Elite (stamp/classification labels), Libre Baskerville (serif titles)
+  Layout: Centered column of stacked file cards (max-width 900px), manila tab labels, dotted-line metadata tables
+  Status indicators: Rubber-stamp style rotated badges, classification pill labels, numbered action items with bordered status tags
+  Structure: File folder cards with tabs, header stamps, metadata tables, sequential action item checklists
+  Unique elements: "FILE ROOM EMPTY" stamped empty state, file tabs ("FILE 001"), "ADDENDUM" notes, dotted table rows, red left-border notes, footer reference numbers
+
+---
+
+CROSS-DESIGN UNIQUENESS VERIFICATION:
+  Colors: Black / Indigo / Cream / Navy / Tan — no overlap
+  Type: JetBrains Mono / IBM Plex Mono+Barlow / Zilla Slab+Caveat / Space Grotesk+Share Tech / Courier Prime+Special Elite — all distinct
+  Layout: 3-col rows / 2-col grid / single-column / 4-col rows / centered cards — all different
+  Progress: Horizontal gauge / Tick-mark bar / Rounded bar / SVG rings / Flat bar — all different
+  Tasks: Select dropdowns / SVG circles + expand / Checkboxes / LED dots / Numbered action items — all different
+  Empty state: "STANDING BY" / "NO DRAWINGS ON FILE" (dashed box) / "Notebook is empty" / "AWAITING SIGNAL" (pulse) / "FILE ROOM EMPTY" (stamp) — all different
