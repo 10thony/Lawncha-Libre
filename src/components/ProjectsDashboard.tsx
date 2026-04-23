@@ -18,7 +18,7 @@ import {
 
 /** Sentinel for Radix Select — empty string is reserved for clearing the selection */
 const NO_CLIENT_SELECT_VALUE = "__no_client__";
-import { Building2, Calendar, Clock, User, Plus, Edit, CheckCircle, Play, Circle, Check, X, Image as ImageIcon } from "lucide-react";
+import { Building2, Calendar, Clock, User, Plus, Edit, CheckCircle, Play, Circle, Check, X, Image as ImageIcon, Sparkles, ChevronRight } from "lucide-react";
 import { uploadImagesWithUploadThing } from "@/lib/uploadthing";
 
 interface ProjectsDashboardProps {
@@ -32,18 +32,20 @@ export function ProjectsDashboard({ profile }: ProjectsDashboardProps) {
   const myProjects = useQuery(api.projects.getMyProjects);
   const clients = useQuery(api.projects.getClients);
   const clientsWithApprovedAppointments = useQuery(api.projects.getClientsWithApprovedAppointments);
-  const updateTaskStatus = useMutation(api.projects.updateTaskStatus);
-  const approveProject = useMutation(api.projects.approveProject);
-  const rejectProject = useMutation(api.projects.rejectProject);
-
   return (
     <div className="space-y-6">
       {profile.userType === "business" && (
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">Projects</h2>
+        <div className="rounded-2xl border border-cyan-200/60 dark:border-cyan-900/60 bg-gradient-to-br from-white to-cyan-50/70 dark:from-gray-800 dark:to-gray-900 p-5 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Projects</h2>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Active pipeline, approvals, and production tasks in one place.
+              </p>
+            </div>
           <Dialog open={showCreateProject} onOpenChange={setShowCreateProject}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
+              <Button className="flex items-center gap-2 shadow-sm">
                 <Plus className="h-4 w-4" />
                 New Project
               </Button>
@@ -61,6 +63,7 @@ export function ProjectsDashboard({ profile }: ProjectsDashboardProps) {
               />
             </DialogContent>
           </Dialog>
+          </div>
         </div>
       )}
 
@@ -100,7 +103,7 @@ export function ProjectsDashboard({ profile }: ProjectsDashboardProps) {
   );
 }
 
-function TaskItem({ task, index, projectId, userType }: any) {
+function TaskItem({ task, index, projectId, userType, onOpenDetails }: any) {
   const updateTaskStatus = useMutation(api.projects.updateTaskStatus);
 
   // Handle backward compatibility - task might be a string or an object
@@ -118,10 +121,10 @@ function TaskItem({ task, index, projectId, userType }: any) {
 
   const getTaskStatusColor = (status: string) => {
     switch (status) {
-      case "queued": return "bg-gray-100 text-gray-700 border-gray-200";
-      case "in_progress": return "bg-blue-100 text-blue-700 border-blue-200";
-      case "done": return "bg-green-100 text-green-700 border-green-200";
-      default: return "bg-gray-100 text-gray-700 border-gray-200";
+      case "queued": return "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/40 dark:text-slate-300 dark:border-slate-700";
+      case "in_progress": return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800";
+      case "done": return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800";
+      default: return "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/40 dark:text-slate-300 dark:border-slate-700";
     }
   };
 
@@ -139,18 +142,25 @@ function TaskItem({ task, index, projectId, userType }: any) {
   };
 
   return (
-    <div className={`flex items-center justify-between p-3 border rounded-lg ${getTaskStatusColor(taskStatus)}`}>
-      <div className="flex items-center gap-3">
-        {getTaskStatusIcon(taskStatus)}
-        <span className="font-medium">{taskName}</span>
-        <span className="text-xs px-2 py-1 rounded-full bg-white/50">
-          {taskStatus.replace('_', ' ')}
-        </span>
-      </div>
-      
-      {userType === "business" && (
+    <div className={`flex items-center justify-between gap-3 p-3 border rounded-xl transition-all duration-200 ${getTaskStatusColor(taskStatus)}`}>
+      <button
+        type="button"
+        onClick={onOpenDetails}
+        className="min-w-0 flex-1 text-left group"
+      >
+        <div className="flex items-center gap-3">
+          {getTaskStatusIcon(taskStatus)}
+          <span className="font-medium truncate">{taskName}</span>
+          <span className="text-xs px-2 py-1 rounded-full bg-white/70 dark:bg-gray-900/50 capitalize">
+            {taskStatus.replace('_', ' ')}
+          </span>
+          <ChevronRight className="h-4 w-4 opacity-40 group-hover:opacity-80 transition-opacity ml-auto" />
+        </div>
+      </button>
+
+      {(userType === "business" || userType === "employee") && (
         <Select value={taskStatus} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-32 h-8">
+          <SelectTrigger className="w-36 h-9 bg-white/80 dark:bg-gray-900/70">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -165,22 +175,27 @@ function TaskItem({ task, index, projectId, userType }: any) {
 }
 
 function ProjectCard({ project, userType, onEdit }: any) {
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [selectedTaskIndex, setSelectedTaskIndex] = useState<number | null>(null);
+  const updateTaskStatus = useMutation(api.projects.updateTaskStatus);
+  const canEditTask = userType === "business" || userType === "employee";
+
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "planned": return "bg-blue-100 text-blue-800";
-      case "in_progress": return "bg-yellow-100 text-yellow-800";
-      case "completed": return "bg-green-100 text-green-800";
-      case "cancelled": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "planned": return "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200";
+      case "in_progress": return "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200";
+      case "completed": return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200";
+      case "cancelled": return "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200";
+      default: return "bg-slate-100 text-slate-800 dark:bg-slate-900/40 dark:text-slate-200";
     }
   };
 
   const getApprovalStatusColor = (approvalStatus: string) => {
     switch (approvalStatus) {
-      case "pending": return "bg-yellow-100 text-yellow-800";
-      case "approved": return "bg-green-100 text-green-800";
-      case "rejected": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "pending": return "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200";
+      case "approved": return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200";
+      case "rejected": return "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200";
+      default: return "bg-slate-100 text-slate-800 dark:bg-slate-900/40 dark:text-slate-200";
     }
   };
 
@@ -188,34 +203,55 @@ function ProjectCard({ project, userType, onEdit }: any) {
     return new Date(timestamp).toLocaleDateString();
   };
 
+  const handleTaskStatusChangeFromModal = async (newStatus: string) => {
+    if (selectedTaskIndex === null) return;
+    try {
+      await updateTaskStatus({
+        projectId: project._id,
+        taskIndex: selectedTaskIndex,
+        status: newStatus as any,
+      });
+      toast.success("Task status updated!");
+      setSelectedTask((prev: any) => prev ? { ...prev, status: newStatus } : prev);
+    } catch (error) {
+      toast.error("Failed to update task status");
+    }
+  };
+
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-xl font-semibold">{project.projectName}</h3>
+    <>
+    <div className="relative overflow-hidden rounded-2xl border border-gray-200/80 dark:border-gray-700/70 bg-gradient-to-br from-white via-white to-cyan-50/40 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900/80 p-6 shadow-sm">
+      <div className="absolute -right-16 -top-16 h-36 w-36 rounded-full bg-cyan-300/20 blur-3xl pointer-events-none" />
+      <div className="relative flex flex-wrap justify-between items-start gap-3 mb-4">
+        <div className="min-w-0">
+          <div className="inline-flex items-center gap-2 mb-2 text-xs uppercase tracking-wide text-cyan-700 dark:text-cyan-300">
+            <Sparkles className="h-3.5 w-3.5" />
+            Project Pipeline
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 break-words">{project.projectName}</h3>
           <p className="text-gray-600 dark:text-gray-400">{project.projectType}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor(project.status)}`}>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(project.status)}`}>
             {project.status.replace('_', ' ')}
           </span>
           {project.approvalStatus && (
-            <span className={`px-3 py-1 rounded-full text-sm ${getApprovalStatusColor(project.approvalStatus)}`}>
+            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getApprovalStatusColor(project.approvalStatus)}`}>
               {project.approvalStatus}
             </span>
           )}
           {userType === "business" && (
-            <Button size="sm" variant="outline" onClick={() => onEdit(project)}>
+            <Button size="sm" variant="outline" onClick={() => onEdit(project)} className="bg-white/80 dark:bg-gray-900/70">
               <Edit className="h-4 w-4" />
             </Button>
           )}
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4 mb-4">
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+      <div className="grid md:grid-cols-2 gap-4 mb-5">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 min-w-0">
           <User className="h-4 w-4" />
-          <span>
+          <span className="truncate">
             {userType === "business" 
               ? project.clientClerkId ? `Client ID: ${project.clientClerkId}` : "Completed Project (No Client)"
               : `Business ID: ${project.businessOwnerClerkId}`
@@ -238,7 +274,7 @@ function ProjectCard({ project, userType, onEdit }: any) {
 
       {project.projectTasks.length > 0 && (
         <div className="mb-4">
-          <h4 className="font-medium mb-2">Tasks:</h4>
+          <h4 className="font-medium mb-2 text-gray-900 dark:text-gray-100">Tasks</h4>
           <div className="space-y-2">
             {project.projectTasks.map((task: any, index: number) => (
               <TaskItem 
@@ -247,6 +283,10 @@ function ProjectCard({ project, userType, onEdit }: any) {
                 index={index}
                 projectId={project._id}
                 userType={userType}
+                onOpenDetails={() => {
+                  setSelectedTask(typeof task === "string" ? { name: task, status: "queued" } : task);
+                  setSelectedTaskIndex(index);
+                }}
               />
             ))}
           </div>
@@ -271,6 +311,57 @@ function ProjectCard({ project, userType, onEdit }: any) {
         <ProjectApprovalButtons project={project} />
       )}
     </div>
+
+    <Dialog open={selectedTaskIndex !== null} onOpenChange={(open) => !open && setSelectedTaskIndex(null)}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Task Details</DialogTitle>
+          <DialogDescription>
+            {canEditTask
+              ? "Review task details and update status when work progresses."
+              : "Read-only task details. Only business owners or assigned employees can make changes."}
+          </DialogDescription>
+        </DialogHeader>
+        {selectedTask && (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/40 p-4">
+              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Project</p>
+              <p className="mt-1 font-medium text-gray-900 dark:text-gray-100">{project.projectName}</p>
+              <p className="mt-3 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Task</p>
+              <p className="mt-1 text-base font-semibold text-gray-900 dark:text-gray-100">{selectedTask.name}</p>
+            </div>
+            <div>
+              <Label htmlFor={`task-status-${project._id}`}>Status</Label>
+              {canEditTask ? (
+                <Select value={selectedTask.status} onValueChange={handleTaskStatusChangeFromModal}>
+                  <SelectTrigger id={`task-status-${project._id}`} className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="queued">Queued</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="done">Done</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id={`task-status-${project._id}`}
+                  className="mt-2 capitalize"
+                  value={selectedTask.status.replace("_", " ")}
+                  readOnly
+                />
+              )}
+            </div>
+            <div className="flex justify-end">
+              <Button type="button" variant="outline" onClick={() => setSelectedTaskIndex(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
 
