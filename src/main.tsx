@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { ClerkProvider, useAuth } from "@clerk/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient } from "convex/react";
+import { BrowserRouter } from "react-router-dom";
 import "@uploadthing/react/styles.css";
 import "./index.css";
 import App from "./App";
@@ -28,7 +29,9 @@ createRoot(document.getElementById("root")!).render(
     localization={clerkLocalization}
   >
     <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </ConvexProviderWithClerk>
   </ClerkProvider>,
 );

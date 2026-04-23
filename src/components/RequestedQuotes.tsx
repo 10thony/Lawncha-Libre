@@ -216,17 +216,17 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "submitted": return "bg-blue-100 text-blue-800";
-      case "claimed": return "bg-yellow-100 text-yellow-800";
-      case "in_progress": return "bg-green-100 text-green-800";
-      case "completed": return "bg-gray-100 text-gray-800";
-      case "cancelled": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "submitted": return "bg-transparent text-[#394b6b] dark:text-blue-400 border border-[#394b6b]/30 dark:border-blue-900/60";
+      case "claimed": return "bg-transparent text-primary border border-primary/30";
+      case "in_progress": return "bg-transparent text-[#276749] dark:text-emerald-400 border border-[#276749]/30 dark:border-emerald-900/60";
+      case "completed": return "bg-secondary text-muted-foreground";
+      case "cancelled": return "bg-transparent text-destructive border border-destructive/30";
+      default: return "bg-secondary text-muted-foreground";
     }
   };
 
   const IntakeFormCard = ({ form }: { form: IntakeFormDetails }) => (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
@@ -243,22 +243,22 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Phone className="h-4 w-4" />
             {form.phone}
           </div>
           
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="h-4 w-4" />
             Submitted {formatDate(form.submittedAt)}
           </div>
 
-          <p className="text-sm text-gray-700 line-clamp-2">
+          <p className="text-sm text-secondary-foreground line-clamp-2">
             {form.projectDescription}
           </p>
 
           {(form.imageUrls?.length || form.videoUrls?.length) && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               {form.imageUrls?.length && (
                 <div className="flex items-center gap-1">
                   <ImageIcon className="h-4 w-4" />
@@ -300,19 +300,19 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
                     <h3 className="font-semibold mb-3">Contact Information</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-gray-500" />
+                        <User className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm">{form.firstName} {form.lastName}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-gray-500" />
+                        <Mail className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm">{form.email}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-gray-500" />
+                        <Phone className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm">{form.phone}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm">{formatDate(form.submittedAt)}</span>
                       </div>
                     </div>
@@ -321,7 +321,7 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
                   {/* Project Description */}
                   <div>
                     <h3 className="font-semibold mb-3">Project Description</h3>
-                    <div className="rounded-lg border border-border bg-muted p-4">
+                    <div className="border border-border bg-muted p-4">
                       <p className="text-sm text-foreground whitespace-pre-wrap">
                         {form.projectDescription}
                       </p>
@@ -334,19 +334,19 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
                       <h3 className="font-semibold mb-3">Project Media</h3>
                       <div className="space-y-2">
                         {form.imageUrls?.map((url, index) => (
-                          <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                          <div key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
                             <ImageIcon className="h-4 w-4" />
                             <span>Image {index + 1}</span>
-                            <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                            <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                               View Image
                             </a>
                           </div>
                         ))}
                         {form.videoUrls?.map((url, index) => (
-                          <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                          <div key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Video className="h-4 w-4" />
                             <span>Video {index + 1}</span>
-                            <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                            <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                               View Video
                             </a>
                           </div>
@@ -426,7 +426,7 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
                                   id="projectType"
                                   value={projectForm.projectType}
                                   onChange={(e) => setProjectForm(prev => ({ ...prev, projectType: e.target.value }))}
-                                  className="w-full p-2 border rounded-md"
+                                  className="w-full p-2 border border-border bg-input text-foreground"
                                 >
                                   <option value="">Select project type</option>
                                   <option value="remodeling">Remodeling & additions</option>
@@ -591,12 +591,12 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Quote Requests</h2>
-          <p className="text-gray-600">Manage incoming quote requests from potential clients</p>
+          <h2 className="font-serif-display text-2xl text-foreground">Quote Requests</h2>
+          <p className="text-muted-foreground">Manage incoming quote requests from potential clients</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search requests..."
               value={searchTerm}
@@ -612,33 +612,33 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">New Requests</CardTitle>
-            <Quote className="h-4 w-4 text-blue-500" />
+            <Quote className="h-4 w-4 text-[#394b6b] dark:text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{submittedForms.length}</div>
-            <p className="text-xs text-gray-500">Awaiting claim</p>
+            <div className="font-serif-display text-2xl text-[#394b6b] dark:text-blue-400">{submittedForms.length}</div>
+            <p className="text-xs text-muted-foreground">Awaiting claim</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Claimed Requests</CardTitle>
-            <CheckCircle className="h-4 w-4 text-yellow-500" />
+            <CheckCircle className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{claimedForms.length}</div>
-            <p className="text-xs text-gray-500">Ready for quotes</p>
+            <div className="font-serif-display text-2xl text-primary">{claimedForms.length}</div>
+            <p className="text-xs text-muted-foreground">Ready for quotes</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-            <Clock className="h-4 w-4 text-green-500" />
+            <Clock className="h-4 w-4 text-[#276749] dark:text-emerald-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{inProgressForms.length}</div>
-            <p className="text-xs text-gray-500">Active projects</p>
+            <div className="font-serif-display text-2xl text-[#276749] dark:text-emerald-400">{inProgressForms.length}</div>
+            <p className="text-xs text-muted-foreground">Active projects</p>
           </CardContent>
         </Card>
       </div>
@@ -647,7 +647,7 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
       {submittedForms.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-blue-500" />
+            <AlertCircle className="h-5 w-5 text-[#394b6b] dark:text-blue-400" />
             New Quote Requests ({submittedForms.length})
           </h3>
           <div className="grid gap-4">
@@ -662,7 +662,7 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
       {claimedForms.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-yellow-500" />
+            <CheckCircle className="h-5 w-5 text-primary" />
             Your Claimed Requests ({claimedForms.length})
           </h3>
           <div className="grid gap-4">
@@ -677,7 +677,7 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
       {inProgressForms.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Clock className="h-5 w-5 text-green-500" />
+            <Clock className="h-5 w-5 text-[#276749] dark:text-emerald-400" />
             Projects In Progress ({inProgressForms.length})
           </h3>
           <div className="grid gap-4">
@@ -692,9 +692,9 @@ export function RequestedQuotes({ profile }: RequestedQuotesProps) {
       {filteredForms.length === 0 && (
         <Card>
           <CardContent className="text-center py-12">
-            <Quote className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Quote Requests Found</h3>
-            <p className="text-gray-600">
+            <Quote className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">No Quote Requests Found</h3>
+            <p className="text-muted-foreground">
               {searchTerm ? "Try adjusting your search terms." : "No quote requests have been submitted yet."}
             </p>
           </CardContent>

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "../../lib/utils";
 import { Button } from "./button";
-import { ChevronLeft, ChevronRight, Menu } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface SidebarProps {
   children: React.ReactNode;
@@ -45,7 +45,7 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
       <div
         ref={ref}
         className={cn(
-          "flex h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out",
+          "flex h-screen w-56 bg-popover border-r border-border transition-all duration-300 ease-in-out",
           className
         )}
         {...props}
@@ -77,7 +77,7 @@ const SidebarHeader = React.forwardRef<HTMLDivElement, SidebarHeaderProps>(
     return (
       <div
         ref={ref}
-        className={cn("p-4 border-b border-gray-200 dark:border-gray-700", className)}
+        className={cn("p-4 border-b border-border", className)}
         {...props}
       >
         {children}
@@ -92,7 +92,7 @@ const SidebarFooter = React.forwardRef<HTMLDivElement, SidebarFooterProps>(
     return (
       <div
         ref={ref}
-        className={cn("p-4 border-t border-gray-200 dark:border-gray-700", className)}
+        className={cn("p-4 border-t border-border", className)}
         {...props}
       >
         {children}
@@ -111,15 +111,15 @@ const SidebarToggle = React.forwardRef<HTMLButtonElement, SidebarToggleProps>(
         size="sm"
         onClick={onToggle}
         className={cn(
-          "absolute -right-3 top-4 z-10 h-6 w-6 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-200",
+          "absolute -right-3 top-4 z-10 h-6 w-6 border border-border bg-card hover:bg-accent hover:border-primary transition-all duration-150",
           className
         )}
         {...props}
       >
         {isCollapsed ? (
-          <ChevronRight className="h-3 w-3" />
+          <ChevronRight className="h-3 w-3 text-muted-foreground" />
         ) : (
-          <ChevronLeft className="h-3 w-3" />
+          <ChevronLeft className="h-3 w-3 text-muted-foreground" />
         )}
         <span className="sr-only">
           {isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -137,9 +137,9 @@ const SidebarItem = React.forwardRef<HTMLButtonElement, SidebarItemProps>(
         ref={ref}
         onClick={onClick}
         className={cn(
-          "flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700",
-          isActive && "bg-primary/10 text-primary border-r-2 border-primary",
-          !isActive && "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100",
+          "flex items-center gap-3 px-4 py-2.5 text-[11px] font-medium tracking-[0.05em] uppercase transition-all duration-150 hover:bg-accent",
+          isActive && "bg-accent text-primary border-r-2 border-primary",
+          !isActive && "text-muted-foreground hover:text-secondary-foreground",
           isCollapsed && "justify-center px-2",
           className
         )}
@@ -184,11 +184,11 @@ const SidebarSection = React.forwardRef<HTMLDivElement, { children: React.ReactN
         {...props}
       >
         {title && (
-          <h3 className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <h3 className="px-2 py-1 text-[9px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
             {title}
           </h3>
         )}
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {children}
         </div>
       </div>

@@ -2,11 +2,18 @@ import { useEffect, useState } from "react";
 import { Show, useUser } from "@clerk/react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
+import { Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 import { ProfileSetup } from "./components/ProfileSetup";
 import { Dashboard } from "./components/Dashboard";
 import { Homepage } from "./components/Homepage";
 import { Badge } from "./components/ui/badge";
+import { AthecaIntroAnimation } from "./components/AthecaIntroAnimation";
+import { ProjectsWarRoom } from "./components/style-poc-warroom";
+import { ProjectsDossier } from "./components/style-poc-dossier";
+import { ProjectsBrutalist } from "./components/style-poc-brutalist";
+import { ProjectsTransit } from "./components/style-poc-transit";
+import { ProjectsCartography } from "./components/style-poc-cartography";
 import {
   clearStoredEmployeeInviteToken,
   readStoredEmployeeInviteToken,
@@ -27,9 +34,16 @@ function getInitialEmployeeInviteToken(): string | null {
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-[#0a0a0a] transition-colors duration-300">
       <main className="flex-1">
-        <Content />
+        <Routes>
+          <Route path="/" element={<Content />} />
+          <Route path="/1" element={<ProjectsWarRoom />} />
+          <Route path="/2" element={<ProjectsDossier />} />
+          <Route path="/5" element={<ProjectsCartography />} />
+          <Route path="/9" element={<ProjectsBrutalist />} />
+          <Route path="/10" element={<ProjectsTransit />} />
+        </Routes>
       </main>
       <Toaster />
     </div>
@@ -39,6 +53,7 @@ export default function App() {
 function Content() {
   const { isLoaded, isSignedIn } = useUser();
   const profile = useQuery(api.profiles.getCurrentProfile);
+  const [showLandingIntro, setShowLandingIntro] = useState(true);
   const [employeeInviteToken, setEmployeeInviteToken] = useState<string | null>(
     getInitialEmployeeInviteToken
   );
@@ -71,6 +86,10 @@ function Content() {
         </div>
       </div>
     );
+  }
+
+  if (!isSignedIn && showLandingIntro) {
+    return <AthecaIntroAnimation onComplete={() => setShowLandingIntro(false)} />;
   }
 
   return (

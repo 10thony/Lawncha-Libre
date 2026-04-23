@@ -3,26 +3,23 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../../lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 relative overflow-hidden group",
+  "inline-flex items-center justify-center whitespace-nowrap text-[10px] font-bold tracking-[0.15em] uppercase ring-offset-background transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary-hover shadow-modern hover:shadow-modern-lg hover:scale-105 active:scale-95",
-        destructive: "bg-red-500 text-white hover:bg-red-600 shadow-modern hover:shadow-modern-lg hover:scale-105 active:scale-95",
-        outline: "border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm hover:shadow-md hover:scale-105 active:scale-95",
-        secondary: "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-sm hover:shadow-md hover:scale-105 active:scale-95",
-        ghost: "hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 active:scale-95",
-        link: "text-primary underline-offset-4 hover:underline",
-        glass: "bg-white/10 dark:bg-black/10 backdrop-blur-md border border-white/20 dark:border-white/10 text-gray-900 dark:text-gray-100 hover:bg-white/20 dark:hover:bg-black/20 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95",
-        neumorphism: "neumorphism text-gray-700 dark:text-gray-300 hover:shadow-neumorphism-inset active:shadow-neumorphism-inset",
-        gradient: "bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95",
+        default: "bg-primary text-primary-foreground border-primary/80 hover:bg-primary/90 active:bg-primary/80",
+        destructive: "bg-destructive text-destructive-foreground border-destructive/80 hover:bg-destructive/90 active:bg-destructive/80",
+        outline: "bg-transparent text-secondary-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary active:bg-accent/80",
+        secondary: "bg-secondary text-secondary-foreground border-border hover:bg-secondary/80 hover:text-foreground active:bg-secondary",
+        ghost: "bg-transparent text-secondary-foreground border-transparent hover:bg-accent hover:text-foreground active:bg-accent/80",
+        link: "text-primary border-transparent underline-offset-4 hover:underline hover:text-primary/80",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3 text-xs",
-        lg: "h-11 rounded-lg px-8 text-base",
-        icon: "h-10 w-10",
-        xl: "h-12 rounded-lg px-10 text-lg",
+        default: "h-9 px-4 py-2",
+        sm: "h-7 px-3 text-[9px]",
+        lg: "h-10 px-6 text-[11px]",
+        icon: "h-9 w-9",
+        xl: "h-11 px-8 text-[11px]",
       },
     },
     defaultVariants: {

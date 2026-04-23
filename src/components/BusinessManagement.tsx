@@ -163,8 +163,8 @@ export function BusinessManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Business Entities</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <h2 className="font-serif-display text-2xl text-foreground">Business Entities</h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Create and manage multiple businesses under your owner profile.
           </p>
         </div>
@@ -176,16 +176,16 @@ export function BusinessManagement() {
 
       {businesses === undefined ? (
         <Card>
-          <CardContent className="p-8 text-center text-gray-600 dark:text-gray-400">
+          <CardContent className="p-8 text-center text-muted-foreground">
             Loading businesses...
           </CardContent>
         </Card>
       ) : businesses.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center space-y-3">
-            <Building2 className="h-10 w-10 text-gray-400 dark:text-gray-500 mx-auto" />
-            <p className="text-gray-700 dark:text-gray-300 font-medium">No businesses created yet.</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <Building2 className="h-10 w-10 text-muted-foreground mx-auto" />
+            <p className="text-secondary-foreground font-medium">No businesses created yet.</p>
+            <p className="text-sm text-muted-foreground">
               Add your first business to start organizing projects and services.
             </p>
             <div className="flex items-center justify-center gap-3">
@@ -206,7 +206,7 @@ export function BusinessManagement() {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <CardTitle className="text-lg flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                    <CardTitle className="text-lg flex items-center gap-2 text-foreground">
                       {business.name}
                       {business.isPrimary && (
                         <Badge variant="secondary" className="flex items-center gap-1">
@@ -216,7 +216,7 @@ export function BusinessManagement() {
                       )}
                     </CardTitle>
                     {business.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                      <p className="text-sm text-muted-foreground mt-2">
                         {business.description}
                       </p>
                     )}
@@ -230,17 +230,17 @@ export function BusinessManagement() {
               <CardContent className="space-y-3">
                 <div className="grid md:grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-gray-500 dark:text-gray-400">Phone:</span>{" "}
-                    <span className="text-gray-800 dark:text-gray-200">{business.phone || "Not set"}</span>
+                    <span className="text-muted-foreground">Phone:</span>{" "}
+                    <span className="text-foreground">{business.phone || "Not set"}</span>
                   </div>
                   <div>
-                    <span className="text-gray-500 dark:text-gray-400">Address:</span>{" "}
-                    <span className="text-gray-800 dark:text-gray-200">{business.address || "Not set"}</span>
+                    <span className="text-muted-foreground">Address:</span>{" "}
+                    <span className="text-foreground">{business.address || "Not set"}</span>
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">Services</p>
+                  <p className="text-muted-foreground text-sm mb-2">Services</p>
                   {business.services && business.services.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {business.services.map((service) => (
@@ -250,7 +250,7 @@ export function BusinessManagement() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">No services listed</p>
+                    <p className="text-sm text-muted-foreground">No services listed</p>
                   )}
                 </div>
               </CardContent>
@@ -341,7 +341,7 @@ export function BusinessManagement() {
                   <button
                     type="button"
                     onClick={() => removeService(service)}
-                    className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                    className="text-muted-foreground hover:text-secondary-foreground"
                     aria-label={`Remove ${service}`}
                   >
                     <X className="h-3 w-3" />
@@ -352,7 +352,7 @@ export function BusinessManagement() {
           </div>
 
           {canSetPrimary && (
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <label className="flex items-center gap-2 text-sm text-secondary-foreground">
               <input
                 type="checkbox"
                 checked={formData.isPrimary}

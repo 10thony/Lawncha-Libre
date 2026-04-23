@@ -78,20 +78,20 @@ export function EmployeeManagement({ profile }: EmployeeManagementProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-transparent text-primary border border-primary/30";
       case "approved":
-        return "bg-green-100 text-green-800";
+        return "bg-transparent text-[#276749] dark:text-emerald-400 border border-[#276749]/30 dark:border-emerald-900/60";
       case "rejected":
-        return "bg-red-100 text-red-800";
+        return "bg-transparent text-destructive border border-destructive/30";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-secondary text-muted-foreground";
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Employee Management</h2>
+        <h2 className="font-serif-display text-2xl text-foreground">Employee Management</h2>
       </div>
 
       <Card className="p-6">
@@ -101,7 +101,7 @@ export function EmployeeManagement({ profile }: EmployeeManagementProps) {
               <Link2 className="h-5 w-5" />
               Invite employees
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xl">
+            <p className="text-sm text-muted-foreground max-w-xl">
               Create a link that sends new hires through sign-up or sign-in, then straight to the employee
               onboarding form for your company. Links expire after 30 days.
             </p>
@@ -112,8 +112,8 @@ export function EmployeeManagement({ profile }: EmployeeManagementProps) {
           </Button>
         </div>
         {inviteUrl && (
-          <div className="mt-4 rounded-md border border-gray-200 dark:border-gray-700 bg-muted/40 p-3 flex flex-col sm:flex-row gap-2 sm:items-center">
-            <code className="text-xs break-all flex-1 text-gray-800 dark:text-gray-200">{inviteUrl}</code>
+          <div className="mt-4 border border-border bg-muted/40 p-3 flex flex-col sm:flex-row gap-2 sm:items-center">
+            <code className="text-xs break-all flex-1 text-foreground">{inviteUrl}</code>
             <Button type="button" variant="outline" size="sm" onClick={handleCopyInvite}>
               Copy again
             </Button>
@@ -125,19 +125,19 @@ export function EmployeeManagement({ profile }: EmployeeManagementProps) {
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4">Pending Employee Requests</h3>
         {employeeRequests?.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400">No pending employee requests</p>
+          <p className="text-muted-foreground">No pending employee requests</p>
         ) : (
           <div className="space-y-4">
             {employeeRequests?.map((request) => (
-              <div key={request._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <div key={request._id} className="border border-border p-4 hover:bg-accent transition-colors">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                    <h4 className="font-medium text-foreground">
                       {request.firstName} {request.lastName}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{request.email}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{request.phone}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-muted-foreground">{request.email}</p>
+                    <p className="text-sm text-muted-foreground">{request.phone}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
                       Requested on {formatDate(request.requestedAt)}
                     </p>
                   </div>
@@ -202,16 +202,16 @@ export function EmployeeManagement({ profile }: EmployeeManagementProps) {
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4">Current Employees</h3>
         {companyEmployees?.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400">No employees yet</p>
+          <p className="text-muted-foreground">No employees yet</p>
         ) : (
           <div className="space-y-4">
             {companyEmployees?.map((employee) => (
-              <div key={employee._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <div key={employee._id} className="border border-border p-4 hover:bg-accent transition-colors">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100">{employee.name}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{employee.phone}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{employee.address}</p>
+                    <h4 className="font-medium text-foreground">{employee.name}</h4>
+                    <p className="text-sm text-muted-foreground">{employee.phone}</p>
+                    <p className="text-sm text-muted-foreground">{employee.address}</p>
                     <Badge className={getStatusColor(employee.employeeStatus || "approved")}>
                       {employee.employeeStatus || "approved"}
                     </Badge>
@@ -232,14 +232,14 @@ export function EmployeeManagement({ profile }: EmployeeManagementProps) {
           <div className="space-y-4">
             <p>Are you sure you want to reject {selectedRequest?.firstName} {selectedRequest?.lastName}'s request?</p>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-secondary-foreground mb-2">
                 Rejection Reason (Optional)
               </label>
               <textarea
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 placeholder="Enter reason for rejection..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full px-3 py-2 border border-border bg-input text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                 rows={3}
               />
             </div>

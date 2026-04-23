@@ -8,17 +8,13 @@ interface ThemeToggleProps {
 }
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
-  const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = React.useState<'light' | 'dark'>('dark');
 
   React.useEffect(() => {
-    // Check for saved theme preference or default to light mode
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    const initialTheme = savedTheme || 'dark';
     setTheme(initialTheme);
     
-    // Apply theme to document
     if (initialTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
@@ -44,17 +40,16 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       size="icon"
       onClick={toggleTheme}
       className={cn(
-        "relative h-9 w-9 rounded-lg transition-all duration-200 hover:scale-105",
-        "hover:bg-gray-100 dark:hover:bg-gray-800",
+        "relative h-8 w-8 transition-all duration-150",
         className
       )}
     >
       <Sun className={cn(
-        "h-4 w-4 transition-all duration-200",
+        "h-3.5 w-3.5 transition-all duration-200 text-primary",
         theme === 'dark' ? "rotate-90 scale-0" : "rotate-0 scale-100"
       )} />
       <Moon className={cn(
-        "absolute h-4 w-4 transition-all duration-200",
+        "absolute h-3.5 w-3.5 transition-all duration-200 text-primary",
         theme === 'dark' ? "rotate-0 scale-100" : "-rotate-90 scale-0"
       )} />
       <span className="sr-only">Toggle theme</span>

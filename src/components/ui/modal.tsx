@@ -51,7 +51,6 @@ export function Modal({
       }
     };
 
-    // Prevent body scroll when modal is open
     document.body.style.overflow = "hidden";
     document.addEventListener("keydown", handleEscape);
 
@@ -64,7 +63,6 @@ export function Modal({
   React.useEffect(() => {
     if (!isOpen) return;
 
-    // Focus management
     const modalElement = document.querySelector('[role="dialog"]') as HTMLElement;
     if (modalElement) {
       modalElement.focus();
@@ -81,35 +79,32 @@ export function Modal({
       aria-labelledby={title ? "modal-title" : undefined}
       aria-describedby={description ? "modal-description" : undefined}
     >
-      {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
+        className="absolute inset-0 bg-black/60 dark:bg-black/85 transition-opacity duration-300"
         onClick={onClose}
         aria-hidden="true"
       />
       
-      {/* Modal Content */}
       <div 
         className={cn(
-          "relative w-full bg-white dark:bg-gray-900 rounded-lg shadow-modern-lg",
-          "border border-gray-200 dark:border-gray-700",
+          "relative w-full bg-card",
+          "border border-border",
           "animate-fade-in max-h-[90vh] overflow-y-auto",
           sizeClasses[size],
           className
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         {(title || onClose) && (
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between p-5 border-b border-border">
             <div className="flex-1">
               {title && (
-                <h2 id="modal-title" className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                <h2 id="modal-title" className="text-base font-bold text-card-foreground tracking-wide uppercase">
                   {title}
                 </h2>
               )}
               {description && (
-                <p id="modal-description" className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <p id="modal-description" className="mt-1 text-xs text-muted-foreground">
                   {description}
                 </p>
               )}
@@ -117,17 +112,16 @@ export function Modal({
             {onClose && (
               <button
                 onClick={onClose}
-                className="ml-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="ml-4 p-2 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
                 aria-label="Close modal"
               >
-                <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                <X className="h-4 w-4" />
               </button>
             )}
           </div>
         )}
         
-        {/* Content */}
-        <div className="p-6">
+        <div className="p-5">
           {children}
         </div>
       </div>
@@ -136,7 +130,6 @@ export function Modal({
   );
 }
 
-// Specialized Auth Modal Component
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -153,15 +146,14 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
       className="max-h-[85vh]"
     >
       <div className="space-y-6">
-        {/* Mode Toggle */}
-        <div className="flex rounded-lg bg-gray-100 dark:bg-gray-800 p-1">
+        <div className="flex bg-background border border-border">
           <button
             onClick={() => onModeChange("signin")}
             className={cn(
-              "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200",
+              "flex-1 py-2 px-4 text-[10px] font-bold tracking-[0.15em] uppercase transition-all duration-150",
               mode === "signin"
-                ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-secondary-foreground hover:bg-accent"
             )}
           >
             Sign In
@@ -169,17 +161,16 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
           <button
             onClick={() => onModeChange("signup")}
             className={cn(
-              "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200",
+              "flex-1 py-2 px-4 text-[10px] font-bold tracking-[0.15em] uppercase transition-all duration-150",
               mode === "signup"
-                ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-secondary-foreground hover:bg-accent"
             )}
           >
             Sign Up
           </button>
         </div>
 
-        {/* Auth Content */}
         <div className="min-h-[400px]">
           {mode === "signin" ? (
             <SignInForm forceRedirectUrl={postAuthUrl} />

@@ -112,17 +112,17 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "submitted": return "bg-blue-100 text-blue-800";
-      case "claimed": return "bg-yellow-100 text-yellow-800";
-      case "in_progress": return "bg-green-100 text-green-800";
-      case "completed": return "bg-gray-100 text-gray-800";
-      case "cancelled": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "submitted": return "bg-transparent text-[#394b6b] dark:text-blue-400 border border-[#394b6b]/30 dark:border-blue-900/60";
+      case "claimed": return "bg-transparent text-primary border border-primary/30";
+      case "in_progress": return "bg-transparent text-[#276749] dark:text-emerald-400 border border-[#276749]/30 dark:border-emerald-900/60";
+      case "completed": return "bg-secondary text-foreground";
+      case "cancelled": return "bg-transparent text-destructive border border-destructive/30";
+      default: return "bg-secondary text-foreground";
     }
   };
 
   const IntakeFormCard = ({ form }: { form: IntakeFormDetails }) => (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:bg-accent transition-colors">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
@@ -139,31 +139,31 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Phone className="h-4 w-4" />
             {form.phone}
           </div>
           
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="h-4 w-4" />
             Submitted {formatDate(form.submittedAt)}
           </div>
 
-          <p className="text-sm text-gray-700 line-clamp-2">
+          <p className="text-sm text-secondary-foreground line-clamp-2">
             {form.projectDescription}
           </p>
 
           {form.businessNotes && (
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <h4 className="text-sm font-medium text-blue-900 mb-1">Business Notes:</h4>
-              <p className="text-sm text-blue-800">{form.businessNotes}</p>
+            <div className="bg-card p-3">
+              <h4 className="text-sm font-medium text-primary mb-1">Business Notes:</h4>
+              <p className="text-sm text-primary">{form.businessNotes}</p>
             </div>
           )}
 
           {form.estimatedQuote && (
-            <div className="bg-green-50 p-3 rounded-lg">
-              <h4 className="text-sm font-medium text-green-900 mb-1">Estimated Quote:</h4>
-              <p className="text-lg font-semibold text-green-800">${form.estimatedQuote.toLocaleString()}</p>
+            <div className="bg-card p-3">
+              <h4 className="text-sm font-medium text-[#276749] dark:text-emerald-400 mb-1">Estimated Quote:</h4>
+              <p className="text-lg font-semibold text-[#276749] dark:text-emerald-400">${form.estimatedQuote.toLocaleString()}</p>
             </div>
           )}
 
@@ -192,19 +192,19 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
                   <h3 className="font-semibold mb-3">Contact Information</h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-gray-500" />
+                      <User className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{form.firstName} {form.lastName}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-gray-500" />
+                      <Mail className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{form.email}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-gray-500" />
+                      <Phone className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{form.phone}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{formatDate(form.submittedAt)}</span>
                     </div>
                   </div>
@@ -213,7 +213,7 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
                 {/* Project Description */}
                 <div>
                   <h3 className="font-semibold mb-3">Project Description</h3>
-                  <div className="rounded-lg border border-border bg-muted p-4">
+                  <div className="border border-border bg-secondary p-4">
                     <p className="text-sm text-foreground whitespace-pre-wrap">
                       {form.projectDescription}
                     </p>
@@ -226,17 +226,17 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
                     <h3 className="font-semibold mb-3">Business Response</h3>
                     {form.businessNotes && (
                       <div className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Notes:</h4>
-                        <div className="bg-blue-50 p-3 rounded-lg">
-                          <p className="text-sm text-blue-800">{form.businessNotes}</p>
+                        <h4 className="text-sm font-medium text-secondary-foreground mb-2">Notes:</h4>
+                        <div className="bg-card p-3">
+                          <p className="text-sm text-primary">{form.businessNotes}</p>
                         </div>
                       </div>
                     )}
                     {form.estimatedQuote && (
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Estimated Quote:</h4>
-                        <div className="bg-green-50 p-3 rounded-lg">
-                          <p className="text-xl font-semibold text-green-800">${form.estimatedQuote.toLocaleString()}</p>
+                        <h4 className="text-sm font-medium text-secondary-foreground mb-2">Estimated Quote:</h4>
+                        <div className="bg-card p-3">
+                          <p className="text-xl font-semibold text-[#276749] dark:text-emerald-400">${form.estimatedQuote.toLocaleString()}</p>
                         </div>
                       </div>
                     )}
@@ -248,18 +248,18 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
                   <h3 className="font-semibold mb-3">Status Timeline</h3>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full"></div>
                       <span>Submitted on {formatDate(form.submittedAt)}</span>
                     </div>
                     {form.claimedAt && (
                       <div className="flex items-center gap-2 text-sm">
-                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full"></div>
                         <span>Claimed by business on {formatDate(form.claimedAt)}</span>
                       </div>
                     )}
                     {form.linkedAt && (
                       <div className="flex items-center gap-2 text-sm">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-[#276749] dark:bg-emerald-400 rounded-full"></div>
                         <span>Linked to your account on {formatDate(form.linkedAt)}</span>
                       </div>
                     )}
@@ -278,8 +278,8 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">My Quote Requests</h2>
-          <p className="text-gray-600">View and manage your submitted quote requests</p>
+          <h2 className="font-serif-display text-2xl text-foreground">My Quote Requests</h2>
+          <p className="text-muted-foreground">View and manage your submitted quote requests</p>
         </div>
         <div className="flex items-center gap-3">
           <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
@@ -325,8 +325,8 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
                               {form.status.replace("_", " ")}
                             </Badge>
                           </div>
-                          <p className="text-sm text-gray-600 line-clamp-2">{form.projectDescription}</p>
-                          <p className="text-xs text-gray-500">Submitted {formatDate(form.submittedAt)}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-2">{form.projectDescription}</p>
+                          <p className="text-xs text-muted-foreground">Submitted {formatDate(form.submittedAt)}</p>
                           <Button
                             size="sm"
                             onClick={() => handleLinkForm(form._id)}
@@ -358,7 +358,7 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search your requests..."
           value={searchTerm}
@@ -378,28 +378,28 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="font-serif-display text-2xl text-primary">
                 {filteredForms.filter(f => f.status === "submitted").length}
               </div>
-              <p className="text-sm text-gray-600">Submitted</p>
+              <p className="text-sm text-muted-foreground">Submitted</p>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">
+              <div className="font-serif-display text-2xl text-primary">
                 {filteredForms.filter(f => f.status === "claimed").length}
               </div>
-              <p className="text-sm text-gray-600">Claimed</p>
+              <p className="text-sm text-muted-foreground">Claimed</p>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-[#276749] dark:text-emerald-400">
                 {filteredForms.filter(f => f.status === "in_progress").length}
               </div>
-              <p className="text-sm text-gray-600">In Progress</p>
+              <p className="text-sm text-muted-foreground">In Progress</p>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-600">
+              <div className="text-2xl font-bold text-muted-foreground">
                 {filteredForms.filter(f => f.status === "completed").length}
               </div>
-              <p className="text-sm text-gray-600">Completed</p>
+              <p className="text-sm text-muted-foreground">Completed</p>
             </div>
           </div>
         </CardContent>
@@ -415,12 +415,12 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
       ) : (
         <Card>
           <CardContent className="text-center py-12">
-            <Quote className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Quote Requests Found</h3>
-            <p className="text-gray-600 mb-4">
+            <Quote className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">No Quote Requests Found</h3>
+            <p className="text-muted-foreground mb-4">
               {searchTerm ? "Try adjusting your search terms." : "You haven't submitted any quote requests yet."}
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Visit our homepage to submit a new quote request for your project.
             </p>
           </CardContent>

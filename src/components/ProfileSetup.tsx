@@ -113,13 +113,13 @@ export function ProfileSetup({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-violet-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-background transition-colors duration-300">
       {/* Header with Theme Toggle */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
+      <header className="sticky top-0 z-50 bg-card/95 border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
           <BrandIdentity
             logoClassName="h-10 w-10"
-            nameClassName="text-2xl font-bold gradient-text"
+            nameClassName="text-2xl font-bold text-primary"
           />
           <div className="flex items-center gap-4">
             <ThemeToggle />
@@ -130,10 +130,10 @@ export function ProfileSetup({
 
       <div className="max-w-4xl mx-auto p-6">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             Complete Your Profile
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          <p className="text-lg text-muted-foreground">
             Let's get you set up with the right experience
           </p>
         </div>
@@ -141,56 +141,56 @@ export function ProfileSetup({
         {!inviteReady || applyingEmployeeInvite ? (
           <div className="flex justify-center py-24">
             <div className="relative">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 dark:border-gray-700"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-border"></div>
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent absolute top-0 left-0"></div>
             </div>
           </div>
         ) : !userType ? (
           <div className="space-y-8">
-            <h2 className="text-2xl font-semibold text-center text-gray-900 dark:text-gray-100">
+            <h2 className="text-2xl font-semibold text-center text-foreground">
               What type of user are you?
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               <Card 
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-2 hover:border-primary dark:hover:border-primary"
+                className="cursor-pointer hover:bg-accent transition-all duration-150 border border-border hover:border-primary"
                 onClick={() => setUserType("client")}
               >
                 <CardContent className="p-8 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-                    <Home className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                  <div className="w-16 h-16 mx-auto mb-4 bg-secondary flex items-center justify-center">
+                    <Home className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">I'm a Client</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <h3 className="text-xl font-semibold mb-3 text-foreground">I'm a Client</h3>
+                  <p className="text-muted-foreground">
                     I'm looking to hire a contractor for a home or commercial project
                   </p>
                 </CardContent>
               </Card>
 
               <Card 
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-2 hover:border-primary dark:hover:border-primary"
+                className="cursor-pointer hover:bg-accent transition-all duration-150 border border-border hover:border-primary"
                 onClick={() => setUserType("business")}
               >
                 <CardContent className="p-8 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
-                    <Building2 className="h-8 w-8 text-green-600 dark:text-green-400" />
+                  <div className="w-16 h-16 mx-auto mb-4 bg-secondary flex items-center justify-center">
+                    <Building2 className="h-8 w-8 text-[#276749] dark:text-emerald-400" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">I'm a Business Owner</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <h3 className="text-xl font-semibold mb-3 text-foreground">I'm a Business Owner</h3>
+                  <p className="text-muted-foreground">
                     I run a contracting business and serve clients directly
                   </p>
                 </CardContent>
               </Card>
 
               <Card 
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-2 hover:border-primary dark:hover:border-primary"
+                className="cursor-pointer hover:bg-accent transition-all duration-150 border border-border hover:border-primary"
                 onClick={() => setUserType("employee")}
               >
                 <CardContent className="p-8 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
-                    <Users className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+                  <div className="w-16 h-16 mx-auto mb-4 bg-secondary flex items-center justify-center">
+                    <Users className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">I'm an Employee</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <h3 className="text-xl font-semibold mb-3 text-foreground">I'm an Employee</h3>
+                  <p className="text-muted-foreground">
                     I work for a general contractor or subcontractor
                   </p>
                 </CardContent>
@@ -210,10 +210,10 @@ export function ProfileSetup({
         ) : (
           <Card className="max-w-2xl mx-auto">
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl text-gray-900 dark:text-gray-100">
+              <CardTitle className="text-2xl text-foreground">
                 {userType === "client" ? "Client Information" : "Business Information"}
               </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-400">
+              <CardDescription className="text-muted-foreground">
                 {userType === "client" 
                   ? "Tell us about yourself so we can connect you with the right contractors"
                   : "Tell us about your business so clients can find you"
@@ -223,7 +223,7 @@ export function ProfileSetup({
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <Label htmlFor="name" className="text-gray-900 dark:text-gray-100">
+                  <Label htmlFor="name" className="text-foreground">
                     {userType === "client" ? "Full Name" : "Contact Name"} *
                   </Label>
                   <Input
@@ -240,7 +240,7 @@ export function ProfileSetup({
                 {userType === "business" && (
                   <>
                     <div>
-                      <Label htmlFor="businessName" className="text-gray-900 dark:text-gray-100">
+                      <Label htmlFor="businessName" className="text-foreground">
                         Business Name *
                       </Label>
                       <Input
@@ -255,7 +255,7 @@ export function ProfileSetup({
                     </div>
 
                     <div>
-                      <Label htmlFor="businessDescription" className="text-gray-900 dark:text-gray-100">
+                      <Label htmlFor="businessDescription" className="text-foreground">
                         Business Description
                       </Label>
                       <Textarea
@@ -269,7 +269,7 @@ export function ProfileSetup({
                     </div>
 
                     <div>
-                      <Label className="text-gray-900 dark:text-gray-100">Services Offered</Label>
+                      <Label className="text-foreground">Services Offered</Label>
                       <div className="flex gap-2 mt-2 mb-3">
                         <Input
                           type="text"
@@ -298,7 +298,7 @@ export function ProfileSetup({
                             <button
                               type="button"
                               onClick={() => removeService(service)}
-                              className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                              className="text-muted-foreground hover:text-secondary-foreground"
                             >
                               <X className="h-3 w-3" />
                             </button>
@@ -310,7 +310,7 @@ export function ProfileSetup({
                 )}
 
                 <div>
-                  <Label htmlFor="phone" className="text-gray-900 dark:text-gray-100">
+                  <Label htmlFor="phone" className="text-foreground">
                     Phone Number
                   </Label>
                   <Input
@@ -324,7 +324,7 @@ export function ProfileSetup({
                 </div>
 
                 <div>
-                  <Label htmlFor="address" className="text-gray-900 dark:text-gray-100">
+                  <Label htmlFor="address" className="text-foreground">
                     Address
                   </Label>
                   <Input

@@ -101,11 +101,11 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "available": return "bg-green-100 text-green-800";
-      case "booked": return "bg-blue-100 text-blue-800";
-      case "completed": return "bg-gray-100 text-gray-800";
-      case "cancelled": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "available": return "bg-transparent text-[#276749] dark:text-emerald-400 border border-[#276749]/30 dark:border-emerald-900/60";
+      case "booked": return "bg-transparent text-[#394b6b] dark:text-blue-400 border border-[#394b6b]/30 dark:border-blue-900/60";
+      case "completed": return "bg-secondary text-muted-foreground";
+      case "cancelled": return "bg-transparent text-destructive border border-destructive/30";
+      default: return "bg-secondary text-muted-foreground";
     }
   };
 
@@ -114,8 +114,8 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
       {profile.userType === "business" ? (
         // Business Owner View
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+          <div className="bg-card p-6 border border-border">
+            <h2 className="font-serif-display text-xl text-foreground mb-4 flex items-center gap-2">
               <Calendar className="h-5 w-5" />
               Create Appointment Slot
             </h2>
@@ -139,14 +139,13 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                   value={startTime}
                   onChange={(e) => {
                     setStartTime(e.target.value);
-                    // Auto-set end time to one hour after start time
                     const startTimeValue = e.target.value;
                     if (startTimeValue) {
                       const [hours, minutes] = startTimeValue.split(':').map(Number);
                       const startDate = new Date();
                       startDate.setHours(hours, minutes, 0, 0);
                       
-                      const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
+                      const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
                       const endTimeString = endDate.toTimeString().slice(0, 5);
                       setEndTime(endTimeString);
                     }
@@ -174,21 +173,21 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
             </form>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">My Appointments</h2>
+          <div className="bg-card p-6 border border-border">
+            <h2 className="font-serif-display text-xl text-foreground mb-4">My Appointments</h2>
             <div className="space-y-3">
               {myAppointments?.map((appointment) => (
-                <div key={appointment._id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700">
+                <div key={appointment._id} className="flex items-center justify-between p-4 border border-border bg-background">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                      <span className="font-medium text-gray-900 dark:text-gray-100">{formatDateTime(appointment.startDateTime)}</span>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(appointment.status)}`}>
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium text-foreground">{formatDateTime(appointment.startDateTime)}</span>
+                      <span className={`px-2 py-1 text-xs ${getStatusColor(appointment.status)}`}>
                         {appointment.status}
                       </span>
                     </div>
                     {appointment.notes && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.notes}</p>
+                      <p className="text-sm text-muted-foreground">{appointment.notes}</p>
                     )}
                   </div>
                   <div className="flex gap-2">
@@ -222,7 +221,7 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                 </div>
               ))}
               {!myAppointments?.length && (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-8">No appointments yet</p>
+                <p className="text-muted-foreground text-center py-8">No appointments yet</p>
               )}
             </div>
           </div>
@@ -230,8 +229,8 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
       ) : (
         // Client View
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+          <div className="bg-card p-6 border border-border">
+            <h2 className="font-serif-display text-xl text-foreground mb-4 flex items-center gap-2">
               <User className="h-5 w-5" />
               Book Appointment
             </h2>
@@ -254,11 +253,11 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
 
               {selectedBusinessId && (
                 <div className="space-y-3">
-                  <h3 className="font-medium text-gray-900 dark:text-gray-100">Available Appointments</h3>
+                  <h3 className="font-medium text-foreground">Available Appointments</h3>
                   {availableAppointments?.map((appointment: any) => (
-                    <div key={appointment._id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700">
+                    <div key={appointment._id} className="flex items-center justify-between p-4 border border-border bg-background">
                       <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        <Clock className="h-4 w-4 text-muted-foreground" />
                         <span>{formatDateTime(appointment.startDateTime)}</span>
                       </div>
                       <Dialog>
@@ -291,28 +290,28 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                     </div>
                   ))}
                   {!availableAppointments?.length && (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">No available appointments</p>
+                    <p className="text-muted-foreground text-center py-4">No available appointments</p>
                   )}
                 </div>
               )}
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <h2 className="text-xl font-semibold mb-4">My Bookings</h2>
+          <div className="bg-card p-6 border">
+            <h2 className="font-serif-display text-xl text-foreground mb-4">My Bookings</h2>
             <div className="space-y-3">
               {myAppointments?.map((appointment) => (
-                <div key={appointment._id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700">
+                <div key={appointment._id} className="flex items-center justify-between p-4 border border-border bg-background">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                      <span className="font-medium text-gray-900 dark:text-gray-100">{formatDateTime(appointment.startDateTime)}</span>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(appointment.status)}`}>
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium text-foreground">{formatDateTime(appointment.startDateTime)}</span>
+                      <span className={`px-2 py-1 text-xs ${getStatusColor(appointment.status)}`}>
                         {appointment.status}
                       </span>
                     </div>
                     {appointment.notes && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.notes}</p>
+                      <p className="text-sm text-muted-foreground">{appointment.notes}</p>
                     )}
                   </div>
                   {appointment.status === "booked" && (
@@ -327,7 +326,7 @@ export function AppointmentBooking({ profile }: AppointmentBookingProps) {
                 </div>
               ))}
               {!myAppointments?.length && (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-8">No bookings yet</p>
+                <p className="text-muted-foreground text-center py-8">No bookings yet</p>
               )}
             </div>
           </div>
@@ -442,13 +441,13 @@ function CreateProjectDialog({ appointment, isOpen, onClose }: any) {
               {projectData.projectTasks.map((task) => (
                 <span
                   key={task}
-                  className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                  className="inline-flex items-center gap-1 px-3 py-1 bg-secondary text-primary border border-border text-sm"
                 >
                   {task}
                   <button
                     type="button"
                     onClick={() => removeTask(task)}
-                    className="text-green-600 hover:text-green-800"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     ×
                   </button>

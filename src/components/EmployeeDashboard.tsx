@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useUser } from "@clerk/react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
@@ -8,12 +9,22 @@ import { Badge } from "./ui/badge";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarItem,
+  SidebarSection,
+} from "./ui/sidebar";
+import { MobileSidebarToggle } from "./ui/mobile-sidebar-toggle";
+import { ThemeToggle } from "./ui/theme-toggle";
+import { BrandIdentity } from "./BrandIdentity";
+import { SignOutButton } from "../SignOutButton";
 import { 
-  Calendar, 
   FolderOpen, 
-  Star, 
   User, 
-  Building2, 
   Phone, 
   Mail,
   MapPin,
@@ -29,8 +40,9 @@ interface EmployeeDashboardProps {
 }
 
 export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
+  const { user } = useUser();
   const [activeTab, setActiveTab] = useState("overview");
-  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
   const [newImageUrl, setNewImageUrl] = useState("");
 
@@ -91,13 +103,13 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "queued":
-        return "bg-gray-100 text-gray-800";
+        return "bg-secondary text-primary";
       case "in_progress":
-        return "bg-blue-100 text-blue-800";
+        return "bg-accent text-primary";
       case "done":
-        return "bg-green-100 text-green-800";
+        return "bg-card text-[#276749] dark:text-emerald-400";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-secondary text-muted-foreground";
     }
   };
 
@@ -123,58 +135,116 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
     { id: "projects", label: "My Projects", icon: FolderOpen },
   ];
 
+  const displayName =
+    user?.firstName || user?.fullName || user?.emailAddresses[0]?.emailAddress || "Employee";
+  const emailAddress = user?.emailAddresses[0]?.emailAddress || profile.email || "Not provided";
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Employee Dashboard
-              </h1>
-              <div className="flex items-center gap-2 mt-2">
-                <Badge variant="secondary">Employee</Badge>
-                {profile.companyId && (
-                  <span className="text-gray-600">• Company Employee</span>
-                )}
+    <div className="min-h-screen bg-background transition-colors duration-300 flex">
+      <MobileSidebarToggle
+        isOpen={isMobileSidebarOpen}
+        onToggle={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+      />
+
+      <div
+        className={`
+          ${isMobileSidebarOpen ? "fixed inset-0 z-40" : "hidden"}
+          lg:!block lg:!relative lg:!z-auto lg:w-64
+          transition-all duration-300 ease-in-out
+        `}
+      >
+        <Sidebar className={`${isMobileSidebarOpen ? "w-64" : ""} lg:w-64 h-full`}>
+          <SidebarContent>
+            <SidebarHeader>
+              <BrandIdentity
+                logoClassName="h-10 w-10"
+                nameClassName="text-lg font-semibold text-primary"
+                showTagline
+              />
+            </SidebarHeader>
+
+            <SidebarGroup>
+              <SidebarSection title="Main">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <SidebarItem
+                      key={tab.id}
+                      isActive={activeTab === tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      icon={<Icon className="h-4 w-4" />}
+                      label={tab.label}
+                    />
+                  );
+                })}
+              </SidebarSection>
+            </SidebarGroup>
+
+            <SidebarFooter>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 px-2 py-2">
+                  <div className="h-8 w-8 bg-secondary flex items-center justify-center">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {displayName}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">Employee</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-2">
+                  <ThemeToggle />
+                  <SignOutButton />
+                </div>
               </div>
+            </SidebarFooter>
+          </SidebarContent>
+        </Sidebar>
+      </div>
+
+      {isMobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="bg-card border-b border-border px-4 py-4 sm:px-6 lg:px-6">
+          <div className="flex flex-col gap-3 pl-12 sm:pl-16 lg:pl-0 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <h1 className="font-serif-display text-xl text-foreground sm:text-2xl break-words">
+                {activeTab === "overview" ? "Employee Dashboard" : "My Projects"}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1 truncate sm:whitespace-normal">
+                Welcome back, {displayName}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              <Badge variant="secondary">Employee</Badge>
+              {profile.companyId && (
+                <span className="text-muted-foreground text-sm break-words">
+                  • Company Employee
+                </span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="flex space-x-8">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
-                      ? "border-green-500 text-green-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Tab Content */}
-        <div className="space-y-6">
+        <div className="flex-1 overflow-auto">
+          <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6">
+            <div className="space-y-6">
           {activeTab === "overview" && (
             <div className="grid gap-6">
               {/* Profile Card */}
-              <Card>
+              <Card variant="default">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
+                  <CardTitle className="flex items-center gap-2 text-foreground">
+                    <User className="h-5 w-5 text-primary" />
                     Profile Information
                   </CardTitle>
                 </CardHeader>
@@ -182,22 +252,22 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-500">Name</label>
-                        <p className="text-gray-900">{profile.name}</p>
+                        <label className="text-sm font-medium text-muted-foreground">Name</label>
+                        <p className="text-foreground">{displayName}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-500">Email</label>
+                        <label className="text-sm font-medium text-muted-foreground">Email</label>
                         <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-gray-400" />
-                          <p className="text-gray-900">Employee Email</p>
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          <p className="text-foreground break-all">{emailAddress}</p>
                         </div>
                       </div>
                       {profile.phone && (
                         <div>
-                          <label className="text-sm font-medium text-gray-500">Phone</label>
+                          <label className="text-sm font-medium text-muted-foreground">Phone</label>
                           <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-gray-400" />
-                            <p className="text-gray-900">{profile.phone}</p>
+                            <Phone className="h-4 w-4 text-muted-foreground" />
+                            <p className="text-foreground">{profile.phone}</p>
                           </div>
                         </div>
                       )}
@@ -206,16 +276,16 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
                     <div className="space-y-4">
                       {profile.address && (
                         <div>
-                          <label className="text-sm font-medium text-gray-500">Address</label>
+                          <label className="text-sm font-medium text-muted-foreground">Address</label>
                           <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-gray-400" />
-                            <p className="text-gray-900">{profile.address}</p>
+                            <MapPin className="h-4 w-4 text-muted-foreground" />
+                            <p className="text-foreground">{profile.address}</p>
                           </div>
                         </div>
                       )}
                       
                       <div>
-                        <label className="text-sm font-medium text-gray-500">Employee Status</label>
+                        <label className="text-sm font-medium text-muted-foreground">Employee Status</label>
                         <Badge className={getStatusColor(profile.employeeStatus || "approved")}>
                           {profile.employeeStatus || "approved"}
                         </Badge>
@@ -227,44 +297,44 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
 
               {/* Quick Stats */}
               <div className="grid md:grid-cols-3 gap-6">
-                <Card>
+                <Card variant="elevated">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Assigned Projects</CardTitle>
-                    <FolderOpen className="h-4 w-4 text-gray-500" />
+                    <CardTitle className="text-sm font-medium text-secondary-foreground">Assigned Projects</CardTitle>
+                    <FolderOpen className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{myProjects?.length || 0}</div>
-                    <p className="text-xs text-gray-500">
+                    <div className="text-2xl font-bold text-foreground">{myProjects?.length || 0}</div>
+                    <p className="text-xs text-muted-foreground">
                       {myProjects?.filter(p => p.status === "in_progress").length || 0} in progress
                     </p>
                   </CardContent>
                 </Card>
                 
-                <Card>
+                <Card variant="elevated">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
-                    <CheckCircle className="h-4 w-4 text-gray-500" />
+                    <CardTitle className="text-sm font-medium text-secondary-foreground">Total Tasks</CardTitle>
+                    <CheckCircle className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-2xl font-bold text-foreground">
                       {myProjects?.reduce((sum, p) => sum + p.projectTasks.length, 0) || 0}
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {myProjects?.reduce((sum, p) => sum + p.projectTasks.filter(t => t.status === "done").length, 0) || 0} completed
                     </p>
                   </CardContent>
                 </Card>
                 
-                <Card>
+                <Card variant="elevated">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Images Uploaded</CardTitle>
-                    <Upload className="h-4 w-4 text-gray-500" />
+                    <CardTitle className="text-sm font-medium text-secondary-foreground">Images Uploaded</CardTitle>
+                    <Upload className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-2xl font-bold text-foreground">
                       {myProjects?.reduce((sum, p) => sum + (p.imageUrls?.length || 0), 0) || 0}
                     </div>
-                    <p className="text-xs text-gray-500">Across all projects</p>
+                    <p className="text-xs text-muted-foreground">Across all projects</p>
                   </CardContent>
                 </Card>
               </div>
@@ -273,24 +343,24 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
 
           {activeTab === "projects" && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800">My Assigned Projects</h2>
+              <h2 className="font-serif-display text-2xl text-foreground">My Assigned Projects</h2>
               
               {myProjects?.length === 0 ? (
-                <Card>
+                <Card variant="default">
                   <CardContent className="text-center py-8">
-                    <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">No projects assigned yet</p>
-                    <p className="text-sm text-gray-400">Your business owner will assign projects to you</p>
+                    <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No projects assigned yet</p>
+                    <p className="text-sm text-muted-foreground">Your business owner will assign projects to you</p>
                   </CardContent>
                 </Card>
               ) : (
                 <div className="grid gap-6">
                   {myProjects?.map((project) => (
-                    <Card key={project._id}>
+                    <Card key={project._id} variant="default">
                       <CardHeader>
                         <div className="flex justify-between items-start">
                           <div>
-                            <CardTitle>{project.projectName}</CardTitle>
+                            <CardTitle className="text-foreground">{project.projectName}</CardTitle>
                             <CardDescription>{project.projectType}</CardDescription>
                           </div>
                           <Badge className={getStatusColor(project.status)}>
@@ -303,18 +373,18 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
                           {/* Project Details */}
                           <div className="grid md:grid-cols-2 gap-4">
                             <div>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-muted-foreground">
                                 <strong>Estimated Duration:</strong> {project.estimatedLength} days
                               </p>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-muted-foreground">
                                 <strong>Start Date:</strong> {formatDate(project.estimatedStartDateTime)}
                               </p>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-muted-foreground">
                                 <strong>End Date:</strong> {formatDate(project.estimatedEndDateTime)}
                               </p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-muted-foreground">
                                 <strong>Approval Status:</strong> 
                                 <Badge className="ml-2" variant={project.approvalStatus === "approved" ? "default" : "secondary"}>
                                   {project.approvalStatus}
@@ -356,10 +426,13 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
                             </div>
                             <div className="space-y-2">
                               {project.projectTasks.map((task, index) => (
-                                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between p-3 bg-secondary border border-border"
+                                >
                                   <div className="flex items-center gap-2">
                                     {getStatusIcon(task.status)}
-                                    <span className="font-medium">{task.name}</span>
+                                    <span className="font-medium text-foreground">{task.name}</span>
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <Badge className={getStatusColor(task.status)}>
@@ -368,7 +441,7 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
                                     <select
                                       value={task.status}
                                       onChange={(e) => handleTaskStatusChange(project._id, index, e.target.value as any)}
-                                      className="text-sm border rounded px-2 py-1"
+                                      className="text-sm border px-2 py-1 bg-input border-border text-foreground"
                                     >
                                       <option value="queued">Queued</option>
                                       <option value="in_progress">In Progress</option>
@@ -414,7 +487,7 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
                             {project.imageUrls && project.imageUrls.length > 0 ? (
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {project.imageUrls.map((url, index) => (
-                                  <div key={index} className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                                  <div key={index} className="aspect-square bg-card overflow-hidden border border-border">
                                     <img
                                       src={url}
                                       alt={`Project image ${index + 1}`}
@@ -424,7 +497,7 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-gray-500 text-sm">No images uploaded yet</p>
+                              <p className="text-muted-foreground text-sm">No images uploaded yet</p>
                             )}
                           </div>
                         </div>
@@ -435,6 +508,8 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
               )}
             </div>
           )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { AuthModal } from "./ui/modal";
 import { ThemeToggle } from "./ui/theme-toggle";
 import { BrandIdentity } from "./BrandIdentity";
+import { useUser } from "@clerk/react";
 import { 
   Calendar, 
   Users, 
@@ -34,7 +35,193 @@ import {
   Handshake
 } from "lucide-react";
 
+const DEFAULT_BRAND_NAME = "Atheca";
+const DEFAULT_LOGO_SRC = "/atheca-logo-transparent.png";
+
+const landingPageCss = `
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Libre+Baskerville:wght@400;700&family=Courier+Prime:wght@400;700&family=Chivo:wght@400;500;700;800&family=Chivo+Mono:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600;700&family=Archivo+Black&family=IBM+Plex+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Azeret+Mono:wght@400;500;600;700&display=swap');
+  .landing-page {
+    background: var(--landing-page-background);
+    background-image: var(--landing-page-texture);
+    color: var(--landing-text);
+    font-family: var(--landing-body-font);
+  }
+  .landing-page .landing-header {
+    background: var(--landing-header-background);
+    border-color: var(--landing-border);
+    backdrop-filter: blur(14px);
+  }
+  .landing-page .landing-banner {
+    background: var(--landing-banner-background);
+    border-color: var(--landing-border);
+    color: var(--landing-text);
+  }
+  .landing-page .landing-hero-shell,
+  .landing-page .landing-card,
+  .landing-page .landing-card-strong,
+  .landing-page .landing-panel,
+  .landing-page .landing-panel-strong,
+  .landing-page .landing-style-chip,
+  .landing-page .landing-filter {
+    box-shadow: var(--landing-shadow);
+  }
+  .landing-page .landing-hero-shell {
+    position: relative;
+    background: var(--landing-surface);
+    border: 1px solid var(--landing-border-strong);
+    border-radius: var(--landing-radius);
+    padding: clamp(2rem, 4vw, 3.5rem);
+    overflow: hidden;
+  }
+  .landing-page .landing-hero-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at top left, var(--landing-hero-glow-1), transparent 28%),
+      radial-gradient(circle at bottom right, var(--landing-hero-glow-2), transparent 32%);
+    pointer-events: none;
+  }
+  .landing-page .landing-hero-shell > * {
+    position: relative;
+    z-index: 1;
+  }
+  .landing-page .landing-display {
+    font-family: var(--landing-display-font);
+    color: var(--landing-text);
+  }
+  .landing-page .landing-section-title,
+  .landing-page .landing-heading {
+    font-family: var(--landing-display-font);
+    color: var(--landing-text);
+  }
+  .landing-page .landing-accent-text {
+    color: var(--landing-accent);
+  }
+  .landing-page .landing-muted-text {
+    color: var(--landing-text-muted) !important;
+  }
+  .landing-page .landing-card,
+  .landing-page .landing-card-strong,
+  .landing-page .landing-panel,
+  .landing-page .landing-panel-strong {
+    border-radius: calc(var(--landing-radius) - 6px);
+    border: 1px solid var(--landing-border);
+    background: var(--landing-surface);
+    color: var(--landing-text);
+  }
+  .landing-page .landing-card-strong,
+  .landing-page .landing-panel-strong {
+    background: var(--landing-surface-strong);
+    border-color: var(--landing-border-strong);
+  }
+  .landing-page .landing-card:hover {
+    background: var(--landing-card-hover);
+  }
+  .landing-page .landing-accent-badge {
+    background: var(--landing-accent-soft);
+    color: var(--landing-accent);
+    border-radius: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    font-size: 0.65rem;
+  }
+  .landing-page .landing-outline-badge {
+    background: transparent;
+    color: var(--landing-text-muted);
+    border-color: var(--landing-border-strong);
+    border-radius: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.6rem;
+  }
+  .landing-page .landing-style-chip {
+    border: 1px solid var(--landing-border);
+    background: var(--landing-surface-strong);
+    border-radius: 0;
+    color: var(--landing-text);
+    padding: 0.65rem 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.7rem;
+  }
+  .landing-page .landing-style-chip.is-active {
+    background: var(--landing-accent);
+    border-color: var(--landing-border-strong);
+    color: var(--landing-button-text);
+  }
+  .landing-page .landing-button-primary {
+    background: var(--landing-accent) !important;
+    color: var(--landing-button-text) !important;
+    border: 1px solid var(--landing-accent) !important;
+    border-radius: 0 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+  }
+  .landing-page .landing-button-primary:hover {
+    background: var(--landing-accent-alt) !important;
+  }
+  .landing-page .landing-button-secondary {
+    background: var(--landing-surface-strong) !important;
+    color: var(--landing-text) !important;
+    border: 1px solid var(--landing-border-strong) !important;
+    border-radius: 0 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .landing-page .landing-button-tertiary {
+    color: var(--landing-text) !important;
+    border-color: var(--landing-border) !important;
+    border-radius: 0 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .landing-page .landing-filter,
+  .landing-page .landing-input {
+    background: var(--landing-surface-strong) !important;
+    border: 1px solid var(--landing-border) !important;
+    color: var(--landing-text) !important;
+    border-radius: 0 !important;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+  .landing-page .landing-filter::placeholder,
+  .landing-page .landing-input::placeholder {
+    color: var(--landing-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .landing-page .landing-cta {
+    background: var(--landing-cta-bg);
+    color: var(--landing-text);
+    border-top: 2px solid var(--landing-accent);
+  }
+  .landing-page .landing-footer {
+    background: var(--landing-footer-bg);
+    border-color: var(--landing-border);
+    color: var(--landing-text);
+  }
+  html:not(.dark) .landing-page .landing-cta,
+  html:not(.dark) .landing-page .landing-footer {
+    --landing-text: #ede5d0;
+    --landing-text-muted: #d6c89b;
+    --landing-accent: #d6a03a;
+    --landing-accent-soft: rgba(214,168,58,0.15);
+    --landing-border: rgba(237,229,208,0.20);
+  }
+  @media (max-width: 768px) {
+    .landing-page .landing-hero-shell {
+      padding: 1.5rem;
+    }
+  }
+`;
+
 export function Homepage() {
+  const { isSignedIn } = useUser();
+  const displayBrandName = DEFAULT_BRAND_NAME;
+  const displayLogoSrc = isSignedIn ? undefined : DEFAULT_LOGO_SRC;
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
   const [showIntakeModal, setShowIntakeModal] = useState(false);
@@ -42,6 +229,7 @@ export function Homepage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [showProjectModal, setShowProjectModal] = useState(false);
+  // Landing theme variables are now defined in index.css under :root and .dark
 
   // Fetch real showcase projects from the database
   const showcaseProjects = useQuery(api.facebookProjectPort.getShowcaseProjects, { limit: 50 });
@@ -294,7 +482,7 @@ export function Homepage() {
       client: "Sarah Johnson",
       rating: 5,
       title: "Smooth kitchen remodel",
-      description: "Atheca helped us line up a great contractor for our kitchen. Clear updates, realistic timeline, and the crew showed up when they said they would.",
+      description: `${displayBrandName} helped us line up a great contractor for our kitchen. Clear updates, realistic timeline, and the crew showed up when they said they would.`,
       highlighted: true
     },
     {
@@ -322,27 +510,54 @@ export function Homepage() {
     { date: "Dec 30", time: "10:00 AM", type: "Follow-up", status: "available" }
   ];
 
-  if (showAuthModal) {
-    return (
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        mode={authMode}
-        onModeChange={setAuthMode}
-      />
-    );
-  }
-
+  const faqs = [
+    {
+      question: "Do I need an account to request a quote?",
+      answer:
+        "No. The quote intake form on this page works without signing in. You can submit your contact info, project details, and optional media first, then create an account later if you want to continue inside the platform.",
+    },
+    {
+      question: "What happens after I submit a quote request?",
+      answer:
+        "Your request is stored as an intake form with a submitted status. A business owner can claim it, add notes and an estimated quote, and convert it into a tracked project when moving forward.",
+    },
+    {
+      question: "Can I upload photos or videos with my request?",
+      answer:
+        "Yes. The intake form supports both images and videos so contractors can review scope before responding. The current form accepts up to 10 files with per-file size limits.",
+    },
+    {
+      question: "How are clients involved before work starts?",
+      answer:
+        "Projects can require client approval when the project is linked to a client account. Linked clients can approve or reject pending projects before execution begins.",
+    },
+    {
+      question: "Can teams (owners + employees) work in the same project?",
+      answer:
+        "Yes. Business owners can assign employees to projects. Assigned employees can update task progress and project images, while project-level controls remain with the business owner.",
+    },
+    {
+      question: "Is everything on this landing page live production data?",
+      answer:
+        "Not all of it. This page is explicitly labeled Demo Mode, and many sections are mocked for demonstration. The platform itself supports real quotes, appointments, projects, and testimonials once users are signed in.",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-violet-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+    <>
+      <style>{landingPageCss}</style>
+      <div className="landing-page min-h-screen transition-colors duration-300">
       {/* Header with Theme Toggle */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-cyan-200/80 dark:border-cyan-800 shadow-sm">
+      <header className="landing-header sticky top-0 z-50 border-b shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex items-center justify-between gap-3">
           <BrandIdentity
             className="min-w-0"
             logoClassName="h-10 w-10 sm:h-12 sm:w-12"
-            nameClassName="text-xl sm:text-2xl font-bold gradient-text truncate"
+            nameClassName="landing-heading text-xl sm:text-2xl font-bold truncate"
+            taglineClassName="landing-muted-text text-xs sm:text-sm"
+            brandName={displayBrandName}
+            logoSrc={displayLogoSrc}
+            showTagline
           />
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <ThemeToggle />
@@ -351,7 +566,7 @@ export function Homepage() {
       </header>
 
       {/* Demo Mode Banner */}
-      <div className="bg-yellow-100 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200 py-3 px-4">
+      <div className="landing-banner border-b py-3 px-4">
         <div className="max-w-6xl mx-auto flex items-center justify-center gap-2">
           <Info className="h-5 w-5 flex-shrink-0 animate-pulse-glow" />
           <p className="text-sm md:text-base font-medium">
@@ -362,37 +577,33 @@ export function Homepage() {
       
       {/* Hero Section */}
       <section className="relative py-20 px-4 overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-violet-500/5"></div>
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl animate-float" style={{animationDelay: '1s'}}></div>
-        
-        <div className="max-w-6xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6 animate-fade-in leading-tight">
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="landing-hero-shell text-center">
+          <h1 className="landing-display text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in leading-tight">
             Built for Tradies,
-            <span className="gradient-text block">made for Customers</span>
+            <span className="landing-accent-text block">made for Customers</span>
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto animate-fade-in" style={{animationDelay: '0.2s'}}>
+          <p className="landing-muted-text text-xl mb-8 max-w-3xl mx-auto animate-fade-in" style={{animationDelay: '0.2s'}}>
             Connect homeowners and businesses with trusted contractors—or run your remodeling, trades, and landscaping jobs from one place.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{animationDelay: '0.4s'}}>
             <Button 
               size="xl" 
-              variant="gradient"
+              variant="default"
               onClick={() => setShowIntakeModal(true)}
-              className="px-8 py-4 animate-pulse-glow"
+              className="landing-button-primary px-8 py-4 animate-pulse-glow"
             >
               <Quote className="mr-2 h-5 w-5" />
               Get Free Quote
             </Button>
             <Button 
               size="xl" 
-              variant="glass"
+              variant="outline"
               onClick={() => {
                 setAuthMode("signin");
                 setShowAuthModal(true);
               }}
-              className="px-8 py-4"
+              className="landing-button-secondary px-8 py-4"
             >
               Sign In / Sign Up
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -401,33 +612,34 @@ export function Homepage() {
               size="xl" 
               variant="ghost"
               onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-8 py-4 hover:scale-105"
+              className="landing-button-tertiary px-8 py-4 hover:scale-105"
             >
               Learn More
             </Button>
+          </div>
           </div>
         </div>
       </section>
 
       {/* Services Showcase */}
-      <section className="py-16 px-4 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+      <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 gradient-text">Our Services</h2>
+          <h2 className="landing-section-title text-4xl font-bold text-center mb-12">Our Services</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {mockServices.map((service, index) => (
               <Card 
                 key={index} 
-                variant="elevated" 
-                className="text-center group hover:scale-105 transition-all duration-300 animate-fade-in"
+                variant="flat" 
+                className="landing-card text-center group hover:scale-105 transition-all duration-300 animate-fade-in"
                 style={{animationDelay: `${index * 0.1}s`}}
               >
                 <CardContent className="p-6">
                   <div className="relative">
-                    <service.icon className="h-12 w-12 text-primary mx-auto mb-4 group-hover:scale-110 transition-transform duration-300" />
-                    <div className="absolute inset-0 bg-primary/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <service.icon className="h-12 w-12 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 landing-accent-text" />
+                    <div className="absolute inset-0 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: "var(--landing-accent-soft)" }}></div>
                   </div>
-                  <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">{service.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{service.description}</p>
+                  <h3 className="landing-heading font-semibold mb-2">{service.name}</h3>
+                  <p className="landing-muted-text text-sm">{service.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -436,25 +648,25 @@ export function Homepage() {
       </section>
 
       {/* App flow: quotes, clients, and projects */}
-      <section id="how-it-works" className="py-16 px-4 bg-gradient-to-b from-emerald-50/80 via-white/60 to-cyan-50/40 dark:from-gray-900/80 dark:via-gray-900/60 dark:to-gray-900/40 border-y border-emerald-100/80 dark:border-gray-700/80">
+      <section id="how-it-works" className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 dark:bg-primary/20 px-4 py-1.5 text-sm font-medium text-primary mb-4">
+            <div className="landing-accent-badge inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium mb-4">
               <Workflow className="h-4 w-4" />
               How the platform fits together
             </div>
-            <h2 className="text-4xl font-bold mb-4 gradient-text">From quotes and clients to live projects</h2>
-            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-lg">
+            <h2 className="landing-section-title text-4xl font-bold mb-4">From quotes and clients to live projects</h2>
+            <p className="landing-muted-text max-w-2xl mx-auto text-lg">
               Quote requests are stored as intake forms. Businesses claim them, add an estimate, then convert the work into a project.
               You can also start a project for a client you already have from a booking or your client list.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
-            <div className="relative rounded-2xl border border-emerald-200/80 dark:border-emerald-900/50 bg-white/70 dark:bg-gray-800/70 p-6 shadow-sm backdrop-blur-sm">
+            <div className="landing-panel relative p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Quote className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Quote request → project</h3>
+                <Quote className="landing-accent-text h-6 w-6" />
+                <h3 className="landing-heading text-lg font-semibold">Quote request → project</h3>
               </div>
               <ol className="space-y-4">
                 {[
@@ -463,22 +675,22 @@ export function Homepage() {
                   { step: "3", title: "Convert to project", body: "From the claimed request, the owner defines tasks, schedule, and scope. Media from the intake comes along; when the client has an account, they are tied to the project for approval." },
                 ].map((item) => (
                   <li key={item.step} className="flex gap-3">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-sm font-bold text-emerald-800 dark:text-emerald-200">
+                    <span className="landing-accent-badge flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold">
                       {item.step}
                     </span>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">{item.title}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{item.body}</p>
+                      <p className="landing-heading font-medium">{item.title}</p>
+                      <p className="landing-muted-text text-sm mt-0.5">{item.body}</p>
                     </div>
                   </li>
                 ))}
               </ol>
             </div>
 
-            <div className="relative rounded-2xl border border-violet-200/80 dark:border-violet-900/50 bg-white/70 dark:bg-gray-800/70 p-6 shadow-sm backdrop-blur-sm">
+            <div className="landing-panel-strong relative p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Handshake className="h-6 w-6 text-violet-600 dark:text-violet-400" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Known client → project</h3>
+                <Handshake className="h-6 w-6" style={{ color: "var(--landing-accent-alt)" }} />
+                <h3 className="landing-heading text-lg font-semibold">Known client → project</h3>
               </div>
               <ol className="space-y-4">
                 {[
@@ -487,12 +699,12 @@ export function Homepage() {
                   { step: "C", title: "Same project record", body: "Either path uses the same project model: tasks, dates, status, and client approval when the client is on the platform." },
                 ].map((item) => (
                   <li key={item.step} className="flex gap-3">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/50 text-sm font-bold text-violet-800 dark:text-violet-200">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold" style={{ background: "var(--landing-accent-soft)", color: "var(--landing-accent-alt)" }}>
                       {item.step}
                     </span>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">{item.title}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{item.body}</p>
+                      <p className="landing-heading font-medium">{item.title}</p>
+                      <p className="landing-muted-text text-sm mt-0.5">{item.body}</p>
                     </div>
                   </li>
                 ))}
@@ -502,37 +714,37 @@ export function Homepage() {
 
           <div className="flex flex-col items-center gap-2 mb-6">
             <ChevronDown className="h-7 w-7 text-primary" aria-hidden />
-            <span className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Both paths converge</span>
+            <span className="landing-muted-text text-xs font-medium uppercase tracking-wide">Both paths converge</span>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 p-6 md:p-8 shadow-md max-w-4xl mx-auto">
+          <div className="landing-panel-strong p-6 md:p-8 max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-stretch md:justify-between gap-6">
-              <div className="flex-1 flex flex-col items-center text-center p-4 rounded-xl bg-gray-50/80 dark:bg-gray-900/50">
-                <FolderKanban className="h-10 w-10 text-primary mb-2" />
-                <p className="font-semibold text-gray-900 dark:text-gray-100">Project</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Planned scope, task list, timeline, and notes in one place.</p>
+              <div className="landing-card-strong flex-1 flex flex-col items-center text-center p-4 rounded-xl">
+                <FolderKanban className="landing-accent-text h-10 w-10 mb-2" />
+                <p className="landing-heading font-semibold">Project</p>
+                <p className="landing-muted-text text-sm mt-1">Planned scope, task list, timeline, and notes in one place.</p>
               </div>
-              <div className="hidden md:flex items-center justify-center text-gray-300 dark:text-gray-600">
+              <div className="landing-muted-text hidden md:flex items-center justify-center">
                 <ArrowRight className="h-6 w-6" />
               </div>
-              <div className="flex md:hidden justify-center text-gray-300 dark:text-gray-600">
+              <div className="landing-muted-text flex md:hidden justify-center">
                 <ChevronDown className="h-6 w-6" />
               </div>
-              <div className="flex-1 flex flex-col items-center text-center p-4 rounded-xl bg-gray-50/80 dark:bg-gray-900/50">
-                <Users className="h-10 w-10 text-primary mb-2" />
-                <p className="font-semibold text-gray-900 dark:text-gray-100">Client approval</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Linked clients review pending projects; then work moves forward with full visibility.</p>
+              <div className="landing-card-strong flex-1 flex flex-col items-center text-center p-4 rounded-xl">
+                <Users className="landing-accent-text h-10 w-10 mb-2" />
+                <p className="landing-heading font-semibold">Client approval</p>
+                <p className="landing-muted-text text-sm mt-1">Linked clients review pending projects; then work moves forward with full visibility.</p>
               </div>
-              <div className="hidden md:flex items-center justify-center text-gray-300 dark:text-gray-600">
+              <div className="landing-muted-text hidden md:flex items-center justify-center">
                 <ArrowRight className="h-6 w-6" />
               </div>
-              <div className="flex md:hidden justify-center text-gray-300 dark:text-gray-600">
+              <div className="landing-muted-text flex md:hidden justify-center">
                 <ChevronDown className="h-6 w-6" />
               </div>
-              <div className="flex-1 flex flex-col items-center text-center p-4 rounded-xl bg-gray-50/80 dark:bg-gray-900/50">
-                <CheckCircle className="h-10 w-10 text-primary mb-2" />
-                <p className="font-semibold text-gray-900 dark:text-gray-100">Delivery & completion</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Track tasks through the queue, run the job, and mark the project complete.</p>
+              <div className="landing-card-strong flex-1 flex flex-col items-center text-center p-4 rounded-xl">
+                <CheckCircle className="landing-accent-text h-10 w-10 mb-2" />
+                <p className="landing-heading font-semibold">Delivery & completion</p>
+                <p className="landing-muted-text text-sm mt-1">Track tasks through the queue, run the job, and mark the project complete.</p>
               </div>
             </div>
           </div>
@@ -540,28 +752,28 @@ export function Homepage() {
       </section>
 
       {/* Projects Showcase */}
-      <section className="py-16 px-4 bg-gradient-to-b from-white/30 dark:from-gray-800/30 to-transparent">
+      <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 gradient-text">Featured Projects</h2>
+          <h2 className="landing-section-title text-4xl font-bold text-center mb-12">Featured Projects</h2>
           
           {/* Filter Controls */}
           <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center items-center">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="landing-muted-text absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
               <input
                 type="text"
                 placeholder="Search projects..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="landing-filter w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2"
               />
             </div>
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <Filter className="landing-muted-text h-4 w-4" />
               <select
                 value={selectedBusiness}
                 onChange={(e) => setSelectedBusiness(e.target.value)}
-                className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="landing-filter px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
               >
                 <option value="all">All Businesses</option>
                 {uniqueBusinesses.map((business) => (
@@ -576,7 +788,8 @@ export function Homepage() {
             {filteredProjects.map((project: any, index: number) => (
               <Card 
                 key={project.id} 
-                className="group hover:shadow-lg transition-all duration-300 animate-fade-in overflow-hidden cursor-pointer"
+                variant="flat"
+                className="landing-card group transition-all duration-300 animate-fade-in overflow-hidden cursor-pointer"
                 style={{animationDelay: `${index * 0.1}s`}}
                 onClick={() => handleProjectClick(project)}
               >
@@ -588,7 +801,7 @@ export function Homepage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4">
-                    <Badge className="bg-green-500 text-white">
+                    <Badge className="border-0 text-white" style={{ background: "var(--landing-accent)" }}>
                       <CheckCircle className="h-3 w-3 mr-1" />
                       Completed
                     </Badge>
@@ -596,19 +809,19 @@ export function Homepage() {
                 </div>
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 group-hover:text-primary transition-colors">
+                    <h3 className="landing-heading font-semibold text-lg transition-colors">
                       {project.projectName}
                     </h3>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="landing-outline-badge text-xs">
                       {project.projectType}
                     </Badge>
                   </div>
                   
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+                  <p className="landing-muted-text text-sm mb-4 line-clamp-2">
                     {project.description}
                   </p>
                   
-                  <div className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="landing-muted-text space-y-2 text-sm">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-4 w-4" />
                       <span>{project.businessName}</span>
@@ -629,11 +842,11 @@ export function Homepage() {
 
           {filteredProjects.length === 0 && (
             <div className="text-center py-12">
-              <div className="text-gray-400 dark:text-gray-600 mb-4">
+              <div className="landing-muted-text mb-4">
                 <Search className="h-12 w-12 mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No projects found</h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <h3 className="landing-heading text-lg font-medium mb-2">No projects found</h3>
+              <p className="landing-muted-text">
                 Try adjusting your search terms or filter criteria
               </p>
             </div>
@@ -647,7 +860,7 @@ export function Homepage() {
                 setAuthMode("signin");
                 setShowAuthModal(true);
               }}
-              className="px-8"
+              className="landing-button-secondary px-8"
             >
               View All Projects
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -657,29 +870,29 @@ export function Homepage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-16 px-4 bg-gradient-to-b from-transparent to-white/30 dark:to-gray-800/30">
+      <section id="features" className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 gradient-text">Platform Features</h2>
+          <h2 className="landing-section-title text-4xl font-bold text-center mb-12">Platform Features</h2>
           
           {/* Appointment Booking Demo */}
           <div className="grid lg:grid-cols-2 gap-12 mb-16">
             <div className="animate-fade-in">
-              <h3 className="text-2xl font-semibold mb-4 flex items-center">
-                <Calendar className="h-6 w-6 text-primary mr-2" />
+              <h3 className="landing-heading text-2xl font-semibold mb-4 flex items-center">
+                <Calendar className="landing-accent-text h-6 w-6 mr-2" />
                 Smart Appointment Booking
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
+              <p className="landing-muted-text mb-6">
                 Clients can easily view available time slots and book appointments with your team. 
                 Business owners can manage their calendar and availability in real-time.
               </p>
               <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Available Appointments:</p>
+                <p className="landing-heading text-sm font-medium">Available Appointments:</p>
                 {mockAppointments.map((apt, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 glass rounded-lg border-white/20 dark:border-white/10 animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
+                  <div key={index} className="landing-card flex items-center justify-between p-3 rounded-lg animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
                     <div className="flex items-center gap-3">
-                      <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                      <span className="font-medium text-gray-900 dark:text-gray-100">{apt.date}</span>
-                      <span className="text-gray-600 dark:text-gray-400">{apt.time}</span>
+                      <Clock className="landing-muted-text h-4 w-4" />
+                      <span className="landing-heading font-medium">{apt.date}</span>
+                      <span className="landing-muted-text">{apt.time}</span>
                       <Badge variant="outline">{apt.type}</Badge>
                     </div>
                     <Badge variant={apt.status === 'available' ? 'default' : 'secondary'}>
@@ -689,22 +902,22 @@ export function Homepage() {
                 ))}
               </div>
             </div>
-            <Card variant="glass" className="p-6 animate-fade-in" style={{animationDelay: '0.2s'}}>
-              <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">Book an Appointment</h4>
+            <Card variant="flat" className="landing-card p-6 animate-fade-in" style={{animationDelay: '0.2s'}}>
+              <h4 className="landing-heading font-semibold mb-4">Book an Appointment</h4>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Service Type</label>
-                  <select className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                  <label className="landing-heading block text-sm font-medium mb-1">Service Type</label>
+                  <select className="landing-filter w-full p-2 rounded-md">
                     <option>Consultation</option>
                     <option>Site Visit</option>
                     <option>Follow-up</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Preferred Date</label>
-                  <input type="date" className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
+                  <label className="landing-heading block text-sm font-medium mb-1">Preferred Date</label>
+                  <input type="date" className="landing-filter w-full p-2 rounded-md" />
                 </div>
-                <Button className="w-full" variant="gradient" disabled>
+                <Button className="landing-button-primary w-full" variant="default" disabled>
                   Book Appointment (Demo)
                 </Button>
               </div>
@@ -713,13 +926,13 @@ export function Homepage() {
 
           {/* Project Management Demo */}
           <div className="grid lg:grid-cols-2 gap-12 mb-16">
-            <Card variant="glass" className="p-6 animate-fade-in" style={{animationDelay: '0.1s'}}>
-              <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">Active Projects</h4>
+            <Card variant="flat" className="landing-card p-6 animate-fade-in" style={{animationDelay: '0.1s'}}>
+              <h4 className="landing-heading font-semibold mb-4">Active Projects</h4>
               <div className="space-y-3">
                 {mockProjects.map((project, index) => (
-                  <div key={project.id} className="p-4 glass rounded-lg border-white/20 dark:border-white/10 animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
+                  <div key={project.id} className="landing-card-strong p-4 rounded-lg animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
                     <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-medium text-gray-900 dark:text-gray-100">{project.projectName}</h5>
+                      <h5 className="landing-heading font-medium">{project.projectName}</h5>
                       <Badge variant={
                         project.status === 'completed' ? 'default' : 
                         project.status === 'in_progress' ? 'secondary' : 'outline'
@@ -727,38 +940,38 @@ export function Homepage() {
                         {project.status.replace('_', ' ')}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Type: {project.projectType}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Duration: {project.estimatedLength} days</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Client: {project.clientName}</p>
+                    <p className="landing-muted-text text-sm mb-1">Type: {project.projectType}</p>
+                    <p className="landing-muted-text text-sm mb-1">Duration: {project.estimatedLength} days</p>
+                    <p className="landing-muted-text text-sm">Client: {project.clientName}</p>
                   </div>
                 ))}
               </div>
             </Card>
             <div className="animate-fade-in" style={{animationDelay: '0.2s'}}>
-              <h3 className="text-2xl font-semibold mb-4 flex items-center">
-                <CheckCircle className="h-6 w-6 text-primary mr-2" />
+              <h3 className="landing-heading text-2xl font-semibold mb-4 flex items-center">
+                <CheckCircle className="landing-accent-text h-6 w-6 mr-2" />
                 Project Management
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
+              <p className="landing-muted-text mb-6">
                 Business owners can create, track, and manage projects from estimate through punch list—
                 remodels, trades, exteriors, and outdoor work. Keep clients informed with real-time updates.
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Create detailed project plans</span>
+                  <CheckCircle className="landing-accent-text h-4 w-4" />
+                  <span className="landing-muted-text text-sm">Create detailed project plans</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Track project progress and milestones</span>
+                  <CheckCircle className="landing-accent-text h-4 w-4" />
+                  <span className="landing-muted-text text-sm">Track project progress and milestones</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Manage timelines and deadlines</span>
+                  <CheckCircle className="landing-accent-text h-4 w-4" />
+                  <span className="landing-muted-text text-sm">Manage timelines and deadlines</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Client communication and updates</span>
+                  <CheckCircle className="landing-accent-text h-4 w-4" />
+                  <span className="landing-muted-text text-sm">Client communication and updates</span>
                 </li>
               </ul>
             </div>
@@ -767,47 +980,47 @@ export function Homepage() {
           {/* Quote Request Feature */}
           <div className="grid lg:grid-cols-2 gap-12 mb-16">
             <div className="animate-fade-in">
-              <h3 className="text-2xl font-semibold mb-4 flex items-center">
-                <Quote className="h-6 w-6 text-primary mr-2" />
+              <h3 className="landing-heading text-2xl font-semibold mb-4 flex items-center">
+                <Quote className="landing-accent-text h-6 w-6 mr-2" />
                 Easy Quote Requests
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
+              <p className="landing-muted-text mb-6">
                 Planning a repair, remodel, or outdoor project? Fill out our intake form with your details, 
                 and we'll connect you with qualified contractors who can provide competitive quotes.
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Free quote requests</span>
+                  <CheckCircle className="landing-accent-text h-4 w-4" />
+                  <span className="landing-muted-text text-sm">Free quote requests</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Upload project photos and videos</span>
+                  <CheckCircle className="landing-accent-text h-4 w-4" />
+                  <span className="landing-muted-text text-sm">Upload project photos and videos</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Multiple quotes from verified professionals</span>
+                  <CheckCircle className="landing-accent-text h-4 w-4" />
+                  <span className="landing-muted-text text-sm">Multiple quotes from verified professionals</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">No obligation to accept any quotes</span>
+                  <CheckCircle className="landing-accent-text h-4 w-4" />
+                  <span className="landing-muted-text text-sm">No obligation to accept any quotes</span>
                 </li>
               </ul>
             </div>
-            <Card variant="glass" className="p-6 animate-fade-in" style={{animationDelay: '0.2s'}}>
-              <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">Ready to Get Started?</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <Card variant="flat" className="landing-card p-6 animate-fade-in" style={{animationDelay: '0.2s'}}>
+              <h4 className="landing-heading font-semibold mb-4">Ready to Get Started?</h4>
+              <p className="landing-muted-text text-sm mb-4">
                 Submit your project details and receive quotes from qualified contractors in your area.
               </p>
               <Button 
                 onClick={() => setShowIntakeModal(true)}
-                className="w-full"
-                variant="gradient"
+                className="landing-button-primary w-full"
+                variant="default"
               >
                 <Quote className="mr-2 h-4 w-4" />
                 Request Free Quote
               </Button>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+              <p className="landing-muted-text text-xs mt-2 text-center">
                 Takes less than 5 minutes
               </p>
             </Card>
@@ -816,30 +1029,30 @@ export function Homepage() {
           {/* Testimonials Demo */}
           <div className="grid lg:grid-cols-2 gap-12">
             <div className="animate-fade-in">
-              <h3 className="text-2xl font-semibold mb-4 flex items-center">
-                <Star className="h-6 w-6 text-primary mr-2" />
+              <h3 className="landing-heading text-2xl font-semibold mb-4 flex items-center">
+                <Star className="landing-accent-text h-6 w-6 mr-2" />
                 Customer Reviews & Testimonials
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
+              <p className="landing-muted-text mb-6">
                 Build trust with potential clients through authentic customer reviews.
                 Business owners can highlight their best testimonials to showcase their expertise.
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
                   <Star className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">5-star rating system</span>
+                  <span className="landing-muted-text text-sm">5-star rating system</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Star className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Detailed written reviews</span>
+                  <span className="landing-muted-text text-sm">Detailed written reviews</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Star className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Highlight featured testimonials</span>
+                  <span className="landing-muted-text text-sm">Highlight featured testimonials</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Star className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Project-specific feedback</span>
+                  <span className="landing-muted-text text-sm">Project-specific feedback</span>
                 </li>
               </ul>
             </div>
@@ -847,8 +1060,8 @@ export function Homepage() {
               {mockTestimonials.map((testimonial, index) => (
                 <Card 
                   key={testimonial.id} 
-                  variant={testimonial.highlighted ? "elevated" : "glass"}
-                  className={`${testimonial.highlighted ? 'ring-2 ring-yellow-400/50' : ''} animate-fade-in`}
+                  variant="flat"
+                  className={`landing-card ${testimonial.highlighted ? 'ring-2 ring-yellow-400/50' : ''} animate-fade-in`}
                   style={{animationDelay: `${index * 0.1}s`}}
                 >
                   <CardContent className="p-4">
@@ -869,9 +1082,9 @@ export function Homepage() {
                         )}
                       </div>
                     </div>
-                    <h4 className="font-semibold text-sm mb-1 text-gray-900 dark:text-gray-100">{testimonial.title}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{testimonial.description}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500">- {testimonial.client}</p>
+                    <h4 className="landing-heading font-semibold text-sm mb-1">{testimonial.title}</h4>
+                    <p className="landing-muted-text text-sm mb-2">{testimonial.description}</p>
+                    <p className="landing-muted-text text-xs">- {testimonial.client}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -881,25 +1094,51 @@ export function Homepage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 px-4 gradient-bg text-white relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-primary/20 via-transparent to-violet-500/20"></div>
-        
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="landing-section-title text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="landing-muted-text text-lg">
+              Quick answers about how quotes, projects, and collaboration work in {displayBrandName}.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <Card
+                key={faq.question}
+                variant="flat"
+                className="landing-card animate-fade-in"
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
+                <CardHeader className="pb-3">
+                  <CardTitle className="landing-heading text-lg">{faq.question}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="landing-muted-text leading-relaxed">{faq.answer}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="landing-cta py-16 px-4 relative overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-4xl font-bold mb-4 animate-fade-in">Ready to Get Started?</h2>
-          <p className="text-xl mb-8 opacity-90 animate-fade-in" style={{animationDelay: '0.2s'}}>
-            Join Atheca today and transform how you manage contracting work.
+          <h2 className="landing-heading text-4xl font-bold mb-4 animate-fade-in">Ready to Get Started?</h2>
+          <p className="landing-muted-text text-xl mb-8 opacity-90 animate-fade-in" style={{animationDelay: '0.2s'}}>
+            Join {displayBrandName} today and transform how you manage contracting work.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{animationDelay: '0.4s'}}>
             <Button 
               size="xl" 
-              variant="secondary"
+              variant="outline"
               onClick={() => {
                 setAuthMode("signup");
                 setShowAuthModal(true);
               }}
-              className="px-8 py-4 bg-white text-primary hover:bg-gray-100"
+              className="landing-button-secondary px-8 py-4"
             >
               Sign Up as Business Owner
             </Button>
@@ -910,7 +1149,7 @@ export function Homepage() {
                 setAuthMode("signup");
                 setShowAuthModal(true);
               }}
-              className="px-8 py-4 bg-transparent text-white border-2 border-white hover:bg-white hover:text-primary"
+              className="landing-button-secondary px-8 py-4"
             >
               Sign Up as Client
             </Button>
@@ -919,22 +1158,26 @@ export function Homepage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm text-gray-900 dark:text-gray-100 py-12 px-4 border-t border-gray-200 dark:border-gray-700">
+      <footer className="landing-footer py-12 px-4 border-t">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <BrandIdentity
                 logoClassName="h-12 w-12"
-                nameClassName="text-2xl font-bold gradient-text"
+                nameClassName="landing-heading text-2xl font-bold"
+                taglineClassName="landing-muted-text text-xs"
                 className="mb-4"
+                brandName={displayBrandName}
+                logoSrc={displayLogoSrc}
+                showTagline
               />
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
+              <p className="landing-muted-text text-sm">
                 Quotes, scheduling, and project management for general contractors and the clients who hire them.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">Services</h4>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <h4 className="landing-heading font-semibold mb-4">Services</h4>
+              <ul className="landing-muted-text space-y-2 text-sm">
                 <li>Remodeling & additions</li>
                 <li>Electrical & plumbing</li>
                 <li>Roofing & exteriors</li>
@@ -942,8 +1185,8 @@ export function Homepage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">Platform</h4>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <h4 className="landing-heading font-semibold mb-4">Platform</h4>
+              <ul className="landing-muted-text space-y-2 text-sm">
                 <li>Appointment Booking</li>
                 <li>Project Management</li>
                 <li>Customer Reviews</li>
@@ -951,8 +1194,8 @@ export function Homepage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">Contact</h4>
-              <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <h4 className="landing-heading font-semibold mb-4">Contact</h4>
+              <div className="landing-muted-text space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
                   <span>(555) 123-4567</span>
@@ -968,8 +1211,8 @@ export function Homepage() {
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-            <p>&copy; 2026 Atheca. All rights reserved. | <span className="gradient-text">Demo data shown for illustration purposes.</span></p>
+          <div className="mt-8 pt-8 text-center text-sm landing-muted-text" style={{ borderTop: "1px solid var(--landing-border)" }}>
+            <p>&copy; 2026 {displayBrandName}. All rights reserved. | <span className="landing-accent-text">Demo data shown for illustration purposes.</span></p>
           </div>
         </div>
       </footer>
@@ -1145,6 +1388,7 @@ export function Homepage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </>
   );
 }

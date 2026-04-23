@@ -18,15 +18,15 @@ const MobileSidebarToggle = React.forwardRef<HTMLButtonElement, MobileSidebarTog
         size="sm"
         onClick={onToggle}
         className={cn(
-          "lg:hidden fixed top-3 left-3 sm:top-4 sm:left-4 z-50 h-11 w-11 rounded-xl border border-gray-200/90 dark:border-gray-700/90 bg-white/95 dark:bg-gray-800/95 shadow-md backdrop-blur-sm hover:shadow-lg transition-all duration-200",
+          "lg:hidden fixed top-3 left-3 sm:top-4 sm:left-4 z-50 h-10 w-10 border border-border bg-card/95 backdrop-blur-sm hover:bg-accent hover:border-primary transition-all duration-150",
           className
         )}
         {...props}
       >
         {isOpen ? (
-          <X className="h-4 w-4" />
+          <X className="h-3.5 w-3.5 text-secondary-foreground" />
         ) : (
-          <Menu className="h-4 w-4" />
+          <Menu className="h-3.5 w-3.5 text-secondary-foreground" />
         )}
         <span className="sr-only">
           {isOpen ? "Close sidebar" : "Open sidebar"}

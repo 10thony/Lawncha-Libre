@@ -181,9 +181,9 @@ export function IntakeForm({ onSuccess, onCancel }: IntakeFormProps) {
     return (
       <div className="w-full">
         <div className="p-8 text-center">
-          <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Request Submitted!</h2>
-          <p className="text-gray-600 mb-6">
+          <CheckCircle className="h-16 w-16 text-[#276749] dark:text-emerald-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-foreground mb-2">Request Submitted!</h2>
+          <p className="text-muted-foreground mb-6">
             Thank you for your interest! We've received your quote request and will contact you within 24 hours.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -276,12 +276,12 @@ export function IntakeForm({ onSuccess, onCancel }: IntakeFormProps) {
           {/* File Upload */}
           <div>
             <Label>Images or Videos (Optional)</Label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-600 mb-2">
+            <div className="border-2 border-dashed border-border p-6 text-center">
+              <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground mb-2">
                 Upload photos or videos of your project area
               </p>
-              <p className="text-xs text-gray-500 mb-2">
+              <p className="text-xs text-muted-foreground mb-2">
                 Supported formats: Images (JPG, PNG, GIF) and Videos (MP4, MOV, AVI)
               </p>
               <input
@@ -300,7 +300,7 @@ export function IntakeForm({ onSuccess, onCancel }: IntakeFormProps) {
               >
                 Choose Files
               </Button>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 Max 10 files, up to 32MB each (videos up to 32MB, images up to 4MB)
               </p>
             </div>
@@ -309,17 +309,17 @@ export function IntakeForm({ onSuccess, onCancel }: IntakeFormProps) {
             {files.length > 0 && (
               <div className="mt-4 space-y-2">
                 {files.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <div key={index} className="flex items-center justify-between p-2 bg-secondary">
                     <div className="flex items-center gap-2">
                       <div className="text-sm">
                         {file.name}
-                        <span className="text-gray-500 ml-2">
+                        <span className="text-muted-foreground ml-2">
                           ({(file.size / 1024 / 1024).toFixed(2)} MB)
                         </span>
-                        <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
+                        <span className={`ml-2 px-2 py-1 text-xs ${
                           file.type.startsWith('video/') 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : 'bg-green-100 text-green-800'
+                            ? 'bg-transparent text-primary border border-primary/30' 
+                            : 'bg-transparent text-[#276749] dark:text-emerald-400 border border-border'
                         }`}>
                           {file.type.startsWith('video/') ? 'Video' : 'Image'}
                         </span>
@@ -330,7 +330,7 @@ export function IntakeForm({ onSuccess, onCancel }: IntakeFormProps) {
                       variant="ghost"
                       size="sm"
                       onClick={() => removeFile(index)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-destructive hover:text-destructive"
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -371,12 +371,12 @@ export function IntakeForm({ onSuccess, onCancel }: IntakeFormProps) {
           </div>
 
           {/* Disclaimer */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-card border border-primary/30 p-4">
             <div className="flex items-start gap-2">
-              <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-blue-800">
+              <AlertCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-primary">
                 <p className="font-medium mb-1">What happens next?</p>
-                <ul className="space-y-1 text-blue-700">
+                <ul className="space-y-1 text-primary">
                   <li>• We'll review your request and match you with qualified contractors</li>
                   <li>• You'll receive quotes from interested professionals within 24 hours</li>
                   <li>• Compare quotes and choose the best fit for your project</li>

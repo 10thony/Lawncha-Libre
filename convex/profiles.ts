@@ -3,6 +3,25 @@ import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 
+const vProfileDoc = v.object({
+  _id: v.id("profiles"),
+  _creationTime: v.number(),
+  clerkUserId: v.string(),
+  name: v.string(),
+  userType: v.union(v.literal("client"), v.literal("business"), v.literal("employee")),
+  businessName: v.optional(v.string()),
+  businessDescription: v.optional(v.string()),
+  phone: v.optional(v.string()),
+  address: v.optional(v.string()),
+  services: v.optional(v.array(v.string())),
+  companyId: v.optional(v.id("profiles")),
+  employeeStatus: v.optional(v.union(
+    v.literal("pending"),
+    v.literal("approved"),
+    v.literal("rejected")
+  )),
+});
+
 function randomInviteToken(): string {
   const bytes = new Uint8Array(24);
   crypto.getRandomValues(bytes);
@@ -25,27 +44,7 @@ async function getValidInviteForToken(
 
 export const getCurrentProfile = query({
   args: {},
-  returns: v.union(
-    v.object({
-      _id: v.id("profiles"),
-      _creationTime: v.number(),
-      clerkUserId: v.string(),
-      name: v.string(),
-      userType: v.union(v.literal("client"), v.literal("business"), v.literal("employee")),
-      businessName: v.optional(v.string()),
-      businessDescription: v.optional(v.string()),
-      phone: v.optional(v.string()),
-      address: v.optional(v.string()),
-      services: v.optional(v.array(v.string())),
-      companyId: v.optional(v.id("profiles")),
-      employeeStatus: v.optional(v.union(
-        v.literal("pending"),
-        v.literal("approved"),
-        v.literal("rejected")
-      )),
-    }),
-    v.null()
-  ),
+  returns: v.union(vProfileDoc, v.null()),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
@@ -128,28 +127,47 @@ export const createProfile = mutation({
   },
 });
 
+/**
+ * One-off migration helper:
+ * removes deprecated `personalization` from a profile document by id.
+ */
+export const clearDeprecatedPersonalizationField = mutation({
+  args: {
+    profileId: v.id("profiles"),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.profileId, {
+      personalization: undefined,
+    } as any);
+    return null;
+  },
+});
+
+/**
+ * One-off no-arg cleanup for known stale profile docs.
+ * Useful when CLI JSON argument escaping is problematic.
+ */
+export const clearKnownDeprecatedPersonalizationFields = mutation({
+  args: {},
+  returns: v.null(),
+  handler: async (ctx) => {
+    const profiles = await ctx.db.query("profiles").collect();
+    for (const profile of profiles) {
+      if ("personalization" in profile) {
+        await ctx.db.patch(profile._id, {
+          personalization: undefined,
+        } as any);
+      }
+    }
+
+    return null;
+  },
+});
+
 export const getBusinessOwners = query({
   args: {},
-  returns: v.array(
-    v.object({
-      _id: v.id("profiles"),
-      _creationTime: v.number(),
-      clerkUserId: v.string(),
-      name: v.string(),
-      userType: v.union(v.literal("client"), v.literal("business"), v.literal("employee")),
-      businessName: v.optional(v.string()),
-      businessDescription: v.optional(v.string()),
-      phone: v.optional(v.string()),
-      address: v.optional(v.string()),
-      services: v.optional(v.array(v.string())),
-      companyId: v.optional(v.id("profiles")),
-      employeeStatus: v.optional(v.union(
-        v.literal("pending"),
-        v.literal("approved"),
-        v.literal("rejected")
-      )),
-    })
-  ),
+  returns: v.array(vProfileDoc),
   handler: async (ctx) => {
     const profiles = await ctx.db
       .query("profiles")
@@ -436,26 +454,7 @@ export const rejectEmployeeRequest = mutation({
 
 export const getCompanyEmployees = query({
   args: {},
-  returns: v.array(
-    v.object({
-      _id: v.id("profiles"),
-      _creationTime: v.number(),
-      clerkUserId: v.string(),
-      name: v.string(),
-      userType: v.union(v.literal("client"), v.literal("business"), v.literal("employee")),
-      businessName: v.optional(v.string()),
-      businessDescription: v.optional(v.string()),
-      phone: v.optional(v.string()),
-      address: v.optional(v.string()),
-      services: v.optional(v.array(v.string())),
-      companyId: v.optional(v.id("profiles")),
-      employeeStatus: v.optional(v.union(
-        v.literal("pending"),
-        v.literal("approved"),
-        v.literal("rejected")
-      )),
-    })
-  ),
+  returns: v.array(vProfileDoc),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
@@ -479,3 +478,4 @@ export const getCompanyEmployees = query({
     return employees.filter((employee) => employee.userType === "employee");
   },
 });
+

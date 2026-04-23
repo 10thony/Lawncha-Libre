@@ -28,7 +28,7 @@ export function TestimonialsDashboard({ profile }: TestimonialsDashboardProps) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">
+        <h2 className="font-serif-display text-2xl text-foreground">
           {profile.userType === "business" ? "Customer Reviews" : "My Reviews"}
         </h2>
         {profile.userType === "client" && (
@@ -67,8 +67,8 @@ export function TestimonialsDashboard({ profile }: TestimonialsDashboardProps) {
         ))}
         {!testimonials?.length && (
           <div className="text-center py-12">
-            <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">
+            <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">
               {profile.userType === "business" 
                 ? "No reviews yet" 
                 : "You haven't written any reviews yet"
@@ -106,30 +106,30 @@ function TestimonialCard({ testimonial, userType }: any) {
       <Star
         key={i}
         className={`h-4 w-4 ${
-          i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
+          i < rating ? "text-yellow-400 fill-current" : "text-muted-foreground"
         }`}
       />
     ));
   };
 
   return (
-    <div className={`bg-white p-6 rounded-lg shadow-sm border ${
-      testimonial.isHighlighted ? "ring-2 ring-yellow-400" : ""
+    <div className={`bg-card p-6 border ${
+      testimonial.isHighlighted ? "ring-2 ring-primary" : ""
     }`}>
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-lg font-semibold">{testimonial.title}</h3>
+            <h3 className="font-serif-display text-lg text-foreground">{testimonial.title}</h3>
             {testimonial.isHighlighted && (
               <Heart className="h-4 w-4 text-yellow-500 fill-current" />
             )}
           </div>
           <div className="flex items-center gap-2 mb-2">
             {renderStars(testimonial.rating)}
-            <span className="text-sm text-gray-600">({testimonial.rating}/5)</span>
+            <span className="text-sm text-muted-foreground">({testimonial.rating}/5)</span>
           </div>
-          <p className="text-gray-600 mb-3">{testimonial.description}</p>
-          <div className="text-sm text-gray-500">
+          <p className="text-muted-foreground mb-3">{testimonial.description}</p>
+          <div className="text-sm text-muted-foreground">
             <p>
               {userType === "business" 
                 ? `Client ID: ${testimonial.clientClerkId}`
@@ -212,7 +212,7 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
               className={`h-6 w-6 ${
                 i < testimonialData.rating 
                   ? "text-yellow-400 fill-current" 
-                  : "text-gray-300 hover:text-yellow-300"
+                  : "text-muted-foreground hover:text-yellow-300"
               }`}
             />
           </button>
@@ -270,10 +270,10 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
         {(testimonialData.imageUrls.length > 0 || selectedFiles.length > 0) && (
           <div className="grid grid-cols-4 gap-2">
             {testimonialData.imageUrls.map((url) => (
-              <img key={url} src={url} alt="uploaded" className="h-20 w-full object-cover rounded border" />
+              <img key={url} src={url} alt="uploaded" className="h-20 w-full object-cover border" />
             ))}
             {selectedFiles.map((f, idx) => (
-              <img key={idx} src={URL.createObjectURL(f)} alt={f.name} className="h-20 w-full object-cover rounded border" />
+              <img key={idx} src={URL.createObjectURL(f)} alt={f.name} className="h-20 w-full object-cover border" />
             ))}
           </div>
         )}
@@ -334,7 +334,7 @@ function CreateTestimonialForm({ businessOwners, projects, onSuccess }: any) {
         <Label>Rating</Label>
         <div className="flex items-center gap-2">
           {renderStarRating()}
-          <span className="text-sm text-gray-600">({testimonialData.rating}/5)</span>
+          <span className="text-sm text-muted-foreground">({testimonialData.rating}/5)</span>
         </div>
       </div>
 
@@ -401,7 +401,7 @@ function ReviewDetailsDialog({ testimonial, currentUserId, onClose }: { testimon
             {isAuthor ? (
               <Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
             ) : (
-              <div className="text-sm text-gray-900">{testimonial.title}</div>
+              <div className="text-sm text-foreground">{testimonial.title}</div>
             )}
           </div>
           <div>
@@ -415,17 +415,17 @@ function ReviewDetailsDialog({ testimonial, currentUserId, onClose }: { testimon
                     onClick={() => setDraft({ ...draft, rating: i + 1 })}
                     className="focus:outline-none"
                   >
-                    <Star className={`h-6 w-6 ${i < draft.rating ? "text-yellow-400 fill-current" : "text-gray-300"}`} />
+                    <Star className={`h-6 w-6 ${i < draft.rating ? "text-yellow-400 fill-current" : "text-muted-foreground"}`} />
                   </button>
                 ))}
-                <span className="text-sm text-gray-600">({draft.rating}/5)</span>
+                <span className="text-sm text-muted-foreground">({draft.rating}/5)</span>
               </div>
             ) : (
               <div className="flex items-center gap-2">
                 {Array.from({ length: 5 }, (_, i) => (
-                  <Star key={i} className={`h-4 w-4 ${i < testimonial.rating ? "text-yellow-400 fill-current" : "text-gray-300"}`} />
+                  <Star key={i} className={`h-4 w-4 ${i < testimonial.rating ? "text-yellow-400 fill-current" : "text-muted-foreground"}`} />
                 ))}
-                <span className="text-sm text-gray-600">({testimonial.rating}/5)</span>
+                <span className="text-sm text-muted-foreground">({testimonial.rating}/5)</span>
               </div>
             )}
           </div>
@@ -434,7 +434,7 @@ function ReviewDetailsDialog({ testimonial, currentUserId, onClose }: { testimon
             {isAuthor ? (
               <Textarea rows={4} value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
             ) : (
-              <p className="text-sm text-gray-700">{testimonial.description}</p>
+              <p className="text-sm text-secondary-foreground">{testimonial.description}</p>
             )}
           </div>
           {!!testimonial.imageUrls?.length && (
@@ -442,7 +442,7 @@ function ReviewDetailsDialog({ testimonial, currentUserId, onClose }: { testimon
               <Label>Images</Label>
               <div className="grid grid-cols-4 gap-2 mt-1">
                 {testimonial.imageUrls.map((url: string) => (
-                  <img key={url} src={url} alt="review" className="h-20 w-full object-cover rounded border" />
+                  <img key={url} src={url} alt="review" className="h-20 w-full object-cover border" />
                 ))}
               </div>
             </div>

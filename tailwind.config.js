@@ -9,18 +9,7 @@ export default {
   ],
   prefix: "",
   safelist: [
-    'gradient-bg',
-    'glass',
     'animate-pulse-glow',
-    'gradient-text',
-    'neumorphism',
-    'neumorphism-inset',
-    'shadow-glass',
-    'shadow-glass-dark',
-    'shadow-modern',
-    'shadow-modern-lg',
-    'shadow-neumorphism',
-    'shadow-neumorphism-inset',
   ],
   theme: {
     container: {
@@ -38,11 +27,11 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#059669", // emerald-600 - more modern green
-          foreground: "#ffffff",
-          hover: "#047857", // emerald-700
-          light: "#10b981", // emerald-500
-          dark: "#064e3b", // emerald-900
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+          hover: "#fbbf24",
+          light: "#fbbf24",
+          dark: "#b45309",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -68,35 +57,55 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Modern gradient colors
-        gradient: {
-          start: "#059669", // emerald-600
-          middle: "#0891b2", // cyan-600
-          end: "#7c3aed", // violet-600
-        },
-        // Glass effect colors
-        glass: {
-          light: "rgba(255, 255, 255, 0.1)",
-          dark: "rgba(0, 0, 0, 0.1)",
+        warroom: {
+          bg: "#0a0a0a",
+          surface: "#0d0d0d",
+          "surface-alt": "#0f0f0f",
+          "surface-hover": "#111010",
+          border: "#292524",
+          "border-dim": "#1c1917",
+          "border-task": "#1a1918",
+          text: "#e5e5e5",
+          "text-strong": "#fafaf9",
+          "text-muted": "#a8a29e",
+          "text-dim": "#78716c",
+          "text-faint": "#57534e",
+          "text-ghost": "#44403c",
+          amber: "#f59e0b",
+          "amber-bright": "#fbbf24",
+          green: "#22c55e",
+          "green-soft": "#34d399",
+          blue: "#60a5fa",
+          red: "#dc2626",
+          "red-soft": "#f87171",
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        container: "0.75rem", // increased for more modern look
-        glass: "1rem",
+        lg: "0px",
+        md: "0px",
+        sm: "0px",
+        container: "0px",
+        glass: "0px",
       },
-      backdropBlur: {
-        xs: "2px",
+      fontFamily: {
+        sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+        display: ['"Chakra Petch"', 'system-ui', 'sans-serif'],
+        // Legacy class name: was DM Serif; now matches tactical display (Chakra Petch).
+        'serif-display': ['"Chakra Petch"', 'system-ui', 'sans-serif'],
+        azeret: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
       },
-      boxShadow: {
-        'neumorphism': '8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff',
-        'neumorphism-inset': 'inset 8px 8px 16px #d1d9e6, inset -8px -8px 16px #ffffff',
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-        'glass-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-        'modern': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'modern-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+      fontSize: {
+        'xs': ['0.625rem', { lineHeight: '1rem', letterSpacing: '0.05em' }],
+        'sm': ['0.75rem', { lineHeight: '1.1rem', letterSpacing: '0.02em' }],
+        'base': ['0.8125rem', { lineHeight: '1.25rem' }],
+        'lg': ['1rem', { lineHeight: '1.5rem' }],
+        'xl': ['1.125rem', { lineHeight: '1.5rem' }],
+        '2xl': ['1.25rem', { lineHeight: '1.75rem' }],
+        '3xl': ['1.5rem', { lineHeight: '1.875rem' }],
+        '4xl': ['1.75rem', { lineHeight: '2rem' }],
+        '5xl': ['2rem', { lineHeight: '1' }],
+        '6xl': ['2.5rem', { lineHeight: '1' }],
       },
       keyframes: {
         "accordion-down": {
@@ -115,13 +124,9 @@ export default {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(0)" },
         },
-        "bounce-subtle": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-4px)" },
-        },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 5px rgba(5, 150, 105, 0.5)" },
-          "50%": { boxShadow: "0 0 20px rgba(5, 150, 105, 0.8)" },
+          "0%, 100%": { boxShadow: "0 0 5px hsl(var(--primary) / 0.4)" },
+          "50%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.7)" },
         },
       },
       animation: {
@@ -129,24 +134,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.5s ease-out",
         "slide-in": "slide-in 0.3s ease-out",
-        "bounce-subtle": "bounce-subtle 2s infinite",
         "pulse-glow": "pulse-glow 2s infinite",
-      },
-      fontFamily: {
-        'sans': ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
-        'display': ['Inter', 'ui-sans-serif', 'system-ui'],
-      },
-      fontSize: {
-        'xs': ['0.75rem', { lineHeight: '1rem' }],
-        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
-        'base': ['1rem', { lineHeight: '1.5rem' }],
-        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
-        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
-        '2xl': ['1.5rem', { lineHeight: '2rem' }],
-        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
-        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
-        '5xl': ['3rem', { lineHeight: '1' }],
-        '6xl': ['3.75rem', { lineHeight: '1' }],
       },
     },
   },
