@@ -15,7 +15,9 @@ import type {
 } from "convex/server";
 import type * as appointments from "../appointments.js";
 import type * as auth from "../auth.js";
+import type * as businesses from "../businesses.js";
 import type * as crons from "../crons.js";
+import type * as demoSeed from "../demoSeed.js";
 import type * as encryption from "../encryption.js";
 import type * as facebookProjectPort from "../facebookProjectPort.js";
 import type * as http from "../http.js";
@@ -41,7 +43,9 @@ import type * as validators from "../validators.js";
 declare const fullApi: ApiFromModules<{
   appointments: typeof appointments;
   auth: typeof auth;
+  businesses: typeof businesses;
   crons: typeof crons;
+  demoSeed: typeof demoSeed;
   encryption: typeof encryption;
   facebookProjectPort: typeof facebookProjectPort;
   http: typeof http;

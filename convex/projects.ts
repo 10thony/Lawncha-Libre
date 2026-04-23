@@ -35,6 +35,12 @@ const projectValidator = v.object({
   ),
   rejectionReason: v.optional(v.string()),
   notes: v.optional(v.string()),
+  assignedEmployees: v.optional(v.array(v.string())),
+  isFromFacebookPost: v.optional(v.boolean()),
+  facebookPostId: v.optional(v.string()),
+  facebookPostUrl: v.optional(v.string()),
+  isPublicShowcase: v.optional(v.boolean()),
+  projectDescription: v.optional(v.string()),
 });
 
 export const getMyProjects = query({

@@ -24,6 +24,23 @@ export default defineSchema({
     .index("by_company", ["companyId"])
     .index("by_employee_status", ["employeeStatus"]),
 
+  // Business entities (a business owner can manage multiple)
+  businesses: defineTable({
+    ownerProfileId: v.id("profiles"),
+    ownerClerkUserId: v.string(),
+    name: v.string(),
+    description: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    address: v.optional(v.string()),
+    services: v.optional(v.array(v.string())),
+    isPrimary: v.optional(v.boolean()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_owner_profile", ["ownerProfileId"])
+    .index("by_owner_clerk_user", ["ownerClerkUserId"])
+    .index("by_owner_primary", ["ownerClerkUserId", "isPrimary"]),
+
   // Appointment slots and bookings
   appointments: defineTable({
     businessOwnerClerkId: v.string(),

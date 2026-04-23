@@ -100,11 +100,31 @@ export const createProfile = mutation({
       }
     }
 
-    return await ctx.db.insert("profiles", {
+    const profileId = await ctx.db.insert("profiles", {
       clerkUserId: identity.subject,
       ...profileFields,
       employeeStatus: args.userType === "employee" ? "pending" : undefined,
     });
+
+    // Seed first business entity for business owners so legacy profile fields
+    // become a fully managed business record.
+    if (args.userType === "business" && args.businessName) {
+      const now = Date.now();
+      await ctx.db.insert("businesses", {
+        ownerProfileId: profileId,
+        ownerClerkUserId: identity.subject,
+        name: args.businessName.trim(),
+        description: args.businessDescription?.trim() || undefined,
+        phone: args.phone?.trim() || undefined,
+        address: args.address?.trim() || undefined,
+        services: args.services?.map((service) => service.trim()).filter(Boolean),
+        isPrimary: true,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+
+    return profileId;
   },
 });
 
