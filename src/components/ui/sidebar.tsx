@@ -165,7 +165,7 @@ const SidebarGroup = React.forwardRef<HTMLDivElement, { children: React.ReactNod
     return (
       <div
         ref={ref}
-        className={cn("flex-1 overflow-y-auto", className)}
+        className={cn("overflow-y-auto", className)}
         {...props}
       >
         {children}

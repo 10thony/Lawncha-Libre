@@ -43,7 +43,6 @@ import {
 } from "lucide-react";
 import {
   getSidebarSections,
-  getTabLabel,
   type TabId,
 } from "../config/toolbeltNav";
 
@@ -129,6 +128,7 @@ export function Dashboard({ profile }: DashboardProps) {
                     logoClassName="h-10 w-10"
                     nameClassName="text-lg font-semibold text-primary"
                     showTagline
+                    tagline={profile.businessName || user?.fullName || user?.firstName || ""}
                   />
                 )}
                 {isSidebarCollapsed && (
@@ -174,7 +174,7 @@ export function Dashboard({ profile }: DashboardProps) {
                         {user?.firstName ||
                           user?.emailAddresses[0]?.emailAddress}
                       </p>
-                      <p className="text-xs text-muted-foreground truncate">
+                      <p className="text-[10px] font-bold tracking-[0.1em] uppercase text-muted-foreground truncate">
                         {profile.userType === "business"
                           ? "Business Owner"
                           : profile.userType === "employee"
@@ -217,43 +217,6 @@ export function Dashboard({ profile }: DashboardProps) {
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Header */}
-        <div className="bg-card border-b border-border px-4 py-4 sm:px-6 lg:px-6">
-          <div className="flex flex-col gap-3 pl-12 sm:pl-16 lg:pl-6 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <h1 className="font-serif-display text-xl text-foreground sm:text-2xl break-words">
-                {getTabLabel(activeTab)}
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1 truncate sm:whitespace-normal">
-                Welcome back,{" "}
-                {user?.firstName || user?.emailAddresses[0]?.emailAddress}
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-              <Badge
-                variant={
-                  profile.userType === "business"
-                    ? "default"
-                    : profile.userType === "employee"
-                      ? "secondary"
-                      : "outline"
-                }
-              >
-                {profile.userType === "business"
-                  ? "Business Owner"
-                  : profile.userType === "employee"
-                    ? "Employee"
-                    : "Client"}
-              </Badge>
-              {profile.businessName && (
-                <span className="text-muted-foreground text-sm break-words">
-                  • {profile.businessName}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Content */}
         <div className="flex-1 overflow-auto">
           <div
