@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import { useUser } from "@clerk/react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { 
+import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
@@ -28,28 +27,25 @@ import { VideoUploadDemo } from "./VideoUploadDemo";
 import { SocialConnections } from "./SocialConnections";
 import { SocialFeed } from "./SocialFeed";
 import { SocialMediaManagement } from "./SocialMediaManagement";
-import { FacebookProjectPorting } from "./FacebookProjectPorting";
 import { FacebookIntegrationHub } from "./FacebookIntegrationHub";
 import { EmployeeManagement } from "./EmployeeManagement";
 import { EmployeeDashboard } from "./EmployeeDashboard";
-import { 
-  Calendar, 
-  FolderOpen, 
-  Star, 
-  User, 
-  Building2, 
-  Phone, 
+import { BusinessManagement } from "./BusinessManagement";
+import {
+  Calendar,
+  FolderOpen,
+  Star,
+  User,
+  Building2,
+  Phone,
   Mail,
   MapPin,
-  Settings,
-  Quote,
-  FileVideo,
-  Link,
-  Instagram,
-  Facebook,
-  Users,
-  LogOut
 } from "lucide-react";
+import {
+  getSidebarSections,
+  getTabLabel,
+  type TabId,
+} from "../config/toolbeltNav";
 
 interface DashboardProps {
   profile: any;
@@ -57,16 +53,16 @@ interface DashboardProps {
 
 export function Dashboard({ profile }: DashboardProps) {
   const { user } = useUser();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Read URL parameters to set initial tab
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const tabParam = urlParams.get('tab');
+    const tabParam = urlParams.get("tab");
     if (tabParam) {
-      setActiveTab(tabParam);
+      setActiveTab(tabParam as TabId);
     }
   }, []);
 
@@ -75,65 +71,62 @@ export function Dashboard({ profile }: DashboardProps) {
     return <EmployeeDashboard profile={profile} />;
   }
 
+  const navRole = profile.userType as "business" | "client";
+  const sidebarSections = getSidebarSections(navRole, isSidebarCollapsed);
+
   // Fetch real data from Convex
   const myAppointments = useQuery(api.appointments.getMyAppointments);
   const myProjects = useQuery(api.projects.getMyProjects);
-  const myTestimonials = useQuery(api.testimonials.getTestimonials, 
-    profile.userType === "business" ? { businessOwnerClerkId: profile.clerkUserId } : {}
+  const myTestimonials = useQuery(
+    api.testimonials.getTestimonials,
+    profile.userType === "business"
+      ? { businessOwnerClerkId: profile.clerkUserId }
+      : {}
   );
 
   // Calculate stats
   const totalAppointments = myAppointments?.length || 0;
-  const activeProjects = myProjects?.filter(p => p.status === "in_progress").length || 0;
+  const activeProjects =
+    myProjects?.filter((p) => p.status === "in_progress").length || 0;
   const totalProjects = myProjects?.length || 0;
   const totalReviews = myTestimonials?.length || 0;
-  const averageRating = myTestimonials && myTestimonials.length > 0 
-    ? (myTestimonials.reduce((sum, t) => sum + t.rating, 0) / myTestimonials.length).toFixed(1)
-    : "0.0";
+  const averageRating =
+    myTestimonials && myTestimonials.length > 0
+      ? (
+          myTestimonials.reduce((sum, t) => sum + t.rating, 0) /
+          myTestimonials.length
+        ).toFixed(1)
+      : "0.0";
 
-  const tabs = [
-    { id: "overview", label: "Overview", icon: User },
-    { id: "appointments", label: "Appointments", icon: Calendar },
-    { id: "projects", label: "Projects", icon: FolderOpen },
-    { id: "testimonials", label: "Reviews", icon: Star },
-  ];
-
-  // Add quotes tab for business owners, intake forms tab for clients
-  if (profile.userType === "business") {
-    tabs.splice(3, 0, { id: "quotes", label: "Quote Requests", icon: Quote });
-    tabs.splice(4, 0, { id: "employees", label: "Employees", icon: Users });
-  } else if (profile.userType === "client") {
-    tabs.splice(3, 0, { id: "intake", label: "My Requests", icon: Quote });
-  }
-  // Employees don't get additional tabs beyond the basic ones
-  
-  // Add social media tabs
-  tabs.push({ id: "facebook-integration", label: "Facebook Integration", icon: Facebook });
-  tabs.push({ id: "social-feed", label: "Social Feed & Porting", icon: Instagram });
-  
-  // Add video upload demo tab for testing
-  tabs.push({ id: "video-demo", label: "Video Upload Demo", icon: FileVideo });
+  const selectTab = (tabId: TabId) => {
+    setActiveTab(tabId);
+    setIsMobileSidebarOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 flex">
       {/* Mobile Sidebar Toggle */}
-      <MobileSidebarToggle 
-        isOpen={isMobileSidebarOpen} 
-        onToggle={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)} 
+      <MobileSidebarToggle
+        isOpen={isMobileSidebarOpen}
+        onToggle={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
       />
 
-      {/* Sidebar */}
-      <div className={`
-        ${isMobileSidebarOpen ? 'fixed inset-0 z-40' : 'hidden'}
+      {/* Sidebar — full nav on desktop, slide-over on small screens */}
+      <div
+        className={`
+        ${isMobileSidebarOpen ? "fixed inset-0 z-40" : "hidden"}
         lg:!block lg:!relative lg:!z-auto
-        ${isSidebarCollapsed ? 'lg:w-16' : 'lg:w-64'}
+        ${isSidebarCollapsed ? "lg:w-16" : "lg:w-64"}
         transition-all duration-300 ease-in-out
-      `}>
-        <Sidebar className={`
-          ${isMobileSidebarOpen ? 'w-64' : ''}
-          ${isSidebarCollapsed ? 'lg:w-16' : 'lg:w-64'}
+      `}
+      >
+        <Sidebar
+          className={`
+          ${isMobileSidebarOpen ? "w-64" : ""}
+          ${isSidebarCollapsed ? "lg:w-16" : "lg:w-64"}
           h-full
-        `}>
+        `}
+        >
           <SidebarContent>
             <SidebarHeader>
               <div className="flex items-center gap-3">
@@ -155,110 +148,23 @@ export function Dashboard({ profile }: DashboardProps) {
             </SidebarHeader>
 
             <SidebarGroup>
-              <SidebarSection title={!isSidebarCollapsed ? "Main" : undefined}>
-                {tabs.slice(0, 4).map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <SidebarItem
-                      key={tab.id}
-                      isActive={activeTab === tab.id}
-                      onClick={() => {
-                        setActiveTab(tab.id);
-                        setIsMobileSidebarOpen(false);
-                      }}
-                      icon={<Icon className="h-4 w-4" />}
-                      label={tab.label}
-                      isCollapsed={isSidebarCollapsed}
-                    />
-                  );
-                })}
-              </SidebarSection>
-
-              {profile.userType === "business" && (
-                <SidebarSection title={!isSidebarCollapsed ? "Business" : undefined}>
-                  <SidebarItem
-                    isActive={activeTab === "quotes"}
-                    onClick={() => {
-                      setActiveTab("quotes");
-                      setIsMobileSidebarOpen(false);
-                    }}
-                    icon={<Quote className="h-4 w-4" />}
-                    label="Quote Requests"
-                    isCollapsed={isSidebarCollapsed}
-                  />
-                  <SidebarItem
-                    isActive={activeTab === "employees"}
-                    onClick={() => {
-                      setActiveTab("employees");
-                      setIsMobileSidebarOpen(false);
-                    }}
-                    icon={<Users className="h-4 w-4" />}
-                    label="Employees"
-                    isCollapsed={isSidebarCollapsed}
-                  />
+              {sidebarSections.map((section) => (
+                <SidebarSection key={section.sectionId} title={section.title}>
+                  {section.items.map((tab) => {
+                    const Icon = tab.icon;
+                    return (
+                      <SidebarItem
+                        key={tab.id}
+                        isActive={activeTab === tab.id}
+                        onClick={() => selectTab(tab.id)}
+                        icon={<Icon className="h-4 w-4" />}
+                        label={tab.label}
+                        isCollapsed={isSidebarCollapsed}
+                      />
+                    );
+                  })}
                 </SidebarSection>
-              )}
-
-              {profile.userType === "client" && (
-                <SidebarSection title={!isSidebarCollapsed ? "Requests" : undefined}>
-                  <SidebarItem
-                    isActive={activeTab === "intake"}
-                    onClick={() => {
-                      setActiveTab("intake");
-                      setIsMobileSidebarOpen(false);
-                    }}
-                    icon={<Quote className="h-4 w-4" />}
-                    label="My Requests"
-                    isCollapsed={isSidebarCollapsed}
-                  />
-                </SidebarSection>
-              )}
-
-              <SidebarSection title={!isSidebarCollapsed ? "Social Media" : undefined}>
-                <SidebarItem
-                  isActive={activeTab === "social-feed"}
-                  onClick={() => {
-                    setActiveTab("social-feed");
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  icon={<Instagram className="h-4 w-4" />}
-                  label="Social Feed"
-                  isCollapsed={isSidebarCollapsed}
-                />
-                <SidebarItem
-                  isActive={activeTab === "social-settings"}
-                  onClick={() => {
-                    setActiveTab("social-settings");
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  icon={<Link className="h-4 w-4" />}
-                  label="Social Settings"
-                  isCollapsed={isSidebarCollapsed}
-                />
-                <SidebarItem
-                  isActive={activeTab === "social-management"}
-                  onClick={() => {
-                    setActiveTab("social-management");
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  icon={<Settings className="h-4 w-4" />}
-                  label="Social Management"
-                  isCollapsed={isSidebarCollapsed}
-                />
-              </SidebarSection>
-
-              <SidebarSection title={!isSidebarCollapsed ? "Tools" : undefined}>
-                <SidebarItem
-                  isActive={activeTab === "video-demo"}
-                  onClick={() => {
-                    setActiveTab("video-demo");
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  icon={<FileVideo className="h-4 w-4" />}
-                  label="Video Upload Demo"
-                  isCollapsed={isSidebarCollapsed}
-                />
-              </SidebarSection>
+              ))}
             </SidebarGroup>
 
             <SidebarFooter>
@@ -270,24 +176,27 @@ export function Dashboard({ profile }: DashboardProps) {
                   {!isSidebarCollapsed && (
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {user?.firstName || user?.emailAddresses[0]?.emailAddress}
+                        {user?.firstName ||
+                          user?.emailAddresses[0]?.emailAddress}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {profile.userType === "business" ? "Business Owner" : 
-                         profile.userType === "employee" ? "Employee" : 
-                         "Client"}
+                        {profile.userType === "business"
+                          ? "Business Owner"
+                          : profile.userType === "employee"
+                            ? "Employee"
+                            : "Client"}
                       </p>
                     </div>
                   )}
                 </div>
-                
+
                 {!isSidebarCollapsed && (
                   <div className="flex items-center gap-2 px-2">
                     <ThemeToggle />
                     <SignOutButton />
                   </div>
                 )}
-                
+
                 {isSidebarCollapsed && (
                   <div className="flex flex-col items-center gap-2 px-2">
                     <ThemeToggle />
@@ -298,8 +207,7 @@ export function Dashboard({ profile }: DashboardProps) {
             </SidebarFooter>
           </SidebarContent>
 
-          {/* Desktop Sidebar Toggle */}
-          <SidebarToggle 
+          <SidebarToggle
             isCollapsed={isSidebarCollapsed}
             onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           />
@@ -308,7 +216,7 @@ export function Dashboard({ profile }: DashboardProps) {
 
       {/* Mobile Overlay */}
       {isMobileSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
           onClick={() => setIsMobileSidebarOpen(false)}
         />
@@ -317,224 +225,286 @@ export function Dashboard({ profile }: DashboardProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {tabs.find(tab => tab.id === activeTab)?.label || "Dashboard"}
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-4 sm:px-6 lg:px-6">
+          <div className="flex flex-col gap-3 pl-12 sm:pl-16 lg:pl-6 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl break-words">
+                {getTabLabel(activeTab)}
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Welcome back, {user?.firstName || user?.emailAddresses[0]?.emailAddress}
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate sm:whitespace-normal">
+                Welcome back,{" "}
+                {user?.firstName || user?.emailAddresses[0]?.emailAddress}
               </p>
             </div>
-            <div className="flex items-center gap-2">
-                <Badge variant={
-                  profile.userType === "business" ? "default" : 
-                  profile.userType === "employee" ? "secondary" : 
-                  "outline"
-                }>
-                  {profile.userType === "business" ? "Business Owner" : 
-                   profile.userType === "employee" ? "Employee" : 
-                   "Client"}
-                </Badge>
-                {profile.businessName && (
-                <span className="text-gray-600 dark:text-gray-400 text-sm">• {profile.businessName}</span>
-                )}
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              <Badge
+                variant={
+                  profile.userType === "business"
+                    ? "default"
+                    : profile.userType === "employee"
+                      ? "secondary"
+                      : "outline"
+                }
+              >
+                {profile.userType === "business"
+                  ? "Business Owner"
+                  : profile.userType === "employee"
+                    ? "Employee"
+                    : "Client"}
+              </Badge>
+              {profile.businessName && (
+                <span className="text-gray-600 dark:text-gray-400 text-sm break-words">
+                  • {profile.businessName}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto px-6 py-6">
-
-        {/* Tab Content */}
-        <div className="space-y-6">
-          {activeTab === "overview" && (
-            <div className="grid gap-6">
-              {/* Profile Card */}
-              <Card variant="glass" className="animate-fade-in">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-                    <User className="h-5 w-5 text-primary" />
-                    Profile Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</label>
-                        <p className="text-gray-900 dark:text-gray-100">{user?.fullName || "Not provided"}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                          <p className="text-gray-900 dark:text-gray-100">{user?.emailAddresses[0]?.emailAddress}</p>
-                        </div>
-                      </div>
-                      {profile.phone && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</label>
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                            <p className="text-gray-900 dark:text-gray-100">{profile.phone}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-4">
-                      {profile.userType === "business" && (
-                        <>
+          <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6">
+            {/* Tab Content */}
+            <div className="space-y-6">
+              {activeTab === "overview" && (
+                <div className="grid gap-6">
+                  {/* Profile Card */}
+                  <Card variant="glass" className="animate-fade-in">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                        <User className="h-5 w-5 text-primary" />
+                        Profile Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
                           <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Business Name</label>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                              Name
+                            </label>
+                            <p className="text-gray-900 dark:text-gray-100">
+                              {user?.fullName || "Not provided"}
+                            </p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                              Email
+                            </label>
                             <div className="flex items-center gap-2">
-                              <Building2 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                              <p className="text-gray-900 dark:text-gray-100">{profile.businessName || "Not provided"}</p>
+                              <Mail className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                              <p className="text-gray-900 dark:text-gray-100 break-all">
+                                {user?.emailAddresses[0]?.emailAddress}
+                              </p>
                             </div>
                           </div>
-                          {profile.businessDescription && (
+                          {profile.phone && (
                             <div>
-                              <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</label>
-                              <p className="text-gray-900 dark:text-gray-100">{profile.businessDescription}</p>
+                              <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                Phone
+                              </label>
+                              <div className="flex items-center gap-2">
+                                <Phone className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                                <p className="text-gray-900 dark:text-gray-100">
+                                  {profile.phone}
+                                </p>
+                              </div>
                             </div>
                           )}
-                        </>
-                      )}
-                      
-                      {profile.userType === "employee" && profile.companyId && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Company</label>
-                          <div className="flex items-center gap-2">
-                            <Building2 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                            <p className="text-gray-900 dark:text-gray-100">Company Name</p>
-                          </div>
                         </div>
-                      )}
-                      
-                      {profile.address && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Address</label>
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                            <p className="text-gray-900 dark:text-gray-100">{profile.address}</p>
-                          </div>
+
+                        <div className="space-y-4">
+                          {profile.userType === "business" && (
+                            <>
+                              <div>
+                                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                  Business Name
+                                </label>
+                                <div className="flex items-center gap-2">
+                                  <Building2 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                                  <p className="text-gray-900 dark:text-gray-100 break-words">
+                                    {profile.businessName || "Not provided"}
+                                  </p>
+                                </div>
+                              </div>
+                              {profile.businessDescription && (
+                                <div>
+                                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    Description
+                                  </label>
+                                  <p className="text-gray-900 dark:text-gray-100">
+                                    {profile.businessDescription}
+                                  </p>
+                                </div>
+                              )}
+                            </>
+                          )}
+
+                          {profile.userType === "employee" && profile.companyId && (
+                            <div>
+                              <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                Company
+                              </label>
+                              <div className="flex items-center gap-2">
+                                <Building2 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                                <p className="text-gray-900 dark:text-gray-100">
+                                  Company Name
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {profile.address && (
+                            <div>
+                              <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                Address
+                              </label>
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                                <p className="text-gray-900 dark:text-gray-100">
+                                  {profile.address}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {profile.services && profile.services.length > 0 && (
+                            <div>
+                              <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                Services
+                              </label>
+                              <div className="flex flex-wrap gap-2 mt-1">
+                                {profile.services.map(
+                                  (service: string, index: number) => (
+                                    <Badge key={index} variant="outline">
+                                      {service}
+                                    </Badge>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                      
-                      {profile.services && profile.services.length > 0 && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Services</label>
-                          <div className="flex flex-wrap gap-2 mt-1">
-                            {profile.services.map((service: string, index: number) => (
-                              <Badge key={index} variant="outline">
-                                {service}
-                              </Badge>
-                            ))}
-                          </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Quick Stats */}
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <Card
+                      variant="elevated"
+                      className="animate-fade-in"
+                      style={{ animationDelay: "0.1s" }}
+                    >
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {profile.userType === "business"
+                            ? "Total Appointments"
+                            : "My Bookings"}
+                        </CardTitle>
+                        <Calendar className="h-4 w-4 text-primary" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          {totalAppointments}
                         </div>
-                      )}
-                    </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {myAppointments?.filter((a) => a.status === "booked")
+                            .length || 0}{" "}
+                          booked
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card
+                      variant="elevated"
+                      className="animate-fade-in"
+                      style={{ animationDelay: "0.2s" }}
+                    >
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {profile.userType === "business"
+                            ? "Active Projects"
+                            : "My Projects"}
+                        </CardTitle>
+                        <FolderOpen className="h-4 w-4 text-primary" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          {totalProjects}
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {activeProjects} in progress
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card
+                      variant="elevated"
+                      className="animate-fade-in"
+                      style={{ animationDelay: "0.3s" }}
+                    >
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {profile.userType === "business"
+                            ? "Customer Reviews"
+                            : "Reviews Given"}
+                        </CardTitle>
+                        <Star className="h-4 w-4 text-primary" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          {totalReviews}
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {averageRating} average rating
+                        </p>
+                      </CardContent>
+                    </Card>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              )}
 
-              {/* Quick Stats */}
-              <div className="grid md:grid-cols-3 gap-6">
-                <Card variant="elevated" className="animate-fade-in" style={{animationDelay: '0.1s'}}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {profile.userType === "business" ? "Total Appointments" : "My Bookings"}
-                    </CardTitle>
-                    <Calendar className="h-4 w-4 text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{totalAppointments}</div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {myAppointments?.filter(a => a.status === "booked").length || 0} booked
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card variant="elevated" className="animate-fade-in" style={{animationDelay: '0.2s'}}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {profile.userType === "business" ? "Active Projects" : "My Projects"}
-                    </CardTitle>
-                    <FolderOpen className="h-4 w-4 text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{totalProjects}</div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {activeProjects} in progress
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card variant="elevated" className="animate-fade-in" style={{animationDelay: '0.3s'}}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {profile.userType === "business" ? "Customer Reviews" : "Reviews Given"}
-                    </CardTitle>
-                    <Star className="h-4 w-4 text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{totalReviews}</div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {averageRating} average rating
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+              {activeTab === "appointments" && (
+                <AppointmentBooking profile={profile} />
+              )}
+
+              {activeTab === "projects" && (
+                <ProjectsDashboard profile={profile} />
+              )}
+
+              {activeTab === "quotes" && profile.userType === "business" && (
+                <RequestedQuotes profile={profile} />
+              )}
+
+              {activeTab === "employees" && profile.userType === "business" && (
+                <EmployeeManagement profile={profile} />
+              )}
+
+              {activeTab === "businesses" && profile.userType === "business" && (
+                <BusinessManagement />
+              )}
+
+              {activeTab === "intake" && profile.userType === "client" && (
+                <ClientIntakeForms profile={profile} />
+              )}
+
+              {activeTab === "testimonials" && (
+                <TestimonialsDashboard profile={profile} />
+              )}
+
+              {activeTab === "social-feed" && <SocialFeed />}
+
+              {activeTab === "social-settings" && <SocialConnections />}
+
+              {activeTab === "social-management" && <SocialMediaManagement />}
+
+              {activeTab === "facebook-integration" && (
+                <FacebookIntegrationHub />
+              )}
+
+              {activeTab === "video-demo" && <VideoUploadDemo />}
             </div>
-          )}
-
-          {activeTab === "appointments" && (
-            <AppointmentBooking profile={profile} />
-          )}
-
-          {activeTab === "projects" && (
-            <ProjectsDashboard profile={profile} />
-          )}
-
-          {activeTab === "quotes" && profile.userType === "business" && (
-            <RequestedQuotes profile={profile} />
-          )}
-
-          {activeTab === "employees" && profile.userType === "business" && (
-            <EmployeeManagement profile={profile} />
-          )}
-
-          {activeTab === "intake" && profile.userType === "client" && (
-            <ClientIntakeForms profile={profile} />
-          )}
-
-          {activeTab === "testimonials" && (
-            <TestimonialsDashboard profile={profile} />
-          )}
-
-          {activeTab === "social-feed" && (
-            <SocialFeed />
-          )}
-
-          {activeTab === "social-settings" && (
-            <SocialConnections />
-          )}
-
-          {activeTab === "social-management" && (
-            <SocialMediaManagement />
-          )}
-
-          {activeTab === "facebook-integration" && (
-            <FacebookIntegrationHub />
-          )}
-
-          {activeTab === "video-demo" && (
-            <VideoUploadDemo />
-          )}
-          </div>
           </div>
         </div>
       </div>
