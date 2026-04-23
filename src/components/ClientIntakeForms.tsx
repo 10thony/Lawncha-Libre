@@ -213,8 +213,10 @@ export function ClientIntakeForms({ profile }: ClientIntakeFormsProps) {
                 {/* Project Description */}
                 <div>
                   <h3 className="font-semibold mb-3">Project Description</h3>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm whitespace-pre-wrap">{form.projectDescription}</p>
+                  <div className="rounded-lg border border-border bg-muted p-4">
+                    <p className="text-sm text-foreground whitespace-pre-wrap">
+                      {form.projectDescription}
+                    </p>
                   </div>
                 </div>
 

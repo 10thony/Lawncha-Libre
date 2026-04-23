@@ -338,12 +338,13 @@ export function Homepage() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-violet-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Header with Theme Toggle */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-cyan-200/80 dark:border-cyan-800 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex items-center justify-between gap-3">
           <BrandIdentity
-            logoClassName="h-12 w-12"
-            nameClassName="text-2xl font-bold gradient-text"
+            className="min-w-0"
+            logoClassName="h-10 w-10 sm:h-12 sm:w-12"
+            nameClassName="text-xl sm:text-2xl font-bold gradient-text truncate"
           />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <ThemeToggle />
           </div>
         </div>
@@ -367,7 +368,7 @@ export function Homepage() {
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl animate-float" style={{animationDelay: '1s'}}></div>
         
         <div className="max-w-6xl mx-auto text-center relative z-10">
-          <h1 className="text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6 animate-fade-in">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6 animate-fade-in leading-tight">
             Built for Tradies,
             <span className="gradient-text block">made for Customers</span>
           </h1>

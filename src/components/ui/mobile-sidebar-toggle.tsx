@@ -18,7 +18,7 @@ const MobileSidebarToggle = React.forwardRef<HTMLButtonElement, MobileSidebarTog
         size="sm"
         onClick={onToggle}
         className={cn(
-          "lg:hidden fixed top-4 left-4 z-50 h-10 w-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-200",
+          "lg:hidden fixed top-3 left-3 sm:top-4 sm:left-4 z-50 h-11 w-11 rounded-xl border border-gray-200/90 dark:border-gray-700/90 bg-white/95 dark:bg-gray-800/95 shadow-md backdrop-blur-sm hover:shadow-lg transition-all duration-200",
           className
         )}
         {...props}
