@@ -1,10 +1,11 @@
 # Netlify configuration for Atheca
 
 [build]
-  command = "npm run build"
+  command = "pnpm run build"
   publish = "dist"
 
 [build.environment]
+  NETLIFY_USE_PNPM = "true"
   SECRETS_SCAN_ENABLED = "false"
 
 # SPA: invite links and deep paths should serve the app shell

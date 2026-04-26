@@ -67,7 +67,7 @@ convex/
 
 ### Prerequisites
 - Node.js 18+ 
-- npm or yarn
+- pnpm
 - Convex account
 - Clerk account
 - Facebook Developer account (for social integration)
@@ -78,12 +78,12 @@ convex/
    ```bash
    git clone <repository-url>
    cd lawncha-libre
-   npm install
+   pnpm install
    ```
 
 2. **Set up Convex**
    ```bash
-   npx convex dev
+   pnpm convex dev
    ```
 
 3. **Configure environment variables**
@@ -96,7 +96,7 @@ convex/
 
 4. **Start development servers**
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
 ## 🔧 Configuration
@@ -185,13 +185,13 @@ FRONTEND_URL=https://yourdomain.com
 
 ### Development
 ```bash
-npm run dev          # Start both frontend and backend
-npm run dev:frontend # Frontend only
-npm run dev:backend  # Backend only
+pnpm dev          # Start both frontend and backend
+pnpm dev:frontend # Frontend only
+pnpm dev:backend  # Backend only
 ```
 
 ### Production
-1. **Deploy Convex**: `npx convex deploy`
+1. **Deploy Convex**: `pnpm convex deploy`
 2. **Deploy Frontend**: Deploy to Vercel, Netlify, or your preferred platform
 3. **Configure Environment**: Set production environment variables
 4. **Update OAuth URLs**: Update Facebook App and Clerk redirect URIs
