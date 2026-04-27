@@ -7,7 +7,14 @@ import "@uploadthing/react/styles.css";
 import "./index.css";
 import App from "./App";
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+const convexUrl =
+  import.meta.env.VITE_CONVEX_URL || import.meta.env.CONVEX_URL;
+if (!convexUrl) {
+  throw new Error(
+    "Missing Convex deployment URL. Set VITE_CONVEX_URL or CONVEX_URL to your Convex https://….convex.cloud URL. It must be available when `vite build` runs (e.g. add it to Cloudflare build environment variables, then redeploy). See https://docs.convex.dev/production/hosting/"
+  );
+}
+const convex = new ConvexReactClient(convexUrl);
 const clerkLocalization = {
   signIn: {
     start: {

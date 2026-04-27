@@ -124,9 +124,13 @@ For Facebook/Instagram integration, follow the detailed guide:
 
 ### Required for Basic Functionality
 ```bash
-# Convex
+# Convex (frontend: must be present when `vite build` runs — e.g. Cloudflare *build* env vars)
+# Use either name; the app reads both.
+VITE_CONVEX_URL=https://your-deployment.convex.cloud
+CONVEX_URL=https://your-deployment.convex.cloud
+
+# Convex (CLI / server tooling; not bundled into the Vite app)
 CONVEX_DEPLOYMENT=your-convex-deployment
-CONVEX_URL=your-convex-url
 
 # Clerk
 VITE_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key

@@ -31,6 +31,8 @@ window.addEventListener('message', async (message) => {
 
 export default defineConfig({
   plugins: [react(), injectPreviewDev],
+  // Expose VITE_* and CONVEX_* so CONVEX_URL (README / backends) or VITE_CONVEX_URL can be inlined at build time.
+  envPrefix: ["VITE_", "CONVEX_"],
   server: {
     proxy: {
       // Proxy API requests in dev to Convex HTTP router
