@@ -1,0 +1,19 @@
+---
+description: Git and remotes—use jmartinez workspace credentials; avoid auth churn
+alwaysApply: true
+---
+
+# Git: jmartinez workspace
+
+This repo lives under **`c:\projects\jmartinez\`** (e.g. `Lawncha-Libre`). Git remotes, **Git Credential Manager**, **SSH keys**, and **user.name / user.email** for day-to-day work are expected to be configured for that tree and the user’s normal terminal—not for the agent’s sandbox shell.
+
+## For the agent
+
+- **Do not** run `git push`, `git pull`, `git fetch`, `git pull --rebase`, or other **networked** git commands unless the user **explicitly** asked for that step in this turn. These often hang or re-prompt for auth in the agent environment and waste the user’s time.
+- It is fine to run **local** git read-only commands when useful: `git status`, `git diff`, `git log -1`, `git branch`.
+- If a commit or push is needed, **prefer**: make file edits; if the user wanted a commit, stage and commit only when they asked; for **push / sync with remote**, give them the exact commands to run in **their** terminal (from this repo path) so their existing credentials apply in one shot.
+- If the user says they authenticated and want a push: one `git push` attempt is reasonable; if it fails or hangs, **stop** and tell them to run `git pull --rebase origin main` (or merge) and `git push` locally—do not loop on auth or remote rejection.
+
+## Rationale
+
+Repeated authentication prompts usually come from running git over HTTPS/remote in an environment that does not share the same credential helper or session as `c:\projects\jmartinez\`. Respecting this rule keeps git work in the place where credentials already work.
