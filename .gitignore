@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+bun.lockb
 
 # Editor directories and files
 .vscode/*
@@ -27,8 +28,14 @@ dist-ssr
 .env
 .env.prod
 .env.local
+.env.*
+.envrc
 .env.production.local
 .env.development.local
 
+# Cloudflare
+.wrangler/
+
 # Convex
-_generated
+.convex/
+convex/_generated/
